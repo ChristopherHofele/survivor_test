@@ -9,6 +9,8 @@ class Player extends SpriteAnimationComponent
 
   @override
   void onLoad() {
+    priority = 1;
+    debugMode = true;
     animation = SpriteAnimation.fromFrameData(
       game.images.fromCache('monster.png'),
       SpriteAnimationData.sequenced(
