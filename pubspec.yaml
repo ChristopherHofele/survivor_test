@@ -12,8 +12,11 @@ dependencies:
   flutter:
     sdk: flutter
   flame: ^1.33.0
+  flame_tiled: ^3.0.9
 
 flutter:
   assets:
     - assets/images/
+    - assets/images/Terrain/
     - assets/audio/
+    - assets/tiles/
