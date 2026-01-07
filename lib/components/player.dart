@@ -7,6 +7,11 @@ class Player extends SpriteAnimationComponent
     with HasGameReference<SurvivorTest>, TapCallbacks, CollisionCallbacks {
   Player({position}) : super(position: position, size: Vector2(64, 64));
 
+  double moveSpeed = 100;
+  double horizontalMovement = 0;
+  double verticalMovement = 0;
+  Vector2 velocity = Vector2.zero();
+
   @override
   void onLoad() {
     priority = 1;
@@ -20,5 +25,18 @@ class Player extends SpriteAnimationComponent
       ),
     );
     add(CircleHitbox());
+  }
+
+  @override
+  void update(double dt) {
+    _updatePlayerMovement(dt);
+    super.update(dt);
+  }
+
+  void _updatePlayerMovement(double dt) {
+    velocity.x = horizontalMovement * moveSpeed;
+    position.x = velocity.x * dt;
+    velocity.y = verticalMovement * moveSpeed;
+    position.y = velocity.y * dt;
   }
 }
