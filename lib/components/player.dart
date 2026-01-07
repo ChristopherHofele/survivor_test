@@ -8,8 +8,7 @@ class Player extends SpriteAnimationComponent
   Player({position}) : super(position: position, size: Vector2(64, 64));
 
   double moveSpeed = 100;
-  double horizontalMovement = 0;
-  double verticalMovement = 0;
+  Vector2 movementDirection = Vector2.zero();
   Vector2 velocity = Vector2.zero();
 
   @override
@@ -34,9 +33,7 @@ class Player extends SpriteAnimationComponent
   }
 
   void _updatePlayerMovement(double dt) {
-    velocity.x = horizontalMovement * moveSpeed;
-    position.x += velocity.x * dt;
-    velocity.y = verticalMovement * moveSpeed;
-    position.y += velocity.y * dt;
+    velocity = movementDirection * moveSpeed;
+    position += velocity * dt;
   }
 }

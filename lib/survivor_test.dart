@@ -1,8 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
-import 'package:flame/input.dart';
-//import 'package:flutter/painting.dart';
 import 'package:survivor_test/components/player.dart';
 import 'package:survivor_test/level.dart';
 
@@ -11,7 +9,7 @@ class SurvivorTest extends FlameGame
   late final CameraComponent cam;
   late Player player;
   final world = Level();
-  late JoystickComponent _joystick;
+  late JoystickComponent joystick;
 
   @override
   Future<void> onLoad() async {
@@ -21,7 +19,6 @@ class SurvivorTest extends FlameGame
       width: size.x,
       height: size.y,
     );
-    //cam.viewfinder.anchor = Anchor.topLeft;
 
     player = Player(position: Vector2(700, 400));
     add(cam);
@@ -38,7 +35,7 @@ class SurvivorTest extends FlameGame
   }
 
   void addJoystick() {
-    _joystick = JoystickComponent(
+    joystick = JoystickComponent(
       position: Vector2(size.x - 100, size.y - 100),
       priority: 100,
       knob: SpriteComponent(sprite: Sprite(images.fromCache('HUD/Knob.png'))),
@@ -46,47 +43,14 @@ class SurvivorTest extends FlameGame
         sprite: Sprite(images.fromCache('HUD/Joystick.png')),
       ),
     );
-    cam.viewport.add(_joystick);
+    cam.viewport.add(joystick);
   }
 
   void updateJoystick() {
-    switch (_joystick.direction) {
-      case JoystickDirection.left:
-        player.horizontalMovement = -1;
-        player.verticalMovement = 0;
-        break;
-      case JoystickDirection.upLeft:
-        player.horizontalMovement = -1;
-        player.verticalMovement = -1;
-        break;
-      case JoystickDirection.downLeft:
-        player.horizontalMovement = -1;
-        player.verticalMovement = 1;
-        break;
-      case JoystickDirection.right:
-        player.horizontalMovement = 1;
-        player.verticalMovement = 0;
-        break;
-      case JoystickDirection.upRight:
-        player.horizontalMovement = 1;
-        player.verticalMovement = -1;
-        break;
-      case JoystickDirection.downRight:
-        player.horizontalMovement = 1;
-        player.verticalMovement = 1;
-        break;
-      case JoystickDirection.up:
-        player.horizontalMovement = 0;
-        player.verticalMovement = -1;
-        break;
-      case JoystickDirection.down:
-        player.horizontalMovement = 0;
-        player.verticalMovement = 1;
-        break;
-      default:
-        player.horizontalMovement = 0;
-        player.verticalMovement = 0;
-        break;
+    if (joystick.direction != JoystickDirection.idle) {
+      player.movementDirection = joystick.relativeDelta;
+    } else {
+      player.movementDirection = Vector2.zero();
     }
   }
 }
