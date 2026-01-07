@@ -11,7 +11,7 @@ class SurvivorTest extends FlameGame
   late final CameraComponent cam;
   late Player _player;
   final world = Level();
-  late JoystickComponent joystick;
+  late JoystickComponent _joystick;
 
   @override
   Future<void> onLoad() async {
@@ -24,21 +24,21 @@ class SurvivorTest extends FlameGame
     //cam.viewfinder.anchor = Anchor.topLeft;
 
     _player = Player(position: Vector2(700, 400));
-    cam.follow(_player);
     add(cam);
-    //addJoystick();
+    cam.follow(_player);
     add(world..priority = -1);
     world.add(_player);
+    addJoystick();
   }
 
   @override
   void update(double dt) {
-    //updateJoystick();
+    updateJoystick();
     super.update(dt);
   }
 
   void addJoystick() {
-    joystick = JoystickComponent(
+    _joystick = JoystickComponent(
       position: Vector2(size.x - 100, size.y - 100),
       priority: 100,
       knob: SpriteComponent(sprite: Sprite(images.fromCache('HUD/Knob.png'))),
@@ -46,11 +46,11 @@ class SurvivorTest extends FlameGame
         sprite: Sprite(images.fromCache('HUD/Joystick.png')),
       ),
     );
-    add(joystick..priority = 100);
+    add(_joystick);
   }
 
   void updateJoystick() {
-    switch (joystick.direction) {
+    switch (_joystick.direction) {
       case JoystickDirection.left:
       case JoystickDirection.upLeft:
       case JoystickDirection.downLeft:

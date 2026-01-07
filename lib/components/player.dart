@@ -35,8 +35,8 @@ class Player extends SpriteAnimationComponent
 
   void _updatePlayerMovement(double dt) {
     velocity.x = horizontalMovement * moveSpeed;
-    position.x = velocity.x * dt;
+    position.x += velocity.x * dt;
     velocity.y = verticalMovement * moveSpeed;
-    position.y = velocity.y * dt;
+    position.y += velocity.y * dt;
   }
 }
