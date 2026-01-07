@@ -11,6 +11,6 @@ class Level extends World {
     priority = -1;
     level = await TiledComponent.load('Level1.tmx', Vector2.all(16));
     add(level);
-    return super.onLoad();
+    super.onLoad();
   }
 }

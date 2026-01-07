@@ -2,7 +2,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
-import 'package:flutter/painting.dart';
+//import 'package:flutter/painting.dart';
 import 'package:survivor_test/components/player.dart';
 import 'package:survivor_test/level.dart';
 
@@ -26,25 +26,25 @@ class SurvivorTest extends FlameGame
     _player = Player(position: Vector2(700, 400));
     cam.follow(_player);
     add(cam);
-    addJoystick();
+    //addJoystick();
     add(world..priority = -1);
     world.add(_player);
   }
 
   @override
   void update(double dt) {
-    updateJoystick();
+    //updateJoystick();
     super.update(dt);
   }
 
   void addJoystick() {
     joystick = JoystickComponent(
+      position: Vector2(size.x - 100, size.y - 100),
       priority: 100,
       knob: SpriteComponent(sprite: Sprite(images.fromCache('HUD/Knob.png'))),
       background: SpriteComponent(
         sprite: Sprite(images.fromCache('HUD/Joystick.png')),
       ),
-      margin: const EdgeInsets.only(right: 400, bottom: 32),
     );
     add(joystick..priority = 100);
   }
