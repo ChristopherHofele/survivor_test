@@ -5,6 +5,7 @@ import 'package:flame/input.dart';
 import 'package:flutter/painting.dart';
 
 import 'package:survivor_test/actors/player.dart';
+import 'package:survivor_test/components/Dash_Button.dart';
 import 'package:survivor_test/level.dart';
 
 class SurvivorTest extends FlameGame
@@ -12,6 +13,7 @@ class SurvivorTest extends FlameGame
   //late final CameraComponent cam;
   late Player player;
   late JoystickComponent joystick;
+  late DashButton dashButton;
 
   @override
   Future<void> onLoad() async {
@@ -23,12 +25,10 @@ class SurvivorTest extends FlameGame
       width: size.x,
       height: size.y,
     );
-
-    add(camera);
     camera.follow(player);
     add(world..priority = -1);
     world.add(player);
-    addJoystick();
+    addControls();
   }
 
   @override
@@ -37,7 +37,7 @@ class SurvivorTest extends FlameGame
     super.update(dt);
   }
 
-  void addJoystick() {
+  void addControls() {
     joystick = JoystickComponent(
       //position: Vector2(size.x - 100, size.y - 100),
       priority: 100,
@@ -47,6 +47,8 @@ class SurvivorTest extends FlameGame
       ),
       margin: const EdgeInsets.only(right: 64, bottom: 64),
     );
+    dashButton = DashButton();
+    camera.viewport.add(dashButton);
     camera.viewport.add(joystick);
   }
 

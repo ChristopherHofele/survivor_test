@@ -11,10 +11,13 @@ class Player extends SpriteAnimationComponent
   Player({position})
     : super(position: position, size: Vector2(64, 64), anchor: Anchor.center);
 
-  double moveSpeed = 300;
+  double moveSpeed = 100;
+  double playerSpeed = 0;
+  double dashBoostMultiplier = 3;
   Vector2 movementDirection = Vector2.zero();
   Vector2 velocity = Vector2.zero();
   List<CollisionBlock> collisionBlocks = [];
+  bool isDashing = false;
 
   @override
   void onLoad() {
@@ -40,7 +43,8 @@ class Player extends SpriteAnimationComponent
   }
 
   void _updatePlayerMovement(double dt) {
-    velocity = movementDirection * moveSpeed;
+    playerSpeed = isDashing ? (moveSpeed * dashBoostMultiplier) : moveSpeed;
+    velocity = movementDirection * playerSpeed;
     position += velocity * dt;
   }
 
