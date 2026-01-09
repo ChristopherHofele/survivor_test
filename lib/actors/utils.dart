@@ -21,6 +21,7 @@ bool checkCollision(player, block) {
 }
 
 bool isCollisionHorizontal(player, block) {
-  return (player.position.x + player.width > block.position.x + block.width ||
-      player.position.x - player.width < block.position.x);
+  return (player.position.x + player.width / 2 >
+          block.position.x + block.width ||
+      player.position.x - player.width / 2 < block.position.x);
 }

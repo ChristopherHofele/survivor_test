@@ -8,11 +8,11 @@
     ],
     "fileStates": {
         "Level1.tmx": {
-            "scale": 3,
-            "selectedLayer": 0,
+            "scale": 1,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 1789.8333333333333,
-                "y": 1144.5
+                "x": 939.5,
+                "y": 883.5
             }
         },
         "survivor_test.tsx": {

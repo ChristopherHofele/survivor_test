@@ -46,18 +46,16 @@ class Player extends SpriteAnimationComponent
 
   void _handleHorizontalCollisions() {
     for (final block in collisionBlocks) {
-      if (!block.isShop) {
-        if (checkCollision(this, block) && isCollisionHorizontal(this, block)) {
-          if (velocity.x > 0) {
-            velocity.x = 0;
-            position.x = block.x - this.width / 2;
-            break;
-          }
-          if (velocity.x < 0) {
-            velocity.x = 0;
-            position.x = block.x + block.width + this.width / 2;
-            break;
-          }
+      if (checkCollision(this, block) && isCollisionHorizontal(this, block)) {
+        if (velocity.x > 0) {
+          velocity.x = 0;
+          position.x = block.x - this.width / 2;
+          break;
+        }
+        if (velocity.x < 0) {
+          velocity.x = 0;
+          position.x = block.x + block.width + this.width / 2;
+          break;
         }
       }
     }
