@@ -14,10 +14,14 @@ class Player extends SpriteAnimationComponent
   double moveSpeed = 100;
   double playerSpeed = 0;
   double dashBoostMultiplier = 3;
+  double stamina = 100;
+  final double staminaDrain = 30;
+  final double staminaRecovery = 20;
   Vector2 movementDirection = Vector2.zero();
   Vector2 velocity = Vector2.zero();
   List<CollisionBlock> collisionBlocks = [];
   bool isDashing = false;
+  bool canDash = true;
 
   @override
   void onLoad() {
@@ -43,9 +47,22 @@ class Player extends SpriteAnimationComponent
   }
 
   void _updatePlayerMovement(double dt) {
-    playerSpeed = isDashing ? (moveSpeed * dashBoostMultiplier) : moveSpeed;
+    if (stamina <= 0) {
+      canDash = false;
+    }
+    if (stamina >= 50) {
+      canDash = true;
+    }
+    if (isDashing && canDash) {
+      playerSpeed = moveSpeed * dashBoostMultiplier;
+      stamina -= staminaDrain * dt;
+    } else {
+      playerSpeed = moveSpeed;
+      stamina += staminaRecovery * dt;
+    }
     velocity = movementDirection * playerSpeed;
     position += velocity * dt;
+    stamina = stamina.clamp(0, 100);
   }
 
   void _handleHorizontalCollisions() {
