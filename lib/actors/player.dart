@@ -13,13 +13,17 @@ class Player extends SpriteAnimationComponent
 
   double moveSpeed = 100;
   double playerSpeed = 0;
+
   double dashBoostMultiplier = 3;
   double stamina = 100;
   final double staminaDrain = 30;
   final double staminaRecovery = 20;
+
   Vector2 movementDirection = Vector2.zero();
   Vector2 velocity = Vector2.zero();
+
   List<CollisionBlock> collisionBlocks = [];
+
   bool isDashing = false;
   bool canDash = true;
 
@@ -41,8 +45,8 @@ class Player extends SpriteAnimationComponent
   @override
   void update(double dt) {
     _updatePlayerMovement(dt);
-    _handleHorizontalCollisions();
-    _handleVerticalCollisons();
+    _handleHorizontalCollisions(dt);
+    _handleVerticalCollisons(dt);
     super.update(dt);
   }
 
@@ -65,9 +69,10 @@ class Player extends SpriteAnimationComponent
     stamina = stamina.clamp(0, 100);
   }
 
-  void _handleHorizontalCollisions() {
+  void _handleHorizontalCollisions(double dt) {
     for (final block in collisionBlocks) {
-      if (checkCollision(this, block) && isCollisionHorizontal(this, block)) {
+      if (checkCollision(this, block) &&
+          isCollisionHorizontal(this, block, dt)) {
         if (velocity.x > 0) {
           velocity.x = 0;
           position.x = block.x - this.width / 2;
@@ -82,9 +87,9 @@ class Player extends SpriteAnimationComponent
     }
   }
 
-  void _handleVerticalCollisons() {
+  void _handleVerticalCollisons(double dt) {
     for (final block in collisionBlocks) {
-      if (checkCollision(this, block) && !isCollisionHorizontal(this, block)) {
+      if (checkCollision(this, block) && isCollisionVertical(this, block, dt)) {
         if (velocity.y > 0) {
           velocity.y = 0;
           position.y = block.y - this.height / 2;
