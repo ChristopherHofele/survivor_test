@@ -5,14 +5,15 @@
     },
     "activeFile": "Level1.tmx",
     "expandedProjectPaths": [
+        "."
     ],
     "fileStates": {
         "Level1.tmx": {
             "scale": 1,
-            "selectedLayer": 1,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 939.5,
-                "y": 883.5
+                "x": 624.5,
+                "y": 159.5
             }
         },
         "survivor_test.tsx": {

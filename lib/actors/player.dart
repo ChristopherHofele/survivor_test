@@ -1,5 +1,7 @@
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:survivor_test/actors/basic_enemy.dart';
 import 'package:survivor_test/actors/utils.dart';
 //import 'package:flutter/widgets.dart';
 import 'package:survivor_test/components/collision_block.dart';
@@ -22,6 +24,7 @@ class Player extends SpriteAnimationComponent
   Vector2 velocity = Vector2.zero();
 
   List<CollisionBlock> collisionBlocks = [];
+  List<BasicEnemy> basicEnemies = [];
 
   bool isDashing = false;
   bool canDash = true;
@@ -29,7 +32,6 @@ class Player extends SpriteAnimationComponent
   @override
   void onLoad() {
     priority = 1;
-    debugMode = true;
     animation = SpriteAnimation.fromFrameData(
       game.images.fromCache('monster.png'),
       SpriteAnimationData.sequenced(
@@ -38,6 +40,7 @@ class Player extends SpriteAnimationComponent
         stepTime: 0.12,
       ),
     );
+    add(CircleHitbox());
   }
 
   @override

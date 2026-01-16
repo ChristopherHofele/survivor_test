@@ -16,6 +16,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
   late BasicEnemy basicEnemy4;
   Level({required this.player});
   List<CollisionBlock> collisionBlocks = [];
+  List<BasicEnemy> basicEnemies = [];
 
   @override
   FutureOr<void> onLoad() async {
@@ -24,18 +25,23 @@ class Level extends World with HasGameReference<SurvivorTest> {
     add(level);
     _addCollisions();
     basicEnemy1 = BasicEnemy(position: Vector2(250, 250), player: player);
+    basicEnemies.add(basicEnemy1);
     add(basicEnemy1);
     basicEnemy2 = BasicEnemy(position: Vector2(-250, -250), player: player);
     add(basicEnemy2);
+    basicEnemies.add(basicEnemy2);
     basicEnemy3 = BasicEnemy(position: Vector2(450, -350), player: player);
     add(basicEnemy3);
+    basicEnemies.add(basicEnemy3);
     basicEnemy4 = BasicEnemy(position: Vector2(250, -250), player: player);
     add(basicEnemy4);
+    basicEnemies.add(basicEnemy4);
+    player.basicEnemies = basicEnemies;
+
     super.onLoad();
   }
 
   void _addCollisions() {
-    debugMode = true;
     final collisionsLayer = level.tileMap.getLayer<ObjectGroup>('Collisions');
     if (collisionsLayer != null) {
       for (final collision in collisionsLayer.objects) {

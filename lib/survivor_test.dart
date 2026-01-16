@@ -1,7 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
-import 'package:flame/input.dart';
 import 'package:flutter/painting.dart';
 
 import 'package:survivor_test/actors/player.dart';
@@ -14,20 +13,21 @@ class SurvivorTest extends FlameGame
   late Player player;
   late JoystickComponent joystick;
   late DashButton dashButton;
+  late Level world1;
 
   @override
   Future<void> onLoad() async {
     player = Player(position: Vector2(700, 400));
     await images.loadAllImages();
-    Level world = Level(player: player);
+    world1 = Level(player: player);
     camera = CameraComponent.withFixedResolution(
-      world: world,
+      world: world1,
       width: size.x,
       height: size.y,
     );
     camera.follow(player);
-    add(world..priority = -1);
-    world.add(player);
+    add(world1..priority = -1);
+    world1.add(player);
     addControls();
   }
 
