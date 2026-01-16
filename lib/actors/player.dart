@@ -1,4 +1,3 @@
-import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:survivor_test/actors/utils.dart';
@@ -7,7 +6,7 @@ import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/survivor_test.dart';
 
 class Player extends SpriteAnimationComponent
-    with HasGameReference<SurvivorTest>, TapCallbacks, CollisionCallbacks {
+    with HasGameReference<SurvivorTest>, TapCallbacks {
   Player({position})
     : super(position: position, size: Vector2(64, 64), anchor: Anchor.center);
 
@@ -39,7 +38,6 @@ class Player extends SpriteAnimationComponent
         stepTime: 0.12,
       ),
     );
-    add(CircleHitbox());
   }
 
   @override
