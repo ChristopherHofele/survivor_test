@@ -4,8 +4,8 @@ import 'package:flame/game.dart';
 import 'package:flutter/painting.dart';
 
 import 'package:survivor_test/actors/player.dart';
-import 'package:survivor_test/components/Dash_Button.dart';
-import 'package:survivor_test/components/health.dart';
+import 'package:survivor_test/overlays/dash_button.dart';
+import 'package:survivor_test/overlays/health.dart';
 import 'package:survivor_test/level.dart';
 
 class SurvivorTest extends FlameGame
@@ -15,6 +15,7 @@ class SurvivorTest extends FlameGame
   late JoystickComponent joystick;
   late DashButton dashButton;
   late Level world1;
+  bool startGame = false;
 
   @override
   Future<void> onLoad() async {
@@ -36,6 +37,10 @@ class SurvivorTest extends FlameGame
   @override
   void update(double dt) {
     updateJoystick();
+    if (player.health <= 0) {
+      startGame = false;
+      overlays.add('GameOver');
+    }
     super.update(dt);
   }
 

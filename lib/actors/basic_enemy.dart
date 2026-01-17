@@ -43,10 +43,12 @@ class BasicEnemy extends SpriteAnimationComponent
 
   @override
   void update(double dt) {
-    movementDirection = determineMoveDirection(player);
-    velocity = movementDirection * moveSpeed;
-    position += velocity * dt;
-    basicEnemies = game.world1.basicEnemies;
+    if (game.startGame) {
+      movementDirection = determineMoveDirection(player);
+      velocity = movementDirection * moveSpeed;
+      position += velocity * dt;
+      basicEnemies = game.world1.basicEnemies;
+    }
     super.update(dt);
   }
 

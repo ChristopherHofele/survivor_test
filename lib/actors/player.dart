@@ -1,9 +1,10 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame/effects.dart';
+
 import 'package:survivor_test/actors/basic_enemy.dart';
 import 'package:survivor_test/actors/utils.dart';
-//import 'package:flutter/widgets.dart';
 import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/survivor_test.dart';
 
@@ -15,7 +16,7 @@ class Player extends SpriteAnimationComponent
   int invincibilityDelay = 1;
   int healthRegenerationDelay = 3;
   double healthRegeneration = 50;
-  double health = 300;
+  double health = 400;
 
   double moveSpeed = 100;
   double playerSpeed = 0;
@@ -52,7 +53,9 @@ class Player extends SpriteAnimationComponent
 
   @override
   void update(double dt) {
-    _updatePlayerMovement(dt);
+    if (game.startGame) {
+      _updatePlayerMovement(dt);
+    }
     _handleHorizontalCollisions(dt);
     _handleVerticalCollisons(dt);
     _handleHealthRegeneration(dt);
@@ -113,19 +116,26 @@ class Player extends SpriteAnimationComponent
   }
 
   @override
-  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+  void onCollisionStart(
+    Set<Vector2> intersectionPoints,
+    PositionComponent other,
+  ) {
     if (other is BasicEnemy && !gotHit) {
       health -= 100;
       gotHit = true;
     }
-    super.onCollision(intersectionPoints, other);
+    super.onCollisionStart(intersectionPoints, other);
   }
 
   Future<void> _handleHealthRegeneration(double dt) async {
     if (gotHit) {
-      Future.delayed(
-        Duration(seconds: invincibilityDelay),
-        () => gotHit = false,
+      add(
+        OpacityEffect.fadeOut(
+            EffectController(alternate: true, duration: 0.1, repeatCount: 5),
+          )
+          ..onComplete = () {
+            gotHit = false;
+          },
       );
       Future.delayed(
         Duration(seconds: healthRegenerationDelay),
