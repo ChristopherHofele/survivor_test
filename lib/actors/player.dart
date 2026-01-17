@@ -8,9 +8,14 @@ import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/survivor_test.dart';
 
 class Player extends SpriteAnimationComponent
-    with HasGameReference<SurvivorTest>, TapCallbacks {
+    with HasGameReference<SurvivorTest>, TapCallbacks, CollisionCallbacks {
   Player({position})
     : super(position: position, size: Vector2(64, 64), anchor: Anchor.center);
+
+  int invincibilityDelay = 1;
+  int healthRegenerationDelay = 3;
+  double healthRegeneration = 50;
+  double health = 300;
 
   double moveSpeed = 100;
   double playerSpeed = 0;
@@ -28,6 +33,8 @@ class Player extends SpriteAnimationComponent
 
   bool isDashing = false;
   bool canDash = true;
+  bool gotHit = false;
+  bool isInjured = false;
 
   @override
   void onLoad() {
@@ -48,6 +55,7 @@ class Player extends SpriteAnimationComponent
     _updatePlayerMovement(dt);
     _handleHorizontalCollisions(dt);
     _handleVerticalCollisons(dt);
+    _handleHealthRegeneration(dt);
     super.update(dt);
   }
 
@@ -101,6 +109,33 @@ class Player extends SpriteAnimationComponent
           position.y = block.y + block.height + this.height / 2;
         }
       }
+    }
+  }
+
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    if (other is BasicEnemy && !gotHit) {
+      health -= 100;
+      gotHit = true;
+    }
+    super.onCollision(intersectionPoints, other);
+  }
+
+  Future<void> _handleHealthRegeneration(double dt) async {
+    if (gotHit) {
+      Future.delayed(
+        Duration(seconds: invincibilityDelay),
+        () => gotHit = false,
+      );
+      Future.delayed(
+        Duration(seconds: healthRegenerationDelay),
+        () => isInjured = true,
+      );
+    } else if (isInjured && health < 300) {
+      health += healthRegeneration * dt;
+      health.clamp(-50, 300);
+    } else if (health >= 300) {
+      isInjured = false;
     }
   }
 }

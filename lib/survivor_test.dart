@@ -5,6 +5,7 @@ import 'package:flutter/painting.dart';
 
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/components/Dash_Button.dart';
+import 'package:survivor_test/components/health.dart';
 import 'package:survivor_test/level.dart';
 
 class SurvivorTest extends FlameGame
@@ -29,6 +30,7 @@ class SurvivorTest extends FlameGame
     add(world1..priority = -1);
     world1.add(player);
     addControls();
+    addHearts();
   }
 
   @override
@@ -57,6 +59,15 @@ class SurvivorTest extends FlameGame
       player.movementDirection = joystick.relativeDelta;
     } else {
       player.movementDirection = Vector2.zero();
+    }
+  }
+
+  void addHearts() {
+    for (int i = 1; i <= player.health / 100; i++) {
+      double heartX = 40 + (i - 1) * 40;
+      double heartY = 40;
+      Heart heart = Heart(heartID: i, position: Vector2(heartX, heartY));
+      camera.viewport.add(heart);
     }
   }
 }

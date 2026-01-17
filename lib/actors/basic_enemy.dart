@@ -7,7 +7,7 @@ import 'package:survivor_test/survivor_test.dart';
 
 class BasicEnemy extends SpriteAnimationComponent
     with HasGameReference<SurvivorTest>, CollisionCallbacks {
-  BasicEnemy({position, player})
+  BasicEnemy({position})
     : super(position: position, size: Vector2(64, 64), anchor: Anchor.center);
 
   double moveSpeed = 100;
