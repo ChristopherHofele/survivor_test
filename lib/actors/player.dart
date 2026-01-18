@@ -6,6 +6,7 @@ import 'package:flame/effects.dart';
 import 'package:survivor_test/actors/basic_enemy.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
+import 'package:survivor_test/components/projectile.dart';
 import 'package:survivor_test/survivor_test.dart';
 
 class Player extends SpriteAnimationComponent
@@ -13,7 +14,7 @@ class Player extends SpriteAnimationComponent
   Player({position})
     : super(position: position, size: Vector2(64, 64), anchor: Anchor.center);
 
-  int invincibilityDelay = 1;
+  //int invincibilityDelay = 1;
   int healthRegenerationDelay = 3;
   double healthRegeneration = 50;
   double health = 400;
@@ -23,8 +24,10 @@ class Player extends SpriteAnimationComponent
 
   double dashBoostMultiplier = 3;
   double stamina = 100;
-  final double staminaDrain = 30;
-  final double staminaRecovery = 20;
+  double staminaDrain = 30;
+  double staminaRecovery = 20;
+
+  double attackCooldown = 2;
 
   Vector2 movementDirection = Vector2.zero();
   Vector2 velocity = Vector2.zero();
@@ -36,6 +39,7 @@ class Player extends SpriteAnimationComponent
   bool canDash = true;
   bool gotHit = false;
   bool isInjured = false;
+  bool isAttacking = false;
 
   @override
   void onLoad() {
@@ -59,6 +63,7 @@ class Player extends SpriteAnimationComponent
     _handleHorizontalCollisions(dt);
     _handleVerticalCollisons(dt);
     _handleHealthRegeneration(dt);
+    _handleAttacks(dt);
     super.update(dt);
   }
 
@@ -146,6 +151,16 @@ class Player extends SpriteAnimationComponent
       health.clamp(-50, 300);
     } else if (health >= 300) {
       isInjured = false;
+    }
+  }
+
+  void _handleAttacks(double dt) {
+    attackCooldown -= dt;
+    if (isAttacking && attackCooldown <= 0) {
+      attackCooldown = 2;
+      game.world1.add(
+        Projectile(position: position, moveDirection: movementDirection),
+      );
     }
   }
 }

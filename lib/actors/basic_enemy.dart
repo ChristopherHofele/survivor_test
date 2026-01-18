@@ -3,6 +3,7 @@ import 'package:flame/components.dart';
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
+import 'package:survivor_test/components/projectile.dart';
 import 'package:survivor_test/level.dart';
 
 import 'package:survivor_test/survivor_test.dart';
@@ -13,6 +14,7 @@ class BasicEnemy extends SpriteAnimationComponent
     : super(position: position, size: Vector2(64, 64), anchor: Anchor.center);
 
   double moveSpeed = 100;
+  double health = 1;
   final double hitboxRadius = 16;
   late final Player player;
   late final Level level;
@@ -47,12 +49,11 @@ class BasicEnemy extends SpriteAnimationComponent
   @override
   void update(double dt) {
     if (game.startGame) {
-      movementDirection = determineMoveDirection(player);
-      velocity = movementDirection * moveSpeed;
-      position += velocity * dt;
+      _updateMovement(dt);
       basicEnemies = game.world1.basicEnemies;
       _handleHorizontalCollisions(dt);
       _handleVerticalCollisons(dt);
+      _handleHealth();
     }
     super.update(dt);
   }
@@ -76,6 +77,18 @@ class BasicEnemy extends SpriteAnimationComponent
       }
       super.onCollision(intersectionPoints, other);
     }
+  }
+
+  @override
+  void onCollisionStart(
+    Set<Vector2> intersectionPoints,
+    PositionComponent other,
+  ) {
+    if (other is Projectile) {
+      health -= other.damage;
+      other.hitCounter += 1;
+    }
+    super.onCollisionStart(intersectionPoints, other);
   }
 
   Vector2 determineMoveDirection(player) {
@@ -117,6 +130,19 @@ class BasicEnemy extends SpriteAnimationComponent
           position.y = block.y + block.height + this.height / 2;
         }
       }
+    }
+  }
+
+  void _updateMovement(double dt) {
+    movementDirection = determineMoveDirection(player);
+    velocity = movementDirection * moveSpeed;
+    position += velocity * dt;
+  }
+
+  void _handleHealth() {
+    if (health <= 0) {
+      removeFromParent();
+      game.world1.enemyCount -= 1;
     }
   }
 }

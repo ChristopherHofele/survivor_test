@@ -19,5 +19,6 @@ flutter:
     - assets/images/
     - assets/images/Terrain/
     - assets/images/HUD/
+    - assets/images/Traps/Saw/
     - assets/audio/
     - assets/tiles/

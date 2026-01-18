@@ -4,6 +4,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/painting.dart';
 
 import 'package:survivor_test/actors/player.dart';
+import 'package:survivor_test/overlays/attack_button.dart';
 import 'package:survivor_test/overlays/dash_button.dart';
 import 'package:survivor_test/overlays/health.dart';
 import 'package:survivor_test/level.dart';
@@ -14,6 +15,7 @@ class SurvivorTest extends FlameGame
   late Player player;
   late JoystickComponent joystick;
   late DashButton dashButton;
+  late AttackButton attackButton;
   late Level world1;
   bool startGame = false;
 
@@ -55,6 +57,8 @@ class SurvivorTest extends FlameGame
       margin: const EdgeInsets.only(right: 64, bottom: 64),
     );
     dashButton = DashButton();
+    attackButton = AttackButton();
+    camera.viewport.add(attackButton);
     camera.viewport.add(dashButton);
     camera.viewport.add(joystick);
   }
