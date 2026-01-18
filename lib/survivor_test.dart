@@ -1,11 +1,11 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
-import 'package:flame/input.dart';
 import 'package:flutter/painting.dart';
 
 import 'package:survivor_test/actors/player.dart';
-import 'package:survivor_test/components/Dash_Button.dart';
+import 'package:survivor_test/overlays/dash_button.dart';
+import 'package:survivor_test/overlays/health.dart';
 import 'package:survivor_test/level.dart';
 
 class SurvivorTest extends FlameGame
@@ -14,26 +14,33 @@ class SurvivorTest extends FlameGame
   late Player player;
   late JoystickComponent joystick;
   late DashButton dashButton;
+  late Level world1;
+  bool startGame = false;
 
   @override
   Future<void> onLoad() async {
     player = Player(position: Vector2(700, 400));
     await images.loadAllImages();
-    Level world = Level(player: player);
+    world1 = Level(player: player);
     camera = CameraComponent.withFixedResolution(
-      world: world,
+      world: world1,
       width: size.x,
       height: size.y,
     );
     camera.follow(player);
-    add(world..priority = -1);
-    world.add(player);
+    add(world1..priority = -1);
+    world1.add(player);
     addControls();
+    addHearts();
   }
 
   @override
   void update(double dt) {
     updateJoystick();
+    if (player.health <= 0) {
+      startGame = false;
+      overlays.add('GameOver');
+    }
     super.update(dt);
   }
 
@@ -57,6 +64,15 @@ class SurvivorTest extends FlameGame
       player.movementDirection = joystick.relativeDelta;
     } else {
       player.movementDirection = Vector2.zero();
+    }
+  }
+
+  void addHearts() {
+    for (int i = 1; i <= player.health / 100; i++) {
+      double heartX = 40 + (i - 1) * 40;
+      double heartY = 40;
+      Heart heart = Heart(heartID: i, position: Vector2(heartX, heartY));
+      camera.viewport.add(heart);
     }
   }
 }
