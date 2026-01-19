@@ -172,12 +172,16 @@ class Player extends SpriteAnimationComponent
   void _handleCookieCollision(double dt) {
     cookies = game.world1.cookies;
     if (cookies.length != 0) {
+      List<Cookie> cookiesToRemove = [];
       for (Cookie cookie in cookies) {
         if (checkCollision(this, cookie)) {
+          cookiesToRemove.add(cookie);
           cookie.removeFromParent();
           money += cookie.worth;
         }
-        ;
+      }
+      for (Cookie cookie in cookiesToRemove) {
+        game.world1.cookies.remove(cookie);
       }
     }
   }
