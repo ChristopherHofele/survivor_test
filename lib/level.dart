@@ -40,14 +40,14 @@ class Level extends World with HasGameReference<SurvivorTest> {
     if (collisionsLayer != null) {
       for (final collision in collisionsLayer.objects) {
         switch (collision.class_) {
-          case 'Shop':
-            final shop = CollisionBlock(
+          case 'Health_Shop':
+            final healthShop = CollisionBlock(
               position: Vector2(collision.x, collision.y),
               size: Vector2(collision.width, collision.height),
-              isShop: true,
+              shopType: ShopType.HealthShop,
             );
-            collisionBlocks.add(shop);
-            add(shop);
+            collisionBlocks.add(healthShop);
+            add(healthShop);
             break;
           default:
             final block = CollisionBlock(

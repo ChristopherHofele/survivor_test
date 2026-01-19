@@ -1,7 +1,9 @@
 import 'package:flame/components.dart';
 
+enum ShopType { NoShop, HealthShop, StaminaShop, DamageShop }
+
 class CollisionBlock extends PositionComponent {
-  bool isShop;
-  CollisionBlock({position, size, this.isShop = false})
+  ShopType shopType;
+  CollisionBlock({position, size, this.shopType = ShopType.NoShop})
     : super(position: position, size: size) {}
 }

@@ -64,8 +64,7 @@ class Player extends SpriteAnimationComponent
     if (game.startGame) {
       _updatePlayerMovement(dt);
     }
-    _handleHorizontalCollisions(dt);
-    _handleVerticalCollisons(dt);
+    _handleBlockCollisions(dt);
     _handleCookieCollision(dt);
     _handleHealthRegeneration(dt);
     _handleAttacks(dt);
@@ -91,37 +90,67 @@ class Player extends SpriteAnimationComponent
     stamina = stamina.clamp(0, 100);
   }
 
-  void _handleHorizontalCollisions(double dt) {
+  void _handleBlockCollisions(double dt) {
+    int collisionCounter = 0;
     for (final block in collisionBlocks) {
-      if (checkCollision(this, block) &&
-          isCollisionHorizontal(this, block, dt)) {
-        if (velocity.x > 0) {
-          velocity.x = 0;
-          position.x = block.x - this.width / 2;
-          break;
+      if (checkCollision(this, block)) {
+        switch (block.shopType) {
+          case ShopType.DamageShop:
+            break;
+          case ShopType.HealthShop:
+            if (money >= 20) {
+              money -= 20;
+              health += 100;
+            }
+            break;
+          case ShopType.StaminaShop:
+            break;
+          default:
+            _handleHorizontalCollisions(dt, block)
+                ? collisionCounter += 1
+                : collisionCounter;
+            _handleVerticalCollisons(dt, block)
+                ? collisionCounter += 1
+                : collisionCounter;
         }
-        if (velocity.x < 0) {
-          velocity.x = 0;
-          position.x = block.x + block.width + this.width / 2;
-          break;
-        }
+        ;
+      }
+      if (collisionCounter >= 2) {
+        print('two collisions');
+        break;
       }
     }
   }
 
-  void _handleVerticalCollisons(double dt) {
-    for (final block in collisionBlocks) {
-      if (checkCollision(this, block) && isCollisionVertical(this, block, dt)) {
-        if (velocity.y > 0) {
-          velocity.y = 0;
-          position.y = block.y - this.height / 2;
-          break;
-        }
-        if (velocity.y < 0) {
-          velocity.y = 0;
-          position.y = block.y + block.height + this.height / 2;
-        }
+  bool _handleHorizontalCollisions(double dt, block) {
+    if (isCollisionHorizontal(this, block, dt)) {
+      if (velocity.x > 0) {
+        velocity.x = 0;
+        position.x = block.x - this.width / 2;
       }
+      if (velocity.x < 0) {
+        velocity.x = 0;
+        position.x = block.x + block.width + this.width / 2;
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  bool _handleVerticalCollisons(double dt, block) {
+    if (isCollisionVertical(this, block, dt)) {
+      if (velocity.y > 0) {
+        velocity.y = 0;
+        position.y = block.y - this.height / 2;
+      }
+      if (velocity.y < 0) {
+        velocity.y = 0;
+        position.y = block.y + block.height + this.height / 2;
+      }
+      return true;
+    } else {
+      return false;
     }
   }
 
