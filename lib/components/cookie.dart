@@ -8,7 +8,7 @@ class Cookie extends SpriteAnimationComponent
     with HasGameReference<SurvivorTest> {
   final int worth;
   Cookie({required position, this.worth = 1})
-    : super(position: position, size: Vector2.all(50));
+    : super(position: position - Vector2.all(25), size: Vector2.all(50));
 
   @override
   FutureOr<void> onLoad() {
