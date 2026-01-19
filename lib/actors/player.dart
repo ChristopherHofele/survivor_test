@@ -96,6 +96,10 @@ class Player extends SpriteAnimationComponent
       if (checkCollision(this, block)) {
         switch (block.shopType) {
           case ShopType.DamageShop:
+            if (money >= 20) {
+              money -= 20;
+              attackCooldown -= 0.5;
+            }
             break;
           case ShopType.HealthShop:
             if (money >= 20) {
@@ -104,6 +108,10 @@ class Player extends SpriteAnimationComponent
             }
             break;
           case ShopType.StaminaShop:
+            if (money >= 20) {
+              money -= 20;
+              staminaDrain -= 5;
+            }
             break;
           default:
             _handleHorizontalCollisions(dt, block)
