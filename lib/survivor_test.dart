@@ -6,8 +6,9 @@ import 'package:flutter/painting.dart';
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/overlays/attack_button.dart';
 import 'package:survivor_test/overlays/dash_button.dart';
-import 'package:survivor_test/overlays/health.dart';
+import 'package:survivor_test/overlays/health_display.dart';
 import 'package:survivor_test/level.dart';
+import 'package:survivor_test/overlays/money_display.dart';
 
 class SurvivorTest extends FlameGame
     with DragCallbacks, HasCollisionDetection, TapCallbacks {
@@ -34,6 +35,7 @@ class SurvivorTest extends FlameGame
     world1.add(player);
     addControls();
     addHearts();
+    addMoney();
   }
 
   @override
@@ -78,5 +80,10 @@ class SurvivorTest extends FlameGame
       Heart heart = Heart(heartID: i, position: Vector2(heartX, heartY));
       camera.viewport.add(heart);
     }
+  }
+
+  void addMoney() {
+    MoneyDisplay moneyDisplay = MoneyDisplay();
+    camera.viewport.add(moneyDisplay);
   }
 }

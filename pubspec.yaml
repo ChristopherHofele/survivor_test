@@ -17,8 +17,9 @@ dependencies:
 flutter:
   assets:
     - assets/images/
-    - assets/images/Terrain/
     - assets/images/HUD/
+    - assets/images/Items/Fruits/
+    - assets/images/Terrain/
     - assets/images/Traps/Saw/
     - assets/audio/
     - assets/tiles/

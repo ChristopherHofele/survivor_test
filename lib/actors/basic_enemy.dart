@@ -1,11 +1,13 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
+
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
+import 'package:survivor_test/components/cookie.dart';
 import 'package:survivor_test/components/projectile.dart';
 import 'package:survivor_test/level.dart';
-
 import 'package:survivor_test/survivor_test.dart';
 
 class BasicEnemy extends SpriteAnimationComponent
@@ -13,7 +15,7 @@ class BasicEnemy extends SpriteAnimationComponent
   BasicEnemy({position})
     : super(position: position, size: Vector2(64, 64), anchor: Anchor.center);
 
-  double moveSpeed = 100;
+  double moveSpeed = 80;
   double health = 1;
   final double hitboxRadius = 16;
   late final Player player;
@@ -87,6 +89,11 @@ class BasicEnemy extends SpriteAnimationComponent
     if (other is Projectile) {
       health -= other.damage;
       other.hitCounter += 1;
+      add(
+        OpacityEffect.fadeOut(
+          EffectController(alternate: true, duration: 0.1, repeatCount: 5),
+        ),
+      );
     }
     super.onCollisionStart(intersectionPoints, other);
   }
@@ -141,8 +148,11 @@ class BasicEnemy extends SpriteAnimationComponent
 
   void _handleHealth() {
     if (health <= 0) {
-      removeFromParent();
       game.world1.enemyCount -= 1;
+      Cookie cookie = Cookie(position: position);
+      game.world1.add(cookie);
+      game.world1.cookies.add(cookie);
+      game.world1.remove(this);
     }
   }
 }

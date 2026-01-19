@@ -27,9 +27,7 @@ class Projectile extends SpriteAnimationComponent
         stepTime: 0.02,
       ),
     );
-    add(
-      CircleHitbox(anchor: Anchor.center, collisionType: CollisionType.passive),
-    );
+    add(CircleHitbox(collisionType: CollisionType.passive));
     return super.onLoad();
   }
 

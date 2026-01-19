@@ -6,6 +6,7 @@ import 'package:flame/effects.dart';
 import 'package:survivor_test/actors/basic_enemy.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
+import 'package:survivor_test/components/cookie.dart';
 import 'package:survivor_test/components/projectile.dart';
 import 'package:survivor_test/survivor_test.dart';
 
@@ -29,11 +30,14 @@ class Player extends SpriteAnimationComponent
 
   double attackCooldown = 2;
 
+  int money = 0;
+
   Vector2 movementDirection = Vector2.zero();
   Vector2 velocity = Vector2.zero();
 
   List<CollisionBlock> collisionBlocks = [];
-  List<BasicEnemy> basicEnemies = [];
+  //List<BasicEnemy> basicEnemies = [];
+  List<Cookie> cookies = [];
 
   bool isDashing = false;
   bool canDash = true;
@@ -62,6 +66,7 @@ class Player extends SpriteAnimationComponent
     }
     _handleHorizontalCollisions(dt);
     _handleVerticalCollisons(dt);
+    _handleCookieCollision(dt);
     _handleHealthRegeneration(dt);
     _handleAttacks(dt);
     super.update(dt);
@@ -161,6 +166,19 @@ class Player extends SpriteAnimationComponent
       game.world1.add(
         Projectile(position: position, moveDirection: movementDirection),
       );
+    }
+  }
+
+  void _handleCookieCollision(double dt) {
+    cookies = game.world1.cookies;
+    if (cookies.length != 0) {
+      for (Cookie cookie in cookies) {
+        if (checkCollision(this, cookie)) {
+          cookie.removeFromParent();
+          money += cookie.worth;
+        }
+        ;
+      }
     }
   }
 }

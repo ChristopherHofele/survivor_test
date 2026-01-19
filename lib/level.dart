@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:survivor_test/actors/basic_enemy.dart';
 import 'package:survivor_test/actors/player.dart';
+import 'package:survivor_test/components/cookie.dart';
 import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/components/spawners.dart';
 import 'package:survivor_test/survivor_test.dart';
@@ -18,10 +19,12 @@ class Level extends World with HasGameReference<SurvivorTest> {
   Level({required this.player});
   List<CollisionBlock> collisionBlocks = [];
   List<BasicEnemy> basicEnemies = [];
+  List<Cookie> cookies = [];
   int enemyCount = 0;
 
   @override
   FutureOr<void> onLoad() async {
+    //debugMode = true;
     priority = -1;
     level = await TiledComponent.load('Level1.tmx', Vector2.all(16));
     add(level);
