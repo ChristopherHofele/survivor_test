@@ -10,7 +10,7 @@ class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
   Spawner({required position, required this.spawnerID, size})
     : super(position: position, size: size);
 
-  double cooldown = 3;
+  double cooldown = 1;
   late int enemyCount;
   late Vector2 spawnLocation;
 
@@ -36,6 +36,6 @@ class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
   }
 
   void resetCooldown() {
-    cooldown = 10;
+    cooldown = 3;
   }
 }

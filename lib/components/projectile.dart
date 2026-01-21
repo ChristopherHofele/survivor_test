@@ -39,7 +39,7 @@ class Projectile extends SpriteAnimationComponent
   }
 
   void _updateMovement(double dt) {
-    velocity = moveDirection * moveSpeed;
+    velocity = moveDirection.normalized() * moveSpeed;
     position += velocity * dt;
   }
 

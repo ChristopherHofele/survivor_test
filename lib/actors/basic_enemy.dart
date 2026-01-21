@@ -109,7 +109,8 @@ class BasicEnemy extends SpriteAnimationComponent
   void _handleHorizontalCollisions(double dt) {
     for (final block in collisionBlocks) {
       if (checkCollision(this, block) &&
-          isCollisionHorizontal(this, block, dt)) {
+          isCollisionHorizontal(this, block, dt) &&
+          block.shopType == ShopType.NoShop) {
         if (velocity.x > 0) {
           velocity.x = 0;
           position.x = block.x - this.width / 2;
@@ -126,7 +127,9 @@ class BasicEnemy extends SpriteAnimationComponent
 
   void _handleVerticalCollisons(double dt) {
     for (final block in collisionBlocks) {
-      if (checkCollision(this, block) && isCollisionVertical(this, block, dt)) {
+      if (checkCollision(this, block) &&
+          isCollisionVertical(this, block, dt) &&
+          block.shopType == ShopType.NoShop) {
         if (velocity.y > 0) {
           velocity.y = 0;
           position.y = block.y - this.height / 2;
