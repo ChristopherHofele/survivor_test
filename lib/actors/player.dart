@@ -15,6 +15,7 @@ class Player extends SpriteAnimationComponent
   Player({position})
     : super(position: position, size: Vector2(64, 64), anchor: Anchor.center);
 
+  int money = 0;
   //int invincibilityDelay = 1;
   int healthRegenerationDelay = 3;
   double healthRegeneration = 50;
@@ -32,7 +33,6 @@ class Player extends SpriteAnimationComponent
   double attackCooldown = 2;
   double maxAttackCooldown = 2;
 
-  int money = 0;
   double buyCooldown = 0;
 
   Vector2 movementDirection = Vector2.zero();
@@ -50,6 +50,7 @@ class Player extends SpriteAnimationComponent
 
   @override
   void onLoad() {
+    debugMode = true;
     priority = 1;
     animation = SpriteAnimation.fromFrameData(
       game.images.fromCache('monster.png'),
@@ -66,12 +67,12 @@ class Player extends SpriteAnimationComponent
   void update(double dt) {
     if (game.startGame) {
       _updatePlayerMovement(dt);
+      _handleBlockCollisions(dt);
+      _handleCookieCollision(dt);
+      _handleHealthRegeneration(dt);
+      _handleAttacks(dt);
+      print(health.toString() + ', ' + maxHealth.toString());
     }
-    _handleBlockCollisions(dt);
-    _handleCookieCollision(dt);
-    _handleHealthRegeneration(dt);
-    _handleAttacks(dt);
-    print(health.toString() + ', ' + maxHealth.toString());
     super.update(dt);
   }
 
@@ -91,6 +92,11 @@ class Player extends SpriteAnimationComponent
     }
     velocity = movementDirection * playerSpeed;
     position += velocity * dt;
+    if (velocity.x < 0 && scale.x > 0) {
+      flipHorizontallyAroundCenter();
+    } else if (velocity.x > 0 && scale.x < 0) {
+      flipHorizontallyAroundCenter();
+    }
     stamina = stamina.clamp(0, 100);
   }
 
@@ -177,7 +183,7 @@ class Player extends SpriteAnimationComponent
     Set<Vector2> intersectionPoints,
     PositionComponent other,
   ) {
-    if (other is BasicEnemy && !gotHit) {
+    if (other is BasicEnemy) {
       health -= 100;
       gotHit = true;
     }
@@ -200,9 +206,9 @@ class Player extends SpriteAnimationComponent
       );
     } else if (isInjured && health < maxHealth) {
       health += healthRegeneration * dt;
-      health.clamp(-50, maxHealth);
     } else if (health >= maxHealth) {
       isInjured = false;
+      health = maxHealth;
     }
   }
 

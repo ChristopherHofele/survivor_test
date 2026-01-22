@@ -42,7 +42,7 @@ class SurvivorTest extends FlameGame
   @override
   void update(double dt) {
     updateJoystick();
-    if (player.health <= 0) {
+    if (player.health < 100) {
       startGame = false;
       overlays.add('GameOver');
     }

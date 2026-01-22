@@ -27,6 +27,7 @@ class BasicEnemy extends SpriteAnimationComponent
 
   @override
   void onLoad() {
+    debugMode = true;
     player = game.player;
     collisionBlocks = player.collisionBlocks;
     priority = 1;
@@ -138,6 +139,7 @@ class BasicEnemy extends SpriteAnimationComponent
         if (velocity.y < 0) {
           velocity.y = 0;
           position.y = block.y + block.height + this.height / 2;
+          break;
         }
       }
     }
@@ -147,6 +149,11 @@ class BasicEnemy extends SpriteAnimationComponent
     movementDirection = determineMoveDirection(player);
     velocity = movementDirection * moveSpeed;
     position += velocity * dt;
+    if (velocity.x < 0 && scale.x > 0) {
+      flipHorizontallyAroundCenter();
+    } else if (velocity.x > 0 && scale.x < 0) {
+      flipHorizontallyAroundCenter();
+    }
   }
 
   void _handleHealth() {
