@@ -33,7 +33,7 @@ class Player extends SpriteAnimationComponent
   double maxAttackCooldown = 2;
 
   int money = 0;
-  double shopCooldown = 0;
+  double buyCooldown = 0;
 
   Vector2 movementDirection = Vector2.zero();
   Vector2 velocity = Vector2.zero();
@@ -71,6 +71,7 @@ class Player extends SpriteAnimationComponent
     _handleCookieCollision(dt);
     _handleHealthRegeneration(dt);
     _handleAttacks(dt);
+    print(health.toString() + ', ' + maxHealth.toString());
     super.update(dt);
   }
 
@@ -95,28 +96,31 @@ class Player extends SpriteAnimationComponent
 
   void _handleBlockCollisions(double dt) {
     int collisionCounter = 0;
-    shopCooldown -= dt;
+    buyCooldown -= dt;
     for (final block in collisionBlocks) {
       if (checkCollision(this, block)) {
         switch (block.shopType) {
           case ShopType.DamageShop:
-            if (money >= 5 && shopCooldown <= 0) {
+            if (money >= 5 && buyCooldown <= 0) {
               money -= 5;
               maxAttackCooldown = maxAttackCooldown * 0.5;
-              shopCooldown = 4;
+              buyCooldown = 4;
             }
             break;
           case ShopType.HealthShop:
-            if (money >= 5 && shopCooldown <= 0) {
+            if (money >= 5 && buyCooldown <= 0) {
               money -= 5;
               maxHealth += 100;
-              shopCooldown = 4;
+              isInjured = true;
+              buyCooldown = 4;
+              game.updateHearts();
             }
             break;
           case ShopType.StaminaShop:
-            if (money >= 5 && shopCooldown <= 0) {
+            if (money >= 5 && buyCooldown <= 0) {
               money -= 5;
               staminaDrain -= 5;
+              buyCooldown = 4;
             }
             break;
           default:

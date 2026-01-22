@@ -13,6 +13,7 @@ import 'package:survivor_test/overlays/money_display.dart';
 class SurvivorTest extends FlameGame
     with DragCallbacks, HasCollisionDetection, TapCallbacks {
   //late final CameraComponent cam;
+  int heartAmount = 0;
   late Player player;
   late JoystickComponent joystick;
   late DashButton dashButton;
@@ -74,11 +75,29 @@ class SurvivorTest extends FlameGame
   }
 
   void addHearts() {
-    for (int i = 1; i <= player.health / 100; i++) {
+    for (int i = 1; i <= player.maxHealth / 100; i++) {
       double heartX = 40 + (i - 1) * 40;
       double heartY = 40;
       Heart heart = Heart(heartID: i, position: Vector2(heartX, heartY));
+      heartAmount += 1;
       camera.viewport.add(heart);
+    }
+  }
+
+  void updateHearts() {
+    double heartDifference = player.maxHealth / 100 - heartAmount;
+    if (heartDifference > 0) {
+      heartAmount += 1;
+      for (int i = 1; i <= heartDifference; i++) {
+        double heartX = 40 + (heartAmount - 1) * 40;
+        double heartY = 40;
+        Heart heart = Heart(
+          heartID: heartAmount,
+          position: Vector2(heartX, heartY),
+        );
+
+        camera.viewport.add(heart);
+      }
     }
   }
 

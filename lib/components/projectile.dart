@@ -15,6 +15,7 @@ class Projectile extends SpriteAnimationComponent
   int maxHits = 3;
   double damage = 10;
   double moveSpeed = 200;
+  double despawnCounter = 5;
   Vector2 velocity = Vector2.zero();
 
   @override
@@ -35,6 +36,7 @@ class Projectile extends SpriteAnimationComponent
   void update(double dt) {
     _updateMovement(dt);
     _handleHits();
+    _handleTime(dt);
     super.update(dt);
   }
 
@@ -45,6 +47,13 @@ class Projectile extends SpriteAnimationComponent
 
   void _handleHits() {
     if (hitCounter >= maxHits) {
+      removeFromParent();
+    }
+  }
+
+  void _handleTime(double dt) {
+    despawnCounter -= dt;
+    if (despawnCounter <= 0) {
       removeFromParent();
     }
   }
