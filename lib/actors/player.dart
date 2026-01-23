@@ -50,7 +50,7 @@ class Player extends SpriteAnimationComponent
 
   @override
   void onLoad() {
-    debugMode = true;
+    //debugMode = true;
     priority = 1;
     animation = SpriteAnimation.fromFrameData(
       game.images.fromCache('monster.png'),
@@ -71,7 +71,7 @@ class Player extends SpriteAnimationComponent
       _handleCookieCollision(dt);
       _handleHealthRegeneration(dt);
       _handleAttacks(dt);
-      print(health.toString() + ', ' + maxHealth.toString());
+      //print(health.toString() + ', ' + maxHealth.toString());
     }
     super.update(dt);
   }
