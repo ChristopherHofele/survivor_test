@@ -12,9 +12,13 @@
             "scale": 1,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 1211,
-                "y": 379.5
+                "x": 981,
+                "y": 493.5
             }
+        },
+        "forrest.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "survivor_test.tsx": {
             "scaleInDock": 1,
@@ -29,11 +33,13 @@
     "map.width": 120,
     "openFiles": [
         "survivor_test.tsx",
-        "Level1.tmx"
+        "Level1.tmx",
+        "forrest.tsx"
     ],
     "project": "survivor_test.tiled-project",
     "recentFiles": [
         "survivor_test.tsx",
+        "forrest.tsx",
         "Level1.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
