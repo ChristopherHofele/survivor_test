@@ -67,6 +67,28 @@ class BasicEnemy extends SpriteAnimationComponent
     super.update(dt);
   }
 
+  void _updateMovement(double dt) {
+    if (followPlayer) {
+      movementDirection = determineDirectionOfPlayer(player);
+      followCornerCooldown = 2;
+      //print('followingPlayer');
+    } else {
+      movementDirection = determineDirectionOfCorner(cornerToFollow);
+      followCornerCooldown -= dt;
+      //print('followingCorner');
+      if ((position - cornerToFollow).length < 2 || followCornerCooldown < 0) {
+        followPlayer = true;
+      }
+    }
+    velocity = movementDirection * moveSpeed;
+    position += velocity * dt;
+    if (velocity.x < 0 && scale.x > 0) {
+      flipHorizontallyAroundCenter();
+    } else if (velocity.x > 0 && scale.x < 0) {
+      flipHorizontallyAroundCenter();
+    }
+  }
+
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     if (other is BasicEnemy && intersectionPoints.length == 2) {
@@ -121,6 +143,22 @@ class BasicEnemy extends SpriteAnimationComponent
     return directionOfCorner;
   }
 
+  void _handleCollisions(double dt) {
+    int collisionCounter = 0;
+    for (final block in collisionBlocks) {
+      if (block.shopType == ShopType.NoShop) {
+        if (checkCollision(this, block)) {
+          _handleHorizontalCollisions(dt, block);
+          _handleVerticalCollisons(dt, block);
+          collisionCounter += 1;
+        }
+      }
+      if (collisionCounter == 2) {
+        break;
+      }
+    }
+  }
+
   void _handleHorizontalCollisions(double dt, CollisionBlock block) {
     if (isCollisionHorizontal(this, block, dt)) {
       //if (followCornerCooldown < 0) {
@@ -136,73 +174,6 @@ class BasicEnemy extends SpriteAnimationComponent
       } else if (velocity.x < 0) {
         velocity.x = 0;
         position.x = block.x + block.width + this.width / 2;
-      }
-    }
-  }
-
-  void _handleVerticalCollisons(double dt, CollisionBlock block) {
-    if (isCollisionVertical(this, block, dt)) {
-      //if (followCornerCooldown < 0) {
-      if (block.extendedCorners.length == 2) {
-        _handleTwoCornerVerticalal(block);
-      } else if (block.extendedCorners.length == 3) {
-        _handleThreeCornerVertical(block);
-      }
-      // }
-      if (velocity.y > 0) {
-        velocity.y = 0;
-        position.y = block.y - this.height / 2;
-      } else if (velocity.y < 0) {
-        velocity.y = 0;
-        position.y = block.y + block.height + this.height / 2;
-      }
-    }
-  }
-
-  void _updateMovement(double dt) {
-    if (followPlayer) {
-      movementDirection = determineDirectionOfPlayer(player);
-      followCornerCooldown = 2;
-      print('followingPlayer');
-    } else {
-      movementDirection = determineDirectionOfCorner(cornerToFollow);
-      followCornerCooldown -= dt;
-      print('followingCorner');
-      if ((position - cornerToFollow).length < 2 || followCornerCooldown < 0) {
-        followPlayer = true;
-      }
-    }
-    velocity = movementDirection * moveSpeed;
-    position += velocity * dt;
-    if (velocity.x < 0 && scale.x > 0) {
-      flipHorizontallyAroundCenter();
-    } else if (velocity.x > 0 && scale.x < 0) {
-      flipHorizontallyAroundCenter();
-    }
-  }
-
-  void _handleHealth() {
-    if (health <= 0) {
-      game.world1.enemyCount -= 1;
-      Cookie cookie = Cookie(position: position);
-      game.world1.add(cookie);
-      game.world1.cookies.add(cookie);
-      game.world1.remove(this);
-    }
-  }
-
-  void _handleCollisions(double dt) {
-    int collisionCounter = 0;
-    for (final block in collisionBlocks) {
-      if (block.shopType == ShopType.NoShop) {
-        if (checkCollision(this, block)) {
-          _handleHorizontalCollisions(dt, block);
-          _handleVerticalCollisons(dt, block);
-          collisionCounter += 1;
-        }
-      }
-      if (collisionCounter == 2) {
-        break;
       }
     }
   }
@@ -248,11 +219,11 @@ class BasicEnemy extends SpriteAnimationComponent
     switch (block.cornerType) {
       case CornerType.BottomLeft:
         if (velocity.x > 0) {
-          cornerToFollow.x = block.extendedCorners[0].x; //- size.x / 1.8;
+          cornerToFollow.x = block.extendedCorners[0].x - size.x / 2;
           cornerToFollow.y = block.extendedCorners[0].y - size.y / 1.5;
         } else {
           if (velocity.y > 0) {
-            cornerToFollow.x = block.extendedCorners[2].x;
+            cornerToFollow.x = block.extendedCorners[2].x + size.x / 2;
             cornerToFollow.y = block.extendedCorners[2].y + size.y / 1.5;
           } else {
             cornerToFollow = block.extendedCorners[1];
@@ -261,37 +232,37 @@ class BasicEnemy extends SpriteAnimationComponent
         }
       case CornerType.TopLeft:
         if (velocity.x > 0) {
-          cornerToFollow.x = block.extendedCorners[2].x;
+          cornerToFollow.x = block.extendedCorners[2].x - size.x / 2;
           cornerToFollow.y = block.extendedCorners[2].y + size.y / 1.5;
         } else {
           if (velocity.y > 0) {
             cornerToFollow = block.extendedCorners[1] + size / 1.8;
           } else {
-            cornerToFollow.x = block.extendedCorners[0].x;
+            cornerToFollow.x = block.extendedCorners[0].x + size.x / 2;
             cornerToFollow.y = block.extendedCorners[0].y - size.y / 1.5;
             ;
           }
         }
       case CornerType.TopRight:
         if (velocity.x < 0) {
-          cornerToFollow.x = block.extendedCorners[0].x;
+          cornerToFollow.x = block.extendedCorners[0].x + size.x / 2;
           cornerToFollow.y = block.extendedCorners[0].y + size.y / 1.5;
         } else {
           if (velocity.y > 0) {
             cornerToFollow = block.extendedCorners[1];
             cornerToFollow += Vector2(-size.x, size.y) / 1.8;
           } else {
-            cornerToFollow.x = block.extendedCorners[2].x;
+            cornerToFollow.x = block.extendedCorners[2].x - size.x / 2;
             cornerToFollow.y = block.extendedCorners[2].y - size.y / 1.5;
           }
         }
       case CornerType.BottomRight:
         if (velocity.x < 0) {
-          cornerToFollow.x = block.extendedCorners[2].x;
+          cornerToFollow.x = block.extendedCorners[2].x + size.x / 2;
           cornerToFollow.y = block.extendedCorners[2].y - size.y / 1.5;
         } else {
           if (velocity.y > 0) {
-            cornerToFollow.x = block.extendedCorners[0].x;
+            cornerToFollow.x = block.extendedCorners[0].x - size.x / 2;
             cornerToFollow.y = block.extendedCorners[0].y + size.y / 1.5;
           } else {
             cornerToFollow = block.extendedCorners[1] - size / 1.8;
@@ -300,6 +271,25 @@ class BasicEnemy extends SpriteAnimationComponent
 
         break;
       default:
+    }
+  }
+
+  void _handleVerticalCollisons(double dt, CollisionBlock block) {
+    if (isCollisionVertical(this, block, dt)) {
+      //if (followCornerCooldown < 0) {
+      if (block.extendedCorners.length == 2) {
+        _handleTwoCornerVerticalal(block);
+      } else if (block.extendedCorners.length == 3) {
+        _handleThreeCornerVertical(block);
+      }
+      // }
+      if (velocity.y > 0) {
+        velocity.y = 0;
+        position.y = block.y - this.height / 2;
+      } else if (velocity.y < 0) {
+        velocity.y = 0;
+        position.y = block.y + block.height + this.height / 2;
+      }
     }
   }
 
@@ -345,32 +335,32 @@ class BasicEnemy extends SpriteAnimationComponent
       case CornerType.BottomLeft:
         if (velocity.y < 0) {
           cornerToFollow.x = block.extendedCorners[2].x + size.x / 1.5;
-          cornerToFollow.y = block.extendedCorners[0].y;
+          cornerToFollow.y = block.extendedCorners[2].y + size.y / 2;
         } else if (velocity.x > 0) {
           cornerToFollow =
               block.extendedCorners[1] + Vector2(size.x, -size.y) / 1.8;
         } else {
           cornerToFollow.x = block.extendedCorners[0].x - size.x / 1.5;
-          cornerToFollow.y = block.extendedCorners[0].y;
+          cornerToFollow.y = block.extendedCorners[0].y - size.y / 2;
         }
 
       case CornerType.TopLeft:
         if (velocity.y > 0) {
           cornerToFollow.x = block.extendedCorners[0].x + size.x / 1.5;
-          cornerToFollow.y = block.extendedCorners[0].y;
+          cornerToFollow.y = block.extendedCorners[0].y - size.y / 2;
         } else if (velocity.x > 0) {
           cornerToFollow = block.extendedCorners[1] + size / 1.8;
         } else {
           cornerToFollow.x = block.extendedCorners[2].x - size.x / 1.5;
-          cornerToFollow.y = block.extendedCorners[2].y;
+          cornerToFollow.y = block.extendedCorners[2].y + size.y / 2;
         }
       case CornerType.TopRight:
         if (velocity.y > 0) {
           cornerToFollow.x = block.extendedCorners[2].x - size.x / 1.5;
-          cornerToFollow.y = block.extendedCorners[2].y;
+          cornerToFollow.y = block.extendedCorners[2].y - size.y / 2;
         } else if (velocity.x > 0) {
           cornerToFollow.x = block.extendedCorners[0].x + size.x / 1.5;
-          cornerToFollow.y = block.extendedCorners[0].y;
+          cornerToFollow.y = block.extendedCorners[0].y + size.y / 2;
         } else {
           cornerToFollow =
               block.extendedCorners[1] + Vector2(-size.x, size.y) / 1.8;
@@ -378,14 +368,24 @@ class BasicEnemy extends SpriteAnimationComponent
       case CornerType.BottomRight:
         if (velocity.y < 0) {
           cornerToFollow.x = block.extendedCorners[0].x - size.x / 1.5;
-          cornerToFollow.y = block.extendedCorners[0].y;
+          cornerToFollow.y = block.extendedCorners[0].y + size.y / 2;
         } else if (velocity.x > 0) {
           cornerToFollow.x = block.extendedCorners[2].x + size.x / 1.5;
-          cornerToFollow.y = block.extendedCorners[0].y;
+          cornerToFollow.y = block.extendedCorners[2].y - size.y / 2;
         } else {
           cornerToFollow = block.extendedCorners[1] - size / 1.8;
         }
       default:
+    }
+  }
+
+  void _handleHealth() {
+    if (health <= 0) {
+      game.world1.enemyCount -= 1;
+      Cookie cookie = Cookie(position: position);
+      game.world1.add(cookie);
+      game.world1.cookies.add(cookie);
+      game.world1.remove(this);
     }
   }
 }

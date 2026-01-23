@@ -10,10 +10,10 @@
     "fileStates": {
         "Level1.tmx": {
             "scale": 1,
-            "selectedLayer": 1,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 981,
-                "y": 493.5
+                "x": 1050,
+                "y": 495.5
             }
         },
         "forrest.tsx": {
