@@ -29,6 +29,7 @@ class Projectile extends SpriteAnimationComponent
       ),
     );
     add(CircleHitbox(collisionType: CollisionType.passive));
+    maxHits = game.player.projectileMaximumHits;
     return super.onLoad();
   }
 

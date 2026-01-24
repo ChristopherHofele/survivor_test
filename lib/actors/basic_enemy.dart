@@ -18,6 +18,7 @@ class BasicEnemy extends SpriteAnimationComponent
   double moveSpeed = 80;
   double health = 1;
   double followCornerCooldown = 0.3;
+  double attackCooldown = 1;
   final double hitboxRadius = 16;
 
   late final Player player;
@@ -63,6 +64,7 @@ class BasicEnemy extends SpriteAnimationComponent
       _handleCollisions(dt);
       basicEnemies = game.world1.basicEnemies;
       _handleHealth();
+      attackCooldown -= dt;
     }
     super.update(dt);
   }
@@ -91,7 +93,8 @@ class BasicEnemy extends SpriteAnimationComponent
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (other is BasicEnemy && intersectionPoints.length == 2) {
+    if (other is BasicEnemy ||
+        other is Player && intersectionPoints.length == 2) {
       final mid =
           (intersectionPoints.elementAt(0) + intersectionPoints.elementAt(1)) /
           2;
@@ -104,6 +107,7 @@ class BasicEnemy extends SpriteAnimationComponent
       for (final block in collisionBlocks) {
         if (checkCollision(this, block)) {
           position -= collisionNormal.scaled(separationDistance);
+          break;
         }
       }
       super.onCollision(intersectionPoints, other);

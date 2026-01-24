@@ -18,6 +18,7 @@ class Player extends SpriteAnimationComponent
   int money = 0;
   //int invincibilityDelay = 1;
   int healthRegenerationDelay = 3;
+  int projectileMaximumHits = 3;
   double healthRegeneration = 50;
   double health = 400;
   double maxHealth = 400;
@@ -110,6 +111,7 @@ class Player extends SpriteAnimationComponent
             if (money >= 5 && buyCooldown <= 0) {
               money -= 5;
               maxAttackCooldown = maxAttackCooldown * 0.5;
+              projectileMaximumHits += 1;
               buyCooldown = 4;
             }
             break;
@@ -179,15 +181,13 @@ class Player extends SpriteAnimationComponent
   }
 
   @override
-  void onCollisionStart(
-    Set<Vector2> intersectionPoints,
-    PositionComponent other,
-  ) {
-    if (other is BasicEnemy) {
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    if (other is BasicEnemy && other.attackCooldown <= 0) {
       health -= 100;
       gotHit = true;
+      other.attackCooldown = 1;
     }
-    super.onCollisionStart(intersectionPoints, other);
+    super.onCollision(intersectionPoints, other);
   }
 
   Future<void> _handleHealthRegeneration(double dt) async {
