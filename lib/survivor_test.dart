@@ -13,6 +13,7 @@ import 'package:survivor_test/overlays/money_display.dart';
 class SurvivorTest extends FlameGame
     with DragCallbacks, HasCollisionDetection, TapCallbacks {
   //late final CameraComponent cam;
+
   int heartAmount = 0;
   late Player player;
   late JoystickComponent joystick;
