@@ -73,6 +73,7 @@ class Player extends SpriteAnimationComponent
       _handleHealthRegeneration(dt);
       _handleAttacks(dt);
       //print(health.toString() + ', ' + maxHealth.toString());
+      //print(collisionBlocks.length);
     }
     super.update(dt);
   }
@@ -132,14 +133,19 @@ class Player extends SpriteAnimationComponent
             }
             break;
           default:
-            _handleHorizontalCollisions(dt, block)
-                ? collisionCounter += 1
-                : collisionCounter;
-            _handleVerticalCollisons(dt, block)
-                ? collisionCounter += 1
-                : collisionCounter;
+            if (block.destinationName != '') {
+              game.world1.removeFromParent();
+              game.loadWorld(block.destinationName);
+            } else {
+              _handleHorizontalCollisions(dt, block)
+                  ? collisionCounter += 1
+                  : collisionCounter;
+              _handleVerticalCollisons(dt, block)
+                  ? collisionCounter += 1
+                  : collisionCounter;
+            }
+            ;
         }
-        ;
       }
       if (collisionCounter >= 2) {
         print('two collisions');

@@ -32,10 +32,14 @@ class BasicEnemy extends SpriteAnimationComponent
   List<BasicEnemy> basicEnemies = [];
 
   bool followPlayer = true;
+  bool first = false;
 
   @override
   void onLoad() {
     //debugMode = true;
+    if (game.world1.enemyCount == 0) {
+      first = true;
+    }
     player = game.player;
     collisionBlocks = player.collisionBlocks;
     priority = 1;
@@ -59,6 +63,10 @@ class BasicEnemy extends SpriteAnimationComponent
 
   @override
   void update(double dt) {
+    if (first) {
+      print('still here');
+    }
+
     if (game.startGame) {
       _updateMovement(dt);
       _handleCollisions(dt);
