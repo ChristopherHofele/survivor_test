@@ -156,22 +156,6 @@ class Level extends World with HasGameReference<SurvivorTest> {
     player.collisionBlocks = collisionBlocks;
   }
 
-  /*void _addInitialEnemies() {
-    basicEnemy1 = BasicEnemy(position: Vector2(250, 250));
-    basicEnemies.add(basicEnemy1);
-    add(basicEnemy1);
-    basicEnemy2 = BasicEnemy(position: Vector2(-250, -250));
-    add(basicEnemy2);
-    basicEnemies.add(basicEnemy2);
-    basicEnemy3 = BasicEnemy(position: Vector2(450, -350));
-    add(basicEnemy3);
-    basicEnemies.add(basicEnemy3);
-    basicEnemy4 = BasicEnemy(position: Vector2(250, -250));
-    add(basicEnemy4);
-    basicEnemies.add(basicEnemy4);
-    player.basicEnemies = basicEnemies;
-  }*/
-
   void _addSpawners() {
     double spawnerID = 0;
     final spawnersLayer = level.tileMap.getLayer<ObjectGroup>('Spawners');

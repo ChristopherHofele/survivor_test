@@ -19,6 +19,7 @@ class BasicEnemy extends SpriteAnimationComponent
   double health = 1;
   double followCornerCooldown = 0.3;
   double attackCooldown = 1;
+  double getOutOfSpawn = 3;
   final double hitboxRadius = 16;
 
   late final Player player;
@@ -68,8 +69,11 @@ class BasicEnemy extends SpriteAnimationComponent
     }
 
     if (game.startGame) {
+      getOutOfSpawn -= dt;
       _updateMovement(dt);
-      _handleCollisions(dt);
+      if (getOutOfSpawn <= 0) {
+        _handleCollisions(dt);
+      }
       basicEnemies = game.world1.basicEnemies;
       _handleHealth();
       attackCooldown -= dt;
