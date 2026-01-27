@@ -19,11 +19,13 @@ enum CornerType {
 class CollisionBlock extends PositionComponent {
   ShopType shopType;
   CornerType cornerType;
+  String destinationName;
   CollisionBlock({
     position,
     size,
     this.shopType = ShopType.NoShop,
     this.cornerType = CornerType.Irrelevant,
+    this.destinationName = '',
   }) : super(position: position, size: size);
 
   List<Vector2> extendedCorners = [];

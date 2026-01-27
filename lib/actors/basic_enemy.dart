@@ -19,6 +19,7 @@ class BasicEnemy extends SpriteAnimationComponent
   double health = 1;
   double followCornerCooldown = 0.3;
   double attackCooldown = 1;
+  double getOutOfSpawn = 3;
   final double hitboxRadius = 16;
 
   late final Player player;
@@ -32,10 +33,14 @@ class BasicEnemy extends SpriteAnimationComponent
   List<BasicEnemy> basicEnemies = [];
 
   bool followPlayer = true;
+  bool first = false;
 
   @override
   void onLoad() {
     //debugMode = true;
+    if (game.world1.enemyCount == 0) {
+      first = true;
+    }
     player = game.player;
     collisionBlocks = player.collisionBlocks;
     priority = 1;
@@ -59,9 +64,16 @@ class BasicEnemy extends SpriteAnimationComponent
 
   @override
   void update(double dt) {
+    if (first) {
+      print('still here');
+    }
+
     if (game.startGame) {
+      getOutOfSpawn -= dt;
       _updateMovement(dt);
-      _handleCollisions(dt);
+      if (getOutOfSpawn <= 0) {
+        _handleCollisions(dt);
+      }
       basicEnemies = game.world1.basicEnemies;
       _handleHealth();
       attackCooldown -= dt;

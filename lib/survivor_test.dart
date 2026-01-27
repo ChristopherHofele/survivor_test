@@ -21,20 +21,21 @@ class SurvivorTest extends FlameGame
   late AttackButton attackButton;
   late Level world1;
   bool startGame = false;
+  Map spawnCoordinates = {};
 
   @override
   Future<void> onLoad() async {
-    player = Player(position: Vector2(700, 400));
+    spawnCoordinates['Level1.tmx'] = Vector2(960, 960);
+    spawnCoordinates['Health.tmx'] = Vector2(1040, 352);
+    player = Player(position: Vector2(960, 960));
     await images.loadAllImages();
-    world1 = Level(player: player);
+    loadWorld('Level1.tmx');
     camera = CameraComponent.withFixedResolution(
       world: world1,
       width: size.x,
       height: size.y,
     );
     camera.follow(player);
-    add(world1..priority = -1);
-    world1.add(player);
     addControls();
     addHearts();
     addMoney();
@@ -105,5 +106,12 @@ class SurvivorTest extends FlameGame
   void addMoney() {
     MoneyDisplay moneyDisplay = MoneyDisplay();
     camera.viewport.add(moneyDisplay);
+  }
+
+  void loadWorld(String worldName) {
+    world1 = Level(player: player, tileMapName: worldName);
+    add(world1..priority = -1);
+    world1.add(player);
+    camera.world = world1;
   }
 }

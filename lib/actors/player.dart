@@ -48,6 +48,7 @@ class Player extends SpriteAnimationComponent
   bool gotHit = false;
   bool isInjured = false;
   bool isAttacking = false;
+  bool justTeleported = false;
 
   @override
   void onLoad() {
@@ -73,6 +74,7 @@ class Player extends SpriteAnimationComponent
       _handleHealthRegeneration(dt);
       _handleAttacks(dt);
       //print(health.toString() + ', ' + maxHealth.toString());
+      //print(collisionBlocks.length);
     }
     super.update(dt);
   }
@@ -99,6 +101,7 @@ class Player extends SpriteAnimationComponent
       flipHorizontallyAroundCenter();
     }
     stamina = stamina.clamp(0, 100);
+    print(position);
   }
 
   void _handleBlockCollisions(double dt) {
@@ -132,14 +135,20 @@ class Player extends SpriteAnimationComponent
             }
             break;
           default:
-            _handleHorizontalCollisions(dt, block)
-                ? collisionCounter += 1
-                : collisionCounter;
-            _handleVerticalCollisons(dt, block)
-                ? collisionCounter += 1
-                : collisionCounter;
+            if (block.destinationName != '') {
+              game.world1.removeFromParent();
+              game.loadWorld(block.destinationName);
+              justTeleported = true;
+            } else {
+              _handleHorizontalCollisions(dt, block)
+                  ? collisionCounter += 1
+                  : collisionCounter;
+              _handleVerticalCollisons(dt, block)
+                  ? collisionCounter += 1
+                  : collisionCounter;
+            }
+            ;
         }
-        ;
       }
       if (collisionCounter >= 2) {
         print('two collisions');

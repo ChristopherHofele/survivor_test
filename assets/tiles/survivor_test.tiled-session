@@ -3,25 +3,33 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Level1.tmx",
+    "activeFile": "Health.tmx",
     "expandedProjectPaths": [
         "."
     ],
     "fileStates": {
         "Health.tmx": {
-            "scale": 0.37356770833333336,
-            "selectedLayer": 0,
+            "expandedObjectLayers": [
+                3,
+                2
+            ],
+            "scale": 1.5,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 961.0038340885326,
-                "y": 641.1153712094806
+                "x": 1064,
+                "y": 376.33333333333337
             }
         },
         "Level1.tmx": {
+            "expandedObjectLayers": [
+                3,
+                2
+            ],
             "scale": 0.75,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 1238.6666666666665,
-                "y": 876.6666666666667
+                "x": 974.6666666666665,
+                "y": 881.9999999999999
             }
         },
         "forrest.tsx": {
@@ -42,13 +50,15 @@
     "openFiles": [
         "survivor_test.tsx",
         "Level1.tmx",
-        "forrest.tsx"
+        "forrest.tsx",
+        "Health.tmx"
     ],
     "project": "survivor_test.tiled-project",
     "recentFiles": [
         "survivor_test.tsx",
+        "Level1.tmx",
         "forrest.tsx",
-        "Level1.tmx"
+        "Health.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {

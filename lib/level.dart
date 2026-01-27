@@ -12,11 +12,8 @@ import 'package:survivor_test/survivor_test.dart';
 class Level extends World with HasGameReference<SurvivorTest> {
   late TiledComponent level;
   final Player player;
-  late BasicEnemy basicEnemy1;
-  late BasicEnemy basicEnemy2;
-  late BasicEnemy basicEnemy3;
-  late BasicEnemy basicEnemy4;
-  Level({required this.player});
+  final String tileMapName;
+  Level({required this.player, required this.tileMapName});
   List<CollisionBlock> collisionBlocks = [];
   List<BasicEnemy> basicEnemies = [];
   List<Cookie> cookies = [];
@@ -26,10 +23,9 @@ class Level extends World with HasGameReference<SurvivorTest> {
   FutureOr<void> onLoad() async {
     //debugMode = true;
     priority = -1;
-    level = await TiledComponent.load('Level1.tmx', Vector2.all(16));
+    level = await TiledComponent.load(tileMapName, Vector2.all(16));
     add(level);
     _addCollisions();
-    //_addInitialEnemies();
     _addSpawners();
 
     super.onLoad();
@@ -40,6 +36,14 @@ class Level extends World with HasGameReference<SurvivorTest> {
     if (collisionsLayer != null) {
       for (final collision in collisionsLayer.objects) {
         switch (collision.class_) {
+          case 'Portal':
+            final portal = CollisionBlock(
+              position: Vector2(collision.x, collision.y),
+              size: Vector2(collision.width, collision.height),
+              destinationName: collision.name,
+            );
+            collisionBlocks.add(portal);
+            add(portal);
           case 'Damage_Shop':
             final damageShop = CollisionBlock(
               position: Vector2(collision.x, collision.y),
@@ -151,22 +155,6 @@ class Level extends World with HasGameReference<SurvivorTest> {
     }
     player.collisionBlocks = collisionBlocks;
   }
-
-  /*void _addInitialEnemies() {
-    basicEnemy1 = BasicEnemy(position: Vector2(250, 250));
-    basicEnemies.add(basicEnemy1);
-    add(basicEnemy1);
-    basicEnemy2 = BasicEnemy(position: Vector2(-250, -250));
-    add(basicEnemy2);
-    basicEnemies.add(basicEnemy2);
-    basicEnemy3 = BasicEnemy(position: Vector2(450, -350));
-    add(basicEnemy3);
-    basicEnemies.add(basicEnemy3);
-    basicEnemy4 = BasicEnemy(position: Vector2(250, -250));
-    add(basicEnemy4);
-    basicEnemies.add(basicEnemy4);
-    player.basicEnemies = basicEnemies;
-  }*/
 
   void _addSpawners() {
     double spawnerID = 0;
