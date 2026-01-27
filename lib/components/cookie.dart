@@ -12,7 +12,6 @@ class Cookie extends SpriteAnimationComponent
 
   @override
   FutureOr<void> onLoad() {
-    debugMode = true;
     animation = SpriteAnimation.fromFrameData(
       game.images.fromCache('Items/Fruits/cookie.png'),
       SpriteAnimationData.sequenced(

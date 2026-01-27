@@ -190,12 +190,25 @@ class Player extends SpriteAnimationComponent
   }
 
   @override
+  void onCollisionStart(
+    Set<Vector2> intersectionPoints,
+    PositionComponent other,
+  ) {
+    if (other is Projectile && other.shooter == Shooter.Enemy) {
+      health -= 100;
+      gotHit = true;
+    }
+    super.onCollisionStart(intersectionPoints, other);
+  }
+
+  @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     if (other is BasicEnemy && other.attackCooldown <= 0) {
       health -= 100;
       gotHit = true;
       other.attackCooldown = 1;
     }
+
     super.onCollision(intersectionPoints, other);
   }
 

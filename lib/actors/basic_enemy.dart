@@ -10,17 +10,20 @@ import 'package:survivor_test/components/projectile.dart';
 import 'package:survivor_test/level.dart';
 import 'package:survivor_test/survivor_test.dart';
 
+enum EnemyType { Small, Medium, Big }
+
 class BasicEnemy extends SpriteAnimationComponent
     with HasGameReference<SurvivorTest>, CollisionCallbacks {
-  BasicEnemy({position})
-    : super(position: position, size: Vector2(64, 64), anchor: Anchor.center);
+  EnemyType enemyType;
+  BasicEnemy({required position, required this.enemyType})
+    : super(position: position, size: Vector2.all(64), anchor: Anchor.center);
 
-  double moveSpeed = 80;
-  double health = 1;
+  late double moveSpeed;
+  late double health;
+  late double attackCooldown;
+  late double hitboxRadius;
   double followCornerCooldown = 0.3;
-  double attackCooldown = 1;
   double getOutOfSpawn = 3;
-  final double hitboxRadius = 16;
 
   late final Player player;
   late final Level level;
@@ -28,6 +31,7 @@ class BasicEnemy extends SpriteAnimationComponent
   Vector2 movementDirection = Vector2.zero();
   Vector2 velocity = Vector2.zero();
   Vector2 cornerToFollow = Vector2.zero();
+  late Vector2 textureSize;
 
   List<CollisionBlock> collisionBlocks = [];
   List<BasicEnemy> basicEnemies = [];
@@ -35,9 +39,12 @@ class BasicEnemy extends SpriteAnimationComponent
   bool followPlayer = true;
   bool first = false;
 
+  late String spriteName;
+
   @override
   void onLoad() {
-    //debugMode = true;
+    debugMode = true;
+    _initializeEnemyType();
     if (game.enemyCount == 0) {
       first = true;
     }
@@ -45,10 +52,10 @@ class BasicEnemy extends SpriteAnimationComponent
     collisionBlocks = player.collisionBlocks;
     priority = 1;
     animation = SpriteAnimation.fromFrameData(
-      game.images.fromCache('enemy.png'),
+      game.images.fromCache(spriteName),
       SpriteAnimationData.sequenced(
         amount: 4,
-        textureSize: Vector2(64, 64),
+        textureSize: textureSize,
         stepTime: 0.12,
       ),
     );
@@ -62,6 +69,36 @@ class BasicEnemy extends SpriteAnimationComponent
     );
   }
 
+  void _initializeEnemyType() {
+    switch (enemyType) {
+      case EnemyType.Small:
+        spriteName = 'enemy_small.png';
+        textureSize = Vector2.all(32);
+        hitboxRadius = 16;
+        moveSpeed = 120;
+        health = 1;
+        attackCooldown = 1;
+        break;
+      case EnemyType.Medium:
+        spriteName = 'enemy.png';
+        textureSize = Vector2.all(64);
+        hitboxRadius = 16;
+        moveSpeed = 80;
+        health = 1;
+        attackCooldown = 1;
+        break;
+      case EnemyType.Big:
+        spriteName = 'enemy_big.png';
+        textureSize = Vector2.all(128);
+        hitboxRadius = 32;
+        moveSpeed = 50;
+        health = 30;
+        attackCooldown = 5;
+        break;
+    }
+    size = textureSize;
+  }
+
   @override
   void update(double dt) {
     if (game.startGame) {
@@ -69,6 +106,16 @@ class BasicEnemy extends SpriteAnimationComponent
       _updateMovement(dt);
       if (getOutOfSpawn <= 0) {
         _handleCollisions(dt);
+      }
+      if (enemyType == EnemyType.Big && attackCooldown <= 0) {
+        game.world1.add(
+          Projectile(
+            position: position,
+            moveDirection: movementDirection,
+            shooter: Shooter.Enemy,
+          ),
+        );
+        attackCooldown = 5;
       }
       basicEnemies = game.world1.basicEnemies;
       _handleHealth();
@@ -108,7 +155,7 @@ class BasicEnemy extends SpriteAnimationComponent
           2;
 
       final collisionNormal = absoluteCenter - mid;
-      final separationDistance = (16) - collisionNormal.length;
+      final separationDistance = (hitboxRadius) - collisionNormal.length;
       collisionNormal.normalize();
 
       position += collisionNormal.scaled(separationDistance);
@@ -127,7 +174,7 @@ class BasicEnemy extends SpriteAnimationComponent
     Set<Vector2> intersectionPoints,
     PositionComponent other,
   ) {
-    if (other is Projectile) {
+    if (other is Projectile && other.shooter == Shooter.Player) {
       health -= other.damage;
       other.hitCounter += 1;
       add(

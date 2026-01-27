@@ -5,11 +5,17 @@ import 'package:flame/components.dart';
 
 import 'package:survivor_test/survivor_test.dart';
 
+enum Shooter { Player, Enemy }
+
 class Projectile extends SpriteAnimationComponent
     with HasGameReference<SurvivorTest> {
   Vector2 moveDirection;
-  Projectile({required position, required this.moveDirection})
-    : super(position: position, size: Vector2(38, 38), anchor: Anchor.center);
+  Shooter shooter;
+  Projectile({
+    required position,
+    required this.moveDirection,
+    this.shooter = Shooter.Player,
+  }) : super(position: position, size: Vector2(38, 38), anchor: Anchor.center);
 
   int hitCounter = 0;
   int maxHits = 3;
@@ -17,11 +23,18 @@ class Projectile extends SpriteAnimationComponent
   double moveSpeed = 200;
   double despawnCounter = 5;
   Vector2 velocity = Vector2.zero();
+  late String spriteName;
 
   @override
   FutureOr<void> onLoad() async {
+    if (shooter == Shooter.Player) {
+      spriteName = 'Traps/Saw/On.png';
+    } else {
+      spriteName = 'Traps/Saw/On_enemy.png';
+    }
+
     animation = SpriteAnimation.fromFrameData(
-      game.images.fromCache('Traps/Saw/On.png'),
+      game.images.fromCache(spriteName),
       SpriteAnimationData.sequenced(
         amount: 8,
         textureSize: Vector2(38, 38),
