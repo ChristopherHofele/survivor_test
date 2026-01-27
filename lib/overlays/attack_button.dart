@@ -4,19 +4,19 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:survivor_test/survivor_test.dart';
 
-class DashButton extends SpriteComponent
+class AttackButton extends SpriteComponent
     with HasGameReference<SurvivorTest>, TapCallbacks {
-  DashButton();
+  AttackButton();
 
   final margin = 64;
   final int buttonSize = 64;
 
   @override
   FutureOr<void> onLoad() {
-    sprite = Sprite(game.images.fromCache('HUD/DashButton.png'));
+    sprite = Sprite(game.images.fromCache('HUD/AttackButton.png'));
     position = Vector2(
-      game.size.x - game.size.x + 2 * margin + buttonSize,
-      game.size.y - margin - buttonSize,
+      game.size.x - game.size.x + margin,
+      game.size.y - 1.5 * margin - buttonSize,
     );
     priority = 10;
     return super.onLoad();
@@ -24,13 +24,13 @@ class DashButton extends SpriteComponent
 
   @override
   void onTapDown(TapDownEvent event) {
-    game.player.isDashing = true;
+    game.player.isAttacking = true;
     super.onTapDown(event);
   }
 
   @override
   void onTapUp(TapUpEvent event) {
-    game.player.isDashing = false;
+    game.player.isAttacking = false;
     super.onTapUp(event);
   }
 }

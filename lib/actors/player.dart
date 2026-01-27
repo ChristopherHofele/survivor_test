@@ -6,6 +6,8 @@ import 'package:flame/effects.dart';
 import 'package:survivor_test/actors/basic_enemy.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
+import 'package:survivor_test/components/cookie.dart';
+import 'package:survivor_test/components/projectile.dart';
 import 'package:survivor_test/survivor_test.dart';
 
 class Player extends SpriteAnimationComponent
@@ -13,32 +15,43 @@ class Player extends SpriteAnimationComponent
   Player({position})
     : super(position: position, size: Vector2(64, 64), anchor: Anchor.center);
 
-  int invincibilityDelay = 1;
+  int money = 0;
+  //int invincibilityDelay = 1;
   int healthRegenerationDelay = 3;
+  int projectileMaximumHits = 3;
   double healthRegeneration = 50;
   double health = 400;
+  double maxHealth = 400;
 
   double moveSpeed = 100;
   double playerSpeed = 0;
 
   double dashBoostMultiplier = 3;
   double stamina = 100;
-  final double staminaDrain = 30;
-  final double staminaRecovery = 20;
+  double staminaDrain = 30;
+  double staminaRecovery = 20;
+
+  double attackCooldown = 2;
+  double maxAttackCooldown = 2;
+
+  double buyCooldown = 0;
 
   Vector2 movementDirection = Vector2.zero();
   Vector2 velocity = Vector2.zero();
 
   List<CollisionBlock> collisionBlocks = [];
-  List<BasicEnemy> basicEnemies = [];
+  //List<BasicEnemy> basicEnemies = [];
+  List<Cookie> cookies = [];
 
   bool isDashing = false;
   bool canDash = true;
   bool gotHit = false;
   bool isInjured = false;
+  bool isAttacking = false;
 
   @override
   void onLoad() {
+    //debugMode = true;
     priority = 1;
     animation = SpriteAnimation.fromFrameData(
       game.images.fromCache('monster.png'),
@@ -55,10 +68,13 @@ class Player extends SpriteAnimationComponent
   void update(double dt) {
     if (game.startGame) {
       _updatePlayerMovement(dt);
+      _handleBlockCollisions(dt);
+      _handleCookieCollision(dt);
+      _handleHealthRegeneration(dt);
+      _handleAttacks(dt);
+      //print(health.toString() + ', ' + maxHealth.toString());
+      //print(collisionBlocks.length);
     }
-    _handleHorizontalCollisions(dt);
-    _handleVerticalCollisons(dt);
-    _handleHealthRegeneration(dt);
     super.update(dt);
   }
 
@@ -78,53 +94,109 @@ class Player extends SpriteAnimationComponent
     }
     velocity = movementDirection * playerSpeed;
     position += velocity * dt;
+    if (velocity.x < 0 && scale.x > 0) {
+      flipHorizontallyAroundCenter();
+    } else if (velocity.x > 0 && scale.x < 0) {
+      flipHorizontallyAroundCenter();
+    }
     stamina = stamina.clamp(0, 100);
+    //print(position);
   }
 
-  void _handleHorizontalCollisions(double dt) {
+  void _handleBlockCollisions(double dt) {
+    int collisionCounter = 0;
+    buyCooldown -= dt;
     for (final block in collisionBlocks) {
-      if (checkCollision(this, block) &&
-          isCollisionHorizontal(this, block, dt)) {
-        if (velocity.x > 0) {
-          velocity.x = 0;
-          position.x = block.x - this.width / 2;
-          break;
+      if (checkCollision(this, block)) {
+        switch (block.shopType) {
+          case ShopType.DamageShop:
+            if (money >= 5 && buyCooldown <= 0) {
+              money -= 5;
+              maxAttackCooldown = maxAttackCooldown * 0.5;
+              projectileMaximumHits += 1;
+              buyCooldown = 4;
+            }
+            break;
+          case ShopType.HealthShop:
+            if (money >= 5 && buyCooldown <= 0) {
+              money -= 5;
+              maxHealth += 100;
+              isInjured = true;
+              buyCooldown = 4;
+              game.updateHearts();
+            }
+            break;
+          case ShopType.StaminaShop:
+            if (money >= 5 && buyCooldown <= 0) {
+              money -= 5;
+              staminaDrain -= 5;
+              buyCooldown = 4;
+            }
+            break;
+          default:
+            if (block.destinationName != '') {
+              game.world1.removeFromParent();
+              game.loadWorld(this, block.destinationName);
+              position = block.teleportCoordinates;
+              game.enemyCount = 0;
+            } else {
+              _handleHorizontalCollisions(dt, block)
+                  ? collisionCounter += 1
+                  : collisionCounter;
+              _handleVerticalCollisons(dt, block)
+                  ? collisionCounter += 1
+                  : collisionCounter;
+            }
+            ;
         }
-        if (velocity.x < 0) {
-          velocity.x = 0;
-          position.x = block.x + block.width + this.width / 2;
-          break;
-        }
+      }
+      if (collisionCounter >= 2) {
+        print('two collisions');
+        break;
       }
     }
   }
 
-  void _handleVerticalCollisons(double dt) {
-    for (final block in collisionBlocks) {
-      if (checkCollision(this, block) && isCollisionVertical(this, block, dt)) {
-        if (velocity.y > 0) {
-          velocity.y = 0;
-          position.y = block.y - this.height / 2;
-          break;
-        }
-        if (velocity.y < 0) {
-          velocity.y = 0;
-          position.y = block.y + block.height + this.height / 2;
-        }
+  bool _handleHorizontalCollisions(double dt, block) {
+    if (isCollisionHorizontal(this, block, dt)) {
+      if (velocity.x > 0) {
+        velocity.x = 0;
+        position.x = block.x - this.width / 2;
       }
+      if (velocity.x < 0) {
+        velocity.x = 0;
+        position.x = block.x + block.width + this.width / 2;
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  bool _handleVerticalCollisons(double dt, block) {
+    if (isCollisionVertical(this, block, dt)) {
+      if (velocity.y > 0) {
+        velocity.y = 0;
+        position.y = block.y - this.height / 2;
+      }
+      if (velocity.y < 0) {
+        velocity.y = 0;
+        position.y = block.y + block.height + this.height / 2;
+      }
+      return true;
+    } else {
+      return false;
     }
   }
 
   @override
-  void onCollisionStart(
-    Set<Vector2> intersectionPoints,
-    PositionComponent other,
-  ) {
-    if (other is BasicEnemy && !gotHit) {
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    if (other is BasicEnemy && other.attackCooldown <= 0) {
       health -= 100;
       gotHit = true;
+      other.attackCooldown = 1;
     }
-    super.onCollisionStart(intersectionPoints, other);
+    super.onCollision(intersectionPoints, other);
   }
 
   Future<void> _handleHealthRegeneration(double dt) async {
@@ -141,11 +213,38 @@ class Player extends SpriteAnimationComponent
         Duration(seconds: healthRegenerationDelay),
         () => isInjured = true,
       );
-    } else if (isInjured && health < 300) {
+    } else if (isInjured && health < maxHealth) {
       health += healthRegeneration * dt;
-      health.clamp(-50, 300);
-    } else if (health >= 300) {
+    } else if (health >= maxHealth) {
       isInjured = false;
+      health = maxHealth;
+    }
+  }
+
+  void _handleAttacks(double dt) {
+    attackCooldown -= dt;
+    if (isAttacking && attackCooldown <= 0) {
+      attackCooldown = maxAttackCooldown;
+      game.world1.add(
+        Projectile(position: position, moveDirection: movementDirection),
+      );
+    }
+  }
+
+  void _handleCookieCollision(double dt) {
+    cookies = game.world1.cookies;
+    if (cookies.length != 0) {
+      List<Cookie> cookiesToRemove = [];
+      for (Cookie cookie in cookies) {
+        if (checkCollision(this, cookie)) {
+          cookiesToRemove.add(cookie);
+          cookie.removeFromParent();
+          money += cookie.worth;
+        }
+      }
+      for (Cookie cookie in cookiesToRemove) {
+        game.world1.cookies.remove(cookie);
+      }
     }
   }
 }

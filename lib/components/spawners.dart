@@ -10,7 +10,7 @@ class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
   Spawner({required position, required this.spawnerID, size})
     : super(position: position, size: size);
 
-  double cooldown = 3;
+  double cooldown = 1;
   late int enemyCount;
   late Vector2 spawnLocation;
 
@@ -23,19 +23,21 @@ class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
 
   @override
   void update(double dt) {
-    enemyCount = game.world1.enemyCount;
-    if (cooldown <= 0 && enemyCount < 12) {
-      BasicEnemy basicEnemy = BasicEnemy(position: spawnLocation);
-      game.world1.add(basicEnemy);
-      game.world1.basicEnemies.add(basicEnemy);
-      resetCooldown();
-      game.world1.enemyCount += 1;
+    if (game.startGame) {
+      enemyCount = game.enemyCount;
+      if (cooldown <= 0 && enemyCount < 12) {
+        BasicEnemy basicEnemy = BasicEnemy(position: spawnLocation);
+        game.world1.add(basicEnemy);
+        game.world1.basicEnemies.add(basicEnemy);
+        resetCooldown();
+        game.enemyCount += 1;
+      }
+      cooldown -= dt;
     }
-    cooldown -= dt;
     super.update(dt);
   }
 
   void resetCooldown() {
-    cooldown = 10;
+    cooldown = 3;
   }
 }
