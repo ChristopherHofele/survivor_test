@@ -48,7 +48,6 @@ class Player extends SpriteAnimationComponent
   bool gotHit = false;
   bool isInjured = false;
   bool isAttacking = false;
-  bool justTeleported = false;
 
   @override
   void onLoad() {
@@ -101,7 +100,7 @@ class Player extends SpriteAnimationComponent
       flipHorizontallyAroundCenter();
     }
     stamina = stamina.clamp(0, 100);
-    print(position);
+    //print(position);
   }
 
   void _handleBlockCollisions(double dt) {
@@ -137,8 +136,9 @@ class Player extends SpriteAnimationComponent
           default:
             if (block.destinationName != '') {
               game.world1.removeFromParent();
-              game.loadWorld(block.destinationName);
-              justTeleported = true;
+              game.loadWorld(this, block.destinationName);
+              position = block.teleportCoordinates;
+              game.enemyCount = 0;
             } else {
               _handleHorizontalCollisions(dt, block)
                   ? collisionCounter += 1

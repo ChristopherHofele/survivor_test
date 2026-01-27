@@ -17,7 +17,6 @@ class Level extends World with HasGameReference<SurvivorTest> {
   List<CollisionBlock> collisionBlocks = [];
   List<BasicEnemy> basicEnemies = [];
   List<Cookie> cookies = [];
-  int enemyCount = 0;
 
   @override
   FutureOr<void> onLoad() async {

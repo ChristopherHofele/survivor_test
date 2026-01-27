@@ -15,6 +15,9 @@ class SurvivorTest extends FlameGame
   //late final CameraComponent cam;
 
   int heartAmount = 0;
+  int enemyCount = 0;
+  int frameCounter = 0;
+  double ticker = 0;
   late Player player;
   late JoystickComponent joystick;
   late DashButton dashButton;
@@ -29,7 +32,7 @@ class SurvivorTest extends FlameGame
     spawnCoordinates['Health.tmx'] = Vector2(1040, 352);
     player = Player(position: Vector2(960, 960));
     await images.loadAllImages();
-    loadWorld('Level1.tmx');
+    loadWorld(player, 'Level1.tmx');
     camera = CameraComponent.withFixedResolution(
       world: world1,
       width: size.x,
@@ -47,6 +50,13 @@ class SurvivorTest extends FlameGame
     if (player.health < 100) {
       startGame = false;
       overlays.add('GameOver');
+    }
+    ticker += dt;
+    frameCounter += 1;
+    if (ticker >= 1) {
+      print(frameCounter);
+      ticker = 0;
+      frameCounter = 0;
     }
     super.update(dt);
   }
@@ -97,7 +107,6 @@ class SurvivorTest extends FlameGame
           heartID: heartAmount,
           position: Vector2(heartX, heartY),
         );
-
         camera.viewport.add(heart);
       }
     }
@@ -108,7 +117,7 @@ class SurvivorTest extends FlameGame
     camera.viewport.add(moneyDisplay);
   }
 
-  void loadWorld(String worldName) {
+  void loadWorld(Player player, String worldName) {
     world1 = Level(player: player, tileMapName: worldName);
     add(world1..priority = -1);
     world1.add(player);

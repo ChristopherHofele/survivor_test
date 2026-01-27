@@ -38,7 +38,7 @@ class BasicEnemy extends SpriteAnimationComponent
   @override
   void onLoad() {
     //debugMode = true;
-    if (game.world1.enemyCount == 0) {
+    if (game.enemyCount == 0) {
       first = true;
     }
     player = game.player;
@@ -64,10 +64,6 @@ class BasicEnemy extends SpriteAnimationComponent
 
   @override
   void update(double dt) {
-    if (first) {
-      print('still here');
-    }
-
     if (game.startGame) {
       getOutOfSpawn -= dt;
       _updateMovement(dt);
@@ -397,7 +393,7 @@ class BasicEnemy extends SpriteAnimationComponent
 
   void _handleHealth() {
     if (health <= 0) {
-      game.world1.enemyCount -= 1;
+      game.enemyCount -= 1;
       Cookie cookie = Cookie(position: position);
       game.world1.add(cookie);
       game.world1.cookies.add(cookie);

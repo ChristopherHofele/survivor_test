@@ -28,6 +28,7 @@ class CollisionBlock extends PositionComponent {
     this.destinationName = '',
   }) : super(position: position, size: size);
 
+  Vector2 teleportCoordinates = Vector2.zero();
   List<Vector2> extendedCorners = [];
 
   @override
@@ -63,6 +64,15 @@ class CollisionBlock extends PositionComponent {
         extendedCorners.add(Vector2(position.x + size.x, position.y + size.y));
       default:
         extendedCorners = [];
+    }
+    switch (destinationName) {
+      case 'Level1.tmx':
+        teleportCoordinates = Vector2(993, 993);
+        break;
+      case 'Health.tmx':
+        teleportCoordinates = Vector2(1140, 400);
+        break;
+      default:
     }
     return super.onLoad();
   }
