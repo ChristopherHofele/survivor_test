@@ -70,6 +70,15 @@ class Level extends World with HasGameReference<SurvivorTest> {
             collisionBlocks.add(staminaShop);
             add(staminaShop);
             break;
+          case 'NoCorners':
+            final block = CollisionBlock(
+              position: Vector2(collision.x, collision.y),
+              size: Vector2(collision.width, collision.height),
+              cornerType: CornerType.NoCorners,
+            );
+            collisionBlocks.add(block);
+            add(block);
+            break;
           case 'Top':
             final block = CollisionBlock(
               position: Vector2(collision.x, collision.y),

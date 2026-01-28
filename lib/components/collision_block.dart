@@ -13,6 +13,7 @@ enum CornerType {
   BottomRight,
   Bottom,
   BottomLeft,
+  NoCorners,
   Irrelevant,
 }
 
@@ -34,34 +35,48 @@ class CollisionBlock extends PositionComponent {
   @override
   FutureOr<void> onLoad() {
     switch (cornerType) {
+      case CornerType.NoCorners:
+        extendedCorners.add(Vector2(position.x, position.y));
+        extendedCorners.add(Vector2(position.x + size.x, position.y));
+        extendedCorners.add(Vector2(position.x + size.x, position.y + size.y));
+        extendedCorners.add(Vector2(position.x, position.y + size.y));
+        break;
       case CornerType.Left:
         extendedCorners.add(Vector2(position.x + size.x, position.y));
         extendedCorners.add(Vector2(position.x + size.x, position.y + size.y));
+        break;
       case CornerType.Top:
         extendedCorners.add(Vector2(position.x, position.y + size.y));
         extendedCorners.add(Vector2(position.x + size.x, position.y + size.y));
+        break;
       case CornerType.Right:
         extendedCorners.add(Vector2(position.x, position.y));
         extendedCorners.add(Vector2(position.x, position.y + size.y));
+        break;
       case CornerType.Bottom:
         extendedCorners.add(Vector2(position.x, position.y));
         extendedCorners.add(Vector2(position.x + size.x, position.y));
+        break;
       case CornerType.TopLeft:
         extendedCorners.add(Vector2(position.x + size.x, position.y));
         extendedCorners.add(Vector2(position.x + size.x, position.y + size.y));
         extendedCorners.add(Vector2(position.x, position.y + size.y));
+        break;
       case CornerType.TopRight:
         extendedCorners.add(Vector2(position.x + size.x, position.y + size.y));
         extendedCorners.add(Vector2(position.x, position.y + size.y));
         extendedCorners.add(Vector2(position.x, position.y));
+        break;
       case CornerType.BottomRight:
         extendedCorners.add(Vector2(position.x, position.y + size.y));
         extendedCorners.add(Vector2(position.x, position.y));
         extendedCorners.add(Vector2(position.x + size.x, position.y));
+        break;
       case CornerType.BottomLeft:
         extendedCorners.add(Vector2(position.x, position.y));
         extendedCorners.add(Vector2(position.x + size.x, position.y));
         extendedCorners.add(Vector2(position.x + size.x, position.y + size.y));
+        break;
       default:
         extendedCorners = [];
     }

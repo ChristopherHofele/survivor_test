@@ -10,26 +10,26 @@
     "fileStates": {
         "Health.tmx": {
             "expandedObjectLayers": [
-                2,
-                3
+                3,
+                2
             ],
             "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 672,
-                "y": 377.66666666666663
+                "x": 960.3333333333333,
+                "y": 640.3333333333333
             }
         },
         "Level1.tmx": {
             "expandedObjectLayers": [
-                2,
-                3
+                3,
+                2
             ],
             "scale": 0.75,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 974.6666666666665,
-                "y": 881.9999999999999
+                "x": 1268.6666666666665,
+                "y": 960.6666666666666
             }
         },
         "forrest.tsx": {
