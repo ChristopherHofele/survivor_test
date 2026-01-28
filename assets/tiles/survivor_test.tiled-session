@@ -3,21 +3,29 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Level1.tmx",
+    "activeFile": "Damage.tmx",
     "expandedProjectPaths": [
         "."
     ],
     "fileStates": {
+        "Damage.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 624,
+                "y": 209
+            }
+        },
         "Health.tmx": {
             "expandedObjectLayers": [
                 3,
                 2
             ],
-            "scale": 1.5,
-            "selectedLayer": 1,
+            "scale": 0.75,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 927.9999999999999,
-                "y": 360.66666666666663
+                "x": 651.3333333333334,
+                "y": 448
             }
         },
         "Level1.tmx": {
@@ -25,11 +33,19 @@
                 3,
                 2
             ],
-            "scale": 0.33,
+            "scale": 1,
+            "selectedLayer": 4,
+            "viewCenter": {
+                "x": 625.5,
+                "y": 414
+            }
+        },
+        "Stamina.tmx": {
+            "scale": 0.722890625,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 1478.7878787878788,
-                "y": 1254.5454545454545
+                "x": 640.4841672970929,
+                "y": 479.32562412190634
             }
         },
         "enemy.tsx": {
@@ -37,7 +53,7 @@
             "scaleInEditor": 1
         },
         "forrest.tsx": {
-            "scaleInDock": 1,
+            "scaleInDock": 2,
             "scaleInEditor": 1
         },
         "survivor_test.tsx": {
@@ -46,25 +62,29 @@
         }
     },
     "last.imagePath": "C:/Users/chris/Flutter/survivor_test/assets/images/Terrain",
-    "map.height": 80,
+    "map.height": 60,
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 16,
     "map.tileWidth": 16,
-    "map.width": 120,
+    "map.width": 80,
     "openFiles": [
         "Level1.tmx",
         "Health.tmx",
-        "survivor_test.tsx",
+        "Damage.tmx",
+        "Stamina.tmx",
         "forrest.tsx",
-        "enemy.tsx"
+        "enemy.tsx",
+        "survivor_test.tsx"
     ],
     "project": "survivor_test.tiled-project",
     "recentFiles": [
+        "Level1.tmx",
+        "Health.tmx",
+        "survivor_test.tsx",
         "enemy.tsx",
         "forrest.tsx",
-        "survivor_test.tsx",
-        "Health.tmx",
-        "Level1.tmx"
+        "Stamina.tmx",
+        "Damage.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
