@@ -16,6 +16,8 @@ class SurvivorTest extends FlameGame
 
   int heartAmount = 0;
   int enemyCount = 0;
+  int frames = 0;
+  double ticker = 0;
   late Player player;
   late JoystickComponent joystick;
   late DashButton dashButton;
@@ -49,9 +51,13 @@ class SurvivorTest extends FlameGame
       startGame = false;
       overlays.add('GameOver');
     }
-
-    //print(1 / dt);
-
+    ticker += dt;
+    frames += 1;
+    if (ticker >= 1) {
+      print(frames);
+      frames = 0;
+      ticker = 0;
+    }
     super.update(dt);
   }
 

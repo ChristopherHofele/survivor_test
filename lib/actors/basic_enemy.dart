@@ -43,7 +43,6 @@ class BasicEnemy extends SpriteAnimationComponent
 
   @override
   void onLoad() {
-    debugMode = true;
     _initializeEnemyType();
     if (game.enemyCount == 0) {
       first = true;
@@ -121,7 +120,6 @@ class BasicEnemy extends SpriteAnimationComponent
       _handleHealth();
       attackCooldown -= dt;
     }
-    print(size);
     super.update(dt);
   }
 
