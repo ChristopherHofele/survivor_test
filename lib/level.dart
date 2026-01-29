@@ -39,6 +39,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
             final portal = CollisionBlock(
               position: Vector2(collision.x, collision.y),
               size: Vector2(collision.width, collision.height),
+              interactionType: InteractionType.Portal,
               destinationName: collision.name,
             );
             collisionBlocks.add(portal);
@@ -47,7 +48,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
             final damageShop = CollisionBlock(
               position: Vector2(collision.x, collision.y),
               size: Vector2(collision.width, collision.height),
-              shopType: ShopType.DamageShop,
+              interactionType: InteractionType.DamageShop,
             );
             collisionBlocks.add(damageShop);
             add(damageShop);
@@ -56,7 +57,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
             final healthShop = CollisionBlock(
               position: Vector2(collision.x, collision.y),
               size: Vector2(collision.width, collision.height),
-              shopType: ShopType.HealthShop,
+              interactionType: InteractionType.HealthShop,
             );
             collisionBlocks.add(healthShop);
             add(healthShop);
@@ -65,7 +66,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
             final staminaShop = CollisionBlock(
               position: Vector2(collision.x, collision.y),
               size: Vector2(collision.width, collision.height),
-              shopType: ShopType.StaminaShop,
+              interactionType: InteractionType.StaminaShop,
             );
             collisionBlocks.add(staminaShop);
             add(staminaShop);
@@ -74,7 +75,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
             final block = CollisionBlock(
               position: Vector2(collision.x, collision.y),
               size: Vector2(collision.width, collision.height),
-              cornerType: CornerType.NoCorners,
+              blockType: BlockType.NoCorners,
             );
             collisionBlocks.add(block);
             add(block);
@@ -83,7 +84,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
             final block = CollisionBlock(
               position: Vector2(collision.x, collision.y),
               size: Vector2(collision.width, collision.height),
-              cornerType: CornerType.Top,
+              blockType: BlockType.Top,
             );
             collisionBlocks.add(block);
             add(block);
@@ -92,7 +93,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
             final block = CollisionBlock(
               position: Vector2(collision.x, collision.y),
               size: Vector2(collision.width, collision.height),
-              cornerType: CornerType.Left,
+              blockType: BlockType.Left,
             );
             collisionBlocks.add(block);
             add(block);
@@ -101,7 +102,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
             final block = CollisionBlock(
               position: Vector2(collision.x, collision.y),
               size: Vector2(collision.width, collision.height),
-              cornerType: CornerType.Right,
+              blockType: BlockType.Right,
             );
             collisionBlocks.add(block);
             add(block);
@@ -110,7 +111,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
             final block = CollisionBlock(
               position: Vector2(collision.x, collision.y),
               size: Vector2(collision.width, collision.height),
-              cornerType: CornerType.Bottom,
+              blockType: BlockType.Bottom,
             );
             collisionBlocks.add(block);
             add(block);
@@ -119,7 +120,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
             final block = CollisionBlock(
               position: Vector2(collision.x, collision.y),
               size: Vector2(collision.width, collision.height),
-              cornerType: CornerType.BottomLeft,
+              blockType: BlockType.BottomLeft,
             );
             collisionBlocks.add(block);
             add(block);
@@ -128,7 +129,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
             final block = CollisionBlock(
               position: Vector2(collision.x, collision.y),
               size: Vector2(collision.width, collision.height),
-              cornerType: CornerType.BottomRight,
+              blockType: BlockType.BottomRight,
             );
             collisionBlocks.add(block);
             add(block);
@@ -137,7 +138,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
             final block = CollisionBlock(
               position: Vector2(collision.x, collision.y),
               size: Vector2(collision.width, collision.height),
-              cornerType: CornerType.TopRight,
+              blockType: BlockType.TopRight,
             );
             collisionBlocks.add(block);
             add(block);
@@ -146,7 +147,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
             final block = CollisionBlock(
               position: Vector2(collision.x, collision.y),
               size: Vector2(collision.width, collision.height),
-              cornerType: CornerType.TopLeft,
+              blockType: BlockType.TopLeft,
             );
             collisionBlocks.add(block);
             add(block);

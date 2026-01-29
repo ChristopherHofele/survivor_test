@@ -29,7 +29,7 @@ class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
     if (game.startGame) {
       enemyCount = game.enemyCount;
       if (cooldown <= 0 && enemyCount < 10) {
-        int enemyTypeChooser = random.nextInt(3);
+        int enemyTypeChooser = 0; //random.nextInt(3);
         switch (enemyTypeChooser) {
           case 0:
             enemyType = EnemyType.Medium;

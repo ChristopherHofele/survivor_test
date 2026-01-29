@@ -151,14 +151,14 @@ class BasicEnemy extends SpriteAnimationComponent
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (other is BasicEnemy ||
+    if (other is BasicEnemy && intersectionPoints.length == 2 ||
         other is Player && intersectionPoints.length == 2) {
       final mid =
           (intersectionPoints.elementAt(0) + intersectionPoints.elementAt(1)) /
           2;
 
       final collisionNormal = absoluteCenter - mid;
-      final separationDistance = (hitboxRadius) - collisionNormal.length;
+      final separationDistance = (hitboxRadius) - collisionNormal.length + 1;
       collisionNormal.normalize();
 
       position += collisionNormal.scaled(separationDistance);
@@ -208,7 +208,7 @@ class BasicEnemy extends SpriteAnimationComponent
   void _handleCollisions(double dt) {
     int collisionCounter = 0;
     for (final block in collisionBlocks) {
-      if (block.shopType == ShopType.NoShop) {
+      if (block.interactionType == InteractionType.None) {
         if (checkCollision(this, block)) {
           _handleHorizontalCollisions(dt, block);
           _handleVerticalCollisons(dt, block);
@@ -244,29 +244,29 @@ class BasicEnemy extends SpriteAnimationComponent
 
   void _handleTwoCornerHorizontal(CollisionBlock block) {
     followPlayer = false;
-    switch (block.cornerType) {
-      case CornerType.Left:
+    switch (block.blockType) {
+      case BlockType.Left:
         if (velocity.y > 0) {
           cornerToFollow = block.extendedCorners[1] + size / 1.8;
         } else {
           cornerToFollow = block.extendedCorners[0];
           cornerToFollow += Vector2(size.x, -size.y) / 1.8;
         }
-      case CornerType.Right:
+      case BlockType.Right:
         if (velocity.y > 0) {
           cornerToFollow = block.extendedCorners[1];
           cornerToFollow += Vector2(-size.x, size.y) / 1.8;
         } else {
           cornerToFollow = block.extendedCorners[0] - size / 1.8;
         }
-      case CornerType.Top:
+      case BlockType.Top:
         if (velocity.x > 0) {
           cornerToFollow = block.extendedCorners[0];
           cornerToFollow += Vector2(-size.x, size.y) / 1.8;
         } else {
           cornerToFollow = block.extendedCorners[1] + size / 1.8;
         }
-      case CornerType.Bottom:
+      case BlockType.Bottom:
         if (velocity.x > 0) {
           cornerToFollow = block.extendedCorners[0] - size / 1.8;
         } else {
@@ -280,8 +280,8 @@ class BasicEnemy extends SpriteAnimationComponent
 
   void _handleThreeCornerHorizontal(CollisionBlock block) {
     followPlayer = false;
-    switch (block.cornerType) {
-      case CornerType.BottomLeft:
+    switch (block.blockType) {
+      case BlockType.BottomLeft:
         if (velocity.x > 0) {
           cornerToFollow.x = block.extendedCorners[0].x - size.x / 2;
           cornerToFollow.y = block.extendedCorners[0].y - size.y / 1.5;
@@ -294,7 +294,7 @@ class BasicEnemy extends SpriteAnimationComponent
             cornerToFollow += Vector2(size.x, -size.y) / 1.8;
           }
         }
-      case CornerType.TopLeft:
+      case BlockType.TopLeft:
         if (velocity.x > 0) {
           cornerToFollow.x = block.extendedCorners[2].x - size.x / 2;
           cornerToFollow.y = block.extendedCorners[2].y + size.y / 1.5;
@@ -307,7 +307,7 @@ class BasicEnemy extends SpriteAnimationComponent
             ;
           }
         }
-      case CornerType.TopRight:
+      case BlockType.TopRight:
         if (velocity.x < 0) {
           cornerToFollow.x = block.extendedCorners[0].x + size.x / 2;
           cornerToFollow.y = block.extendedCorners[0].y + size.y / 1.5;
@@ -320,7 +320,7 @@ class BasicEnemy extends SpriteAnimationComponent
             cornerToFollow.y = block.extendedCorners[2].y - size.y / 1.5;
           }
         }
-      case CornerType.BottomRight:
+      case BlockType.BottomRight:
         if (velocity.x < 0) {
           cornerToFollow.x = block.extendedCorners[2].x + size.x / 2;
           cornerToFollow.y = block.extendedCorners[2].y - size.y / 1.5;
@@ -382,29 +382,29 @@ class BasicEnemy extends SpriteAnimationComponent
 
   void _handleTwoCornerVerticalal(CollisionBlock block) {
     followPlayer = false;
-    switch (block.cornerType) {
-      case CornerType.Left:
+    switch (block.blockType) {
+      case BlockType.Left:
         if (velocity.y > 0) {
           cornerToFollow =
               block.extendedCorners[0] + Vector2(size.x, -size.y) / 1.8;
         } else {
           cornerToFollow = block.extendedCorners[1] + size / 1.8;
         }
-      case CornerType.Right:
+      case BlockType.Right:
         if (velocity.y > 0) {
           cornerToFollow = block.extendedCorners[0] - size / 1.8;
         } else {
           cornerToFollow =
               block.extendedCorners[1] + Vector2(-size.x, size.y) / 1.8;
         }
-      case CornerType.Top:
+      case BlockType.Top:
         if (velocity.x > 0) {
           cornerToFollow = block.extendedCorners[1] + size / 1.8;
         } else {
           cornerToFollow =
               block.extendedCorners[0] + Vector2(-size.x, size.y) / 1.8;
         }
-      case CornerType.Bottom:
+      case BlockType.Bottom:
         if (velocity.x > 0) {
           cornerToFollow =
               block.extendedCorners[1] + Vector2(size.x, -size.y) / 1.8;
@@ -418,8 +418,8 @@ class BasicEnemy extends SpriteAnimationComponent
 
   void _handleThreeCornerVertical(CollisionBlock block) {
     followPlayer = false;
-    switch (block.cornerType) {
-      case CornerType.BottomLeft:
+    switch (block.blockType) {
+      case BlockType.BottomLeft:
         if (velocity.y < 0) {
           cornerToFollow.x = block.extendedCorners[2].x + size.x / 1.5;
           cornerToFollow.y = block.extendedCorners[2].y + size.y / 2;
@@ -431,7 +431,7 @@ class BasicEnemy extends SpriteAnimationComponent
           cornerToFollow.y = block.extendedCorners[0].y - size.y / 2;
         }
 
-      case CornerType.TopLeft:
+      case BlockType.TopLeft:
         if (velocity.y > 0) {
           cornerToFollow.x = block.extendedCorners[0].x + size.x / 1.5;
           cornerToFollow.y = block.extendedCorners[0].y - size.y / 2;
@@ -441,7 +441,7 @@ class BasicEnemy extends SpriteAnimationComponent
           cornerToFollow.x = block.extendedCorners[2].x - size.x / 1.5;
           cornerToFollow.y = block.extendedCorners[2].y + size.y / 2;
         }
-      case CornerType.TopRight:
+      case BlockType.TopRight:
         if (velocity.y > 0) {
           cornerToFollow.x = block.extendedCorners[2].x - size.x / 1.5;
           cornerToFollow.y = block.extendedCorners[2].y - size.y / 2;
@@ -452,7 +452,7 @@ class BasicEnemy extends SpriteAnimationComponent
           cornerToFollow =
               block.extendedCorners[1] + Vector2(-size.x, size.y) / 1.8;
         }
-      case CornerType.BottomRight:
+      case BlockType.BottomRight:
         if (velocity.y < 0) {
           cornerToFollow.x = block.extendedCorners[0].x - size.x / 1.5;
           cornerToFollow.y = block.extendedCorners[0].y + size.y / 2;

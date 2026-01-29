@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
+import 'package:survivor_test/survivor_test.dart';
 
-enum ShopType { NoShop, HealthShop, StaminaShop, DamageShop }
+enum InteractionType { None, HealthShop, StaminaShop, DamageShop, Portal }
 
-enum CornerType {
+enum BlockType {
   Left,
   TopLeft,
   Top,
@@ -17,62 +18,66 @@ enum CornerType {
   Irrelevant,
 }
 
-class CollisionBlock extends PositionComponent {
-  ShopType shopType;
-  CornerType cornerType;
+class CollisionBlock extends PositionComponent
+    with HasGameReference<SurvivorTest> {
+  InteractionType interactionType;
+  BlockType blockType;
   String destinationName;
   CollisionBlock({
     position,
     size,
-    this.shopType = ShopType.NoShop,
-    this.cornerType = CornerType.Irrelevant,
+    this.interactionType = InteractionType.None,
+    this.blockType = BlockType.Irrelevant,
     this.destinationName = '',
   }) : super(position: position, size: size);
 
+  int entryCost = 0;
   Vector2 teleportCoordinates = Vector2.zero();
   List<Vector2> extendedCorners = [];
 
   @override
   FutureOr<void> onLoad() {
-    switch (cornerType) {
-      case CornerType.NoCorners:
+    entryCost = game.doorPrices[game.doorsOpened];
+    print(entryCost);
+    switch (blockType) {
+      case BlockType.NoCorners:
         extendedCorners.add(Vector2(position.x, position.y));
         extendedCorners.add(Vector2(position.x + size.x, position.y));
         extendedCorners.add(Vector2(position.x + size.x, position.y + size.y));
         extendedCorners.add(Vector2(position.x, position.y + size.y));
         break;
-      case CornerType.Left:
+      case BlockType.Left:
         extendedCorners.add(Vector2(position.x + size.x, position.y));
         extendedCorners.add(Vector2(position.x + size.x, position.y + size.y));
         break;
-      case CornerType.Top:
+      case BlockType.Top:
         extendedCorners.add(Vector2(position.x, position.y + size.y));
         extendedCorners.add(Vector2(position.x + size.x, position.y + size.y));
         break;
-      case CornerType.Right:
+      case BlockType.Right:
         extendedCorners.add(Vector2(position.x, position.y));
         extendedCorners.add(Vector2(position.x, position.y + size.y));
         break;
-      case CornerType.Bottom:
+      case BlockType.Bottom:
         extendedCorners.add(Vector2(position.x, position.y));
         extendedCorners.add(Vector2(position.x + size.x, position.y));
         break;
-      case CornerType.TopLeft:
+      case BlockType.TopLeft:
         extendedCorners.add(Vector2(position.x + size.x, position.y));
         extendedCorners.add(Vector2(position.x + size.x, position.y + size.y));
         extendedCorners.add(Vector2(position.x, position.y + size.y));
         break;
-      case CornerType.TopRight:
+      case BlockType.TopRight:
         extendedCorners.add(Vector2(position.x + size.x, position.y + size.y));
         extendedCorners.add(Vector2(position.x, position.y + size.y));
         extendedCorners.add(Vector2(position.x, position.y));
         break;
-      case CornerType.BottomRight:
+      case BlockType.BottomRight:
         extendedCorners.add(Vector2(position.x, position.y + size.y));
         extendedCorners.add(Vector2(position.x, position.y));
         extendedCorners.add(Vector2(position.x + size.x, position.y));
         break;
-      case CornerType.BottomLeft:
+      case BlockType.BottomLeft:
         extendedCorners.add(Vector2(position.x, position.y));
         extendedCorners.add(Vector2(position.x + size.x, position.y));
         extendedCorners.add(Vector2(position.x + size.x, position.y + size.y));
@@ -80,20 +85,22 @@ class CollisionBlock extends PositionComponent {
       default:
         extendedCorners = [];
     }
-    switch (destinationName) {
-      case 'Level1.tmx':
-        teleportCoordinates = Vector2(993, 993);
-        break;
-      case 'Health.tmx':
-        teleportCoordinates = Vector2(128, 496);
-        break;
-      case 'Stamina.tmx':
-        teleportCoordinates = Vector2(690, 96);
-        break;
-      case 'Damage.tmx':
-        teleportCoordinates = Vector2(1120, 432);
-        break;
-      default:
+    if (interactionType == InteractionType.Portal) {
+      switch (destinationName) {
+        case 'Level1.tmx':
+          teleportCoordinates = Vector2(993, 993);
+          break;
+        case 'Health.tmx':
+          teleportCoordinates = Vector2(128, 496);
+          break;
+        case 'Stamina.tmx':
+          teleportCoordinates = Vector2(690, 96);
+          break;
+        case 'Damage.tmx':
+          teleportCoordinates = Vector2(1120, 432);
+          break;
+        default:
+      }
     }
     return super.onLoad();
   }

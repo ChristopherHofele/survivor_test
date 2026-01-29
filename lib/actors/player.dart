@@ -48,6 +48,7 @@ class Player extends SpriteAnimationComponent
   bool gotHit = false;
   bool isInjured = false;
   bool isAttacking = false;
+  bool allowedTeleportation = false;
 
   @override
   void onLoad() {
@@ -108,8 +109,8 @@ class Player extends SpriteAnimationComponent
     buyCooldown -= dt;
     for (final block in collisionBlocks) {
       if (checkCollision(this, block)) {
-        switch (block.shopType) {
-          case ShopType.DamageShop:
+        switch (block.interactionType) {
+          case InteractionType.DamageShop:
             if (money >= 5 && buyCooldown <= 0) {
               money -= 5;
               maxAttackCooldown = maxAttackCooldown * 0.5;
@@ -117,7 +118,7 @@ class Player extends SpriteAnimationComponent
               buyCooldown = 4;
             }
             break;
-          case ShopType.HealthShop:
+          case InteractionType.HealthShop:
             if (money >= 5 && buyCooldown <= 0) {
               money -= 5;
               maxHealth += 100;
@@ -126,28 +127,42 @@ class Player extends SpriteAnimationComponent
               game.updateHearts();
             }
             break;
-          case ShopType.StaminaShop:
+          case InteractionType.StaminaShop:
             if (money >= 5 && buyCooldown <= 0) {
               money -= 5;
               staminaDrain -= 5;
               buyCooldown = 4;
             }
             break;
-          default:
-            if (block.destinationName != '') {
+          case InteractionType.Portal:
+            switch (block.destinationName) {
+              case 'Level1.tmx':
+                allowedTeleportation = true;
+                break;
+              case 'Health.tmx':
+              case 'Stamina.tmx':
+              case 'Damage.tmx':
+                if (money >= block.entryCost) {
+                  allowedTeleportation = true;
+                  game.doorsOpened += 1;
+                }
+              default:
+            }
+            if (allowedTeleportation) {
               game.world1.removeFromParent();
               game.loadWorld(this, block.destinationName);
               position = block.teleportCoordinates;
               game.enemyCount = 0;
-            } else {
-              _handleHorizontalCollisions(dt, block)
-                  ? collisionCounter += 1
-                  : collisionCounter;
-              _handleVerticalCollisons(dt, block)
-                  ? collisionCounter += 1
-                  : collisionCounter;
+              allowedTeleportation = false;
             }
-            ;
+            break;
+          default:
+            _handleHorizontalCollisions(dt, block)
+                ? collisionCounter += 1
+                : collisionCounter;
+            _handleVerticalCollisons(dt, block)
+                ? collisionCounter += 1
+                : collisionCounter;
         }
       }
       if (collisionCounter >= 2) {
