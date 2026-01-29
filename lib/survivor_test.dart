@@ -24,12 +24,9 @@ class SurvivorTest extends FlameGame
   late AttackButton attackButton;
   late Level world1;
   bool startGame = false;
-  Map spawnCoordinates = {};
 
   @override
   Future<void> onLoad() async {
-    spawnCoordinates['Level1.tmx'] = Vector2(960, 960);
-    spawnCoordinates['Health.tmx'] = Vector2(1040, 352);
     player = Player(position: Vector2(960, 960));
     await images.loadAllImages();
     loadWorld(player, 'Level1.tmx');

@@ -85,7 +85,13 @@ class CollisionBlock extends PositionComponent {
         teleportCoordinates = Vector2(993, 993);
         break;
       case 'Health.tmx':
-        teleportCoordinates = Vector2(1140, 400);
+        teleportCoordinates = Vector2(128, 496);
+        break;
+      case 'Stamina.tmx':
+        teleportCoordinates = Vector2(690, 96);
+        break;
+      case 'Damage.tmx':
+        teleportCoordinates = Vector2(1120, 432);
         break;
       default:
     }

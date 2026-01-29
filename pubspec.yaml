@@ -20,6 +20,9 @@ flutter:
     - assets/images/HUD/
     - assets/images/Items/Fruits/
     - assets/images/Terrain/
+    - assets/images/Terrain/summer/
+    - assets/images/Terrain/winter/
+    - assets/images/Terrain/autumn/
     - assets/images/Traps/Saw/
     - assets/audio/
     - assets/tiles/
