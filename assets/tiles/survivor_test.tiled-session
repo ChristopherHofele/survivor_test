@@ -3,20 +3,35 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Health.tmx",
+    "activeFile": "Damage.tmx",
     "expandedProjectPaths": [
-        "Summer",
+        "Spring",
         ".",
-        "Spring"
+        "Summer"
     ],
     "fileStates": {
         "Damage.tmx": {
-            "scale": 1,
+            "expandedObjectLayers": [
+                4
+            ],
+            "scale": 2,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 958,
-                "y": 480
+                "x": 1119,
+                "y": 343.25
             }
+        },
+        "Fall_Tiles.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Fall_Trees.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Fall_Water.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "Ground.tsx": {
             "scaleInDock": 1,
@@ -31,7 +46,7 @@
             "selectedLayer": 4,
             "viewCenter": {
                 "x": 251.33333333333337,
-                "y": 413.33333333333337
+                "y": 413.66666666666663
             }
         },
         "Level1.tmx": {
@@ -39,11 +54,11 @@
                 3,
                 2
             ],
-            "scale": 1.5,
-            "selectedLayer": 3,
+            "scale": 0.75,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 39.333333333333314,
-                "y": 178.66666666666663
+                "x": 998.6666666666667,
+                "y": 1052.6666666666667
             }
         },
         "Spring/Spring_Cliff.tsx": {
@@ -56,13 +71,14 @@
         },
         "Stamina.tmx": {
             "expandedObjectLayers": [
-                5
+                5,
+                6
             ],
             "scale": 1.5,
-            "selectedLayer": 4,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 604.6666666666666,
-                "y": 81.99999999999997
+                "x": 776,
+                "y": 163.66666666666663
             }
         },
         "Summer/Summer_Trees.tsx": {
@@ -109,6 +125,14 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "Winter_Tiles.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Winter_Trees.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "enemy.tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1
@@ -130,22 +154,29 @@
     "map.width": 80,
     "openFiles": [
         "Level1.tmx",
-        "Health.tmx"
+        "Health.tmx",
+        "Stamina.tmx",
+        "Damage.tmx",
+        "Fall_Tiles.tsx",
+        "Fall_Trees.tsx",
+        "Fall_Water.tsx",
+        "Winter_Tiles.tsx",
+        "Winter_Trees.tsx"
     ],
     "project": "survivor_test.tiled-project",
     "recentFiles": [
-        "Summer_Water.tsx",
-        "Summer_Trees.tsx",
-        "Summer_Tiles.tsx",
         "Level1.tmx",
         "Health.tmx",
-        "Summer/Summer_tiles.tsx",
-        "Summer/Summer_Trees.tsx",
-        "Summer_tiles.tsx",
-        "Summer/Summer_Water.tsx",
-        "Spring/Spring_Cliff.tsx",
-        "Spring/Spring_Tiles.tsx",
-        "Damage.tmx"
+        "Stamina.tmx",
+        "Winter_Trees.tsx",
+        "Winter_Tiles.tsx",
+        "Fall_Water.tsx",
+        "Fall_Trees.tsx",
+        "Fall_Tiles.tsx",
+        "Damage.tmx",
+        "Summer_Water.tsx",
+        "Summer_Trees.tsx",
+        "Summer_Tiles.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
