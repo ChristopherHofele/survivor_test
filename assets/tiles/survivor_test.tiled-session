@@ -10,6 +10,14 @@
         "Summer"
     ],
     "fileStates": {
+        "Bossroom.tmx": {
+            "scale": 1,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 534,
+                "y": 425.5
+            }
+        },
         "Damage.tmx": {
             "expandedObjectLayers": [
                 5,
@@ -42,8 +50,8 @@
             "scale": 2,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 572.5,
-                "y": 448.5
+                "x": 1221,
+                "y": 504.25
             }
         },
         "Level1.tmx": {
@@ -52,10 +60,10 @@
                 2
             ],
             "scale": 2,
-            "selectedLayer": 1,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 1167,
-                "y": 672.25
+                "x": 851.5,
+                "y": 57.25
             }
         },
         "Spring/Spring_Cliff.tsx": {
@@ -74,8 +82,8 @@
             "scale": 1.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 640,
-                "y": 480
+                "x": 792.6666666666666,
+                "y": 579.6666666666666
             }
         },
         "Summer/Summer_Trees.tsx": {

@@ -37,6 +37,12 @@ class Item extends SpriteAnimationComponent
       amount = 8;
       textureSize = Vector2.all(32);
       stepTime = 0.12;
+    } else if (worth == 0) {
+      spriteName = 'Key';
+      amount = 25;
+      textureSize = Vector2(10, 27);
+      size = textureSize;
+      stepTime = 0.12;
     } else {
       switch (worldName) {
         case 'Health.tmx':

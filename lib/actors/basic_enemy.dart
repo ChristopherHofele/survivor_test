@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
@@ -24,6 +26,8 @@ class BasicEnemy extends SpriteAnimationComponent
   late double hitboxRadius;
   double followCornerCooldown = 0.3;
   double getOutOfSpawn = 3;
+
+  var random = Random();
 
   late final Player player;
   late final Level level;
@@ -491,9 +495,16 @@ class BasicEnemy extends SpriteAnimationComponent
   void _handleHealth() {
     if (health <= 0) {
       game.enemyCount -= 1;
-      Item cookie = Item(position: position);
-      game.world1.add(cookie);
-      game.world1.items.add(cookie);
+      int worth = 1;
+      if (game.keyCanSpawn && game.world1.tileMapName == 'Level1.tmx') {
+        int spawnParlay = random.nextInt(game.keySpawnrate);
+        if (spawnParlay == 2) {
+          worth = 0;
+        }
+      }
+      Item loot = Item(position: position, worth: worth);
+      game.world1.add(loot);
+      game.world1.items.add(loot);
       game.world1.remove(this);
     }
   }

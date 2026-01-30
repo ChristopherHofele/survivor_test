@@ -19,6 +19,7 @@ class SurvivorTest extends FlameGame
   int maxEnemyCount = 12;
   int frames = 0;
   int doorsOpened = 0;
+  int keySpawnrate = 10;
   double ticker = 0;
 
   List<int> doorPrices = [2, 1, 4, 0, 0, 0, 0, 0, 0, 0];
@@ -32,6 +33,7 @@ class SurvivorTest extends FlameGame
   bool hasBeenToDamage = false;
   bool hasBeenToStamina = false;
   bool hasBeenToHealth = false;
+  bool keyCanSpawn = false;
   Color background = Color.fromARGB(255, 44, 96, 26);
 
   @override
@@ -67,6 +69,7 @@ class SurvivorTest extends FlameGame
       ticker = 0;
     }
     _updateHearts();
+    _determineKeyCanSpawn();
     super.update(dt);
   }
 
@@ -135,5 +138,13 @@ class SurvivorTest extends FlameGame
 
   void resetMaxEnemyCount() {
     maxEnemyCount = 12;
+  }
+
+  void _determineKeyCanSpawn() {
+    if (player.hasKey == false) {
+      if (hasBeenToDamage && hasBeenToHealth && hasBeenToStamina) {
+        keyCanSpawn = true;
+      }
+    }
   }
 }

@@ -8,6 +8,7 @@ import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/components/projectile.dart';
+import 'package:survivor_test/overlays/key_display.dart';
 import 'package:survivor_test/survivor_test.dart';
 
 class Player extends SpriteAnimationComponent
@@ -48,6 +49,7 @@ class Player extends SpriteAnimationComponent
   bool isInjured = false;
   bool isAttacking = false;
   bool allowedTeleportation = false;
+  bool hasKey = false;
 
   @override
   void onLoad() {
@@ -246,7 +248,7 @@ class Player extends SpriteAnimationComponent
           itemsToRemove.add(item);
           item.removeFromParent();
           money += item.worth;
-          if (item.worth > 1) {
+          if (item.worth != 1) {
             switch (item.spriteName) {
               case 'Apple':
                 maxHealth += 100;
@@ -258,6 +260,10 @@ class Player extends SpriteAnimationComponent
               case 'Cherries':
                 maxAttackCooldown = maxAttackCooldown * 0.25;
                 projectileMaximumHits += 1;
+              case 'Key':
+                hasKey = true;
+                KeyDisplay keyDisplay = KeyDisplay();
+                game.camera.viewport.add(keyDisplay);
               default:
             }
           }
