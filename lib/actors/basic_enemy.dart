@@ -5,7 +5,7 @@ import 'package:flame/effects.dart';
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
-import 'package:survivor_test/components/cookie.dart';
+import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/components/projectile.dart';
 import 'package:survivor_test/level.dart';
 import 'package:survivor_test/survivor_test.dart';
@@ -124,6 +124,7 @@ class BasicEnemy extends SpriteAnimationComponent
   }
 
   void _updateMovement(double dt) {
+    followCornerCooldown -= dt;
     if (followPlayer) {
       movementDirection = determineDirectionOfPlayer(player);
       if (enemyType == EnemyType.Big) {
@@ -490,9 +491,9 @@ class BasicEnemy extends SpriteAnimationComponent
   void _handleHealth() {
     if (health <= 0) {
       game.enemyCount -= 1;
-      Cookie cookie = Cookie(position: position);
+      Item cookie = Item(position: position);
       game.world1.add(cookie);
-      game.world1.cookies.add(cookie);
+      game.world1.items.add(cookie);
       game.world1.remove(this);
     }
   }

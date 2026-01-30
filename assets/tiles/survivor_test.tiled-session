@@ -3,22 +3,23 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Damage.tmx",
+    "activeFile": "Level1.tmx",
     "expandedProjectPaths": [
         "Spring",
-        ".",
-        "Summer"
+        "Summer",
+        "."
     ],
     "fileStates": {
         "Damage.tmx": {
             "expandedObjectLayers": [
-                4
+                4,
+                5
             ],
             "scale": 2,
-            "selectedLayer": 3,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 1119,
-                "y": 343.25
+                "x": 309.5,
+                "y": 482.25
             }
         },
         "Fall_Tiles.tsx": {
@@ -42,11 +43,11 @@
                 3,
                 2
             ],
-            "scale": 1.5,
-            "selectedLayer": 4,
+            "scale": 2,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 251.33333333333337,
-                "y": 413.66666666666663
+                "x": 1221,
+                "y": 504.25
             }
         },
         "Level1.tmx": {
@@ -54,11 +55,11 @@
                 3,
                 2
             ],
-            "scale": 0.75,
-            "selectedLayer": 4,
+            "scale": 3,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 998.6666666666667,
-                "y": 1052.6666666666667
+                "x": 916.3333333333333,
+                "y": 1008.3333333333333
             }
         },
         "Spring/Spring_Cliff.tsx": {
@@ -71,14 +72,14 @@
         },
         "Stamina.tmx": {
             "expandedObjectLayers": [
-                5,
-                6
+                6,
+                5
             ],
             "scale": 1.5,
-            "selectedLayer": 5,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 776,
-                "y": 163.66666666666663
+                "x": 528.6666666666666,
+                "y": 333.66666666666663
             }
         },
         "Summer/Summer_Trees.tsx": {
@@ -165,15 +166,15 @@
     ],
     "project": "survivor_test.tiled-project",
     "recentFiles": [
-        "Level1.tmx",
-        "Health.tmx",
-        "Stamina.tmx",
         "Winter_Trees.tsx",
         "Winter_Tiles.tsx",
         "Fall_Water.tsx",
         "Fall_Trees.tsx",
         "Fall_Tiles.tsx",
         "Damage.tmx",
+        "Stamina.tmx",
+        "Health.tmx",
+        "Level1.tmx",
         "Summer_Water.tsx",
         "Summer_Trees.tsx",
         "Summer_Tiles.tsx"

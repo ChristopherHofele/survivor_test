@@ -20,7 +20,7 @@ class SurvivorTest extends FlameGame
   int doorsOpened = 0;
   double ticker = 0;
 
-  List<int> doorPrices = [20, 100, 400, 0, 0, 0, 0, 0, 0, 0];
+  List<int> doorPrices = [2, 1, 4, 0, 0, 0, 0, 0, 0, 0];
 
   late Player player;
   late JoystickComponent joystick;
@@ -28,6 +28,7 @@ class SurvivorTest extends FlameGame
   late AttackButton attackButton;
   late Level world1;
   bool startGame = false;
+  Color background = Color.fromARGB(255, 44, 96, 26);
 
   @override
   Future<void> onLoad() async {
@@ -46,6 +47,9 @@ class SurvivorTest extends FlameGame
   }
 
   @override
+  Color backgroundColor() => background;
+
+  @override
   void update(double dt) {
     updateJoystick();
     if (player.health < 100) {
@@ -58,6 +62,7 @@ class SurvivorTest extends FlameGame
       frames = 0;
       ticker = 0;
     }
+    _updateHearts();
     super.update(dt);
   }
 
@@ -96,7 +101,7 @@ class SurvivorTest extends FlameGame
     }
   }
 
-  void updateHearts() {
+  void _updateHearts() {
     double heartDifference = player.maxHealth / 100 - heartAmount;
     if (heartDifference > 0) {
       heartAmount += 1;

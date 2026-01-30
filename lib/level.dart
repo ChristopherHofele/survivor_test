@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
+import 'package:flame/image_composition.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:survivor_test/actors/basic_enemy.dart';
 import 'package:survivor_test/actors/player.dart';
-import 'package:survivor_test/components/cookie.dart';
+import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/components/spawners.dart';
 import 'package:survivor_test/survivor_test.dart';
@@ -16,7 +17,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
   Level({required this.player, required this.tileMapName});
   List<CollisionBlock> collisionBlocks = [];
   List<BasicEnemy> basicEnemies = [];
-  List<Cookie> cookies = [];
+  List<Item> items = [];
 
   @override
   FutureOr<void> onLoad() async {
@@ -26,7 +27,6 @@ class Level extends World with HasGameReference<SurvivorTest> {
     add(level);
     _addCollisions();
     _addSpawners();
-
     super.onLoad();
   }
 

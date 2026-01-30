@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
+import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/survivor_test.dart';
 
 enum InteractionType { None, HealthShop, StaminaShop, DamageShop, Portal }
@@ -88,7 +89,7 @@ class CollisionBlock extends PositionComponent
     if (interactionType == InteractionType.Portal) {
       switch (destinationName) {
         case 'Level1.tmx':
-          teleportCoordinates = Vector2(993, 993);
+          teleportCoordinates = Vector2(960, 1024);
           break;
         case 'Health.tmx':
           teleportCoordinates = Vector2(128, 496);
@@ -101,6 +102,20 @@ class CollisionBlock extends PositionComponent
           break;
         default:
       }
+    }
+    switch (interactionType) {
+      case InteractionType.HealthShop:
+      case InteractionType.StaminaShop:
+      case InteractionType.DamageShop:
+        Item fruit = Item(
+          position: position,
+          worldName: game.world1.tileMapName,
+          worth: 5,
+        );
+        game.world1.add(fruit);
+        game.world1.items.add(fruit);
+        break;
+      default:
     }
     return super.onLoad();
   }

@@ -6,7 +6,7 @@ import 'package:flame/effects.dart';
 import 'package:survivor_test/actors/basic_enemy.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
-import 'package:survivor_test/components/cookie.dart';
+import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/components/projectile.dart';
 import 'package:survivor_test/survivor_test.dart';
 
@@ -41,7 +41,6 @@ class Player extends SpriteAnimationComponent
 
   List<CollisionBlock> collisionBlocks = [];
   //List<BasicEnemy> basicEnemies = [];
-  List<Cookie> cookies = [];
 
   bool isDashing = false;
   bool canDash = true;
@@ -70,7 +69,7 @@ class Player extends SpriteAnimationComponent
     if (game.startGame) {
       _updatePlayerMovement(dt);
       _handleBlockCollisions(dt);
-      _handleCookieCollision(dt);
+      _handleItemCollision(dt);
       _handleHealthRegeneration(dt);
       _handleAttacks(dt);
       //print(health.toString() + ', ' + maxHealth.toString());
@@ -111,28 +110,8 @@ class Player extends SpriteAnimationComponent
       if (checkCollision(this, block)) {
         switch (block.interactionType) {
           case InteractionType.DamageShop:
-            if (money >= 5 && buyCooldown <= 0) {
-              money -= 5;
-              maxAttackCooldown = maxAttackCooldown * 0.5;
-              projectileMaximumHits += 1;
-              buyCooldown = 4;
-            }
-            break;
           case InteractionType.HealthShop:
-            if (money >= 5 && buyCooldown <= 0) {
-              money -= 5;
-              maxHealth += 100;
-              isInjured = true;
-              buyCooldown = 4;
-              game.updateHearts();
-            }
-            break;
           case InteractionType.StaminaShop:
-            if (money >= 5 && buyCooldown <= 0) {
-              money -= 5;
-              staminaDrain -= 5;
-              buyCooldown = 4;
-            }
             break;
           case InteractionType.Portal:
             switch (block.destinationName) {
@@ -259,19 +238,33 @@ class Player extends SpriteAnimationComponent
     }
   }
 
-  void _handleCookieCollision(double dt) {
-    cookies = game.world1.cookies;
-    if (cookies.length != 0) {
-      List<Cookie> cookiesToRemove = [];
-      for (Cookie cookie in cookies) {
-        if (checkCollision(this, cookie)) {
-          cookiesToRemove.add(cookie);
-          cookie.removeFromParent();
-          money += cookie.worth;
+  void _handleItemCollision(double dt) {
+    if (game.world1.items.length != 0) {
+      List<Item> itemsToRemove = [];
+      for (final item in game.world1.items) {
+        if (checkCollision(this, item)) {
+          itemsToRemove.add(item);
+          item.removeFromParent();
+          money += item.worth;
+          if (item.worth > 1) {
+            switch (item.spriteName) {
+              case 'Apple':
+                maxHealth += 100;
+                isInjured = true;
+                break;
+              case 'Bananas':
+                staminaDrain -= 8;
+                break;
+              case 'Cherries':
+                maxAttackCooldown = maxAttackCooldown * 0.25;
+                projectileMaximumHits += 1;
+              default:
+            }
+          }
         }
       }
-      for (Cookie cookie in cookiesToRemove) {
-        game.world1.cookies.remove(cookie);
+      for (Item item in itemsToRemove) {
+        game.world1.items.remove(item);
       }
     }
   }
