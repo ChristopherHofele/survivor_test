@@ -7,11 +7,12 @@ import 'package:survivor_test/actors/basic_enemy.dart';
 import 'package:survivor_test/survivor_test.dart';
 
 class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
-  final double spawnerID;
-  Spawner({required position, required this.spawnerID, size})
+  String worldName;
+  Spawner({required position, required this.worldName, size})
     : super(position: position, size: size);
 
-  double cooldown = 1;
+  double cooldown = 3;
+  int specialEnemySpawnrate = 20;
   late int enemyCount;
   late Vector2 spawnLocation;
   var random = Random();
@@ -28,29 +29,60 @@ class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
   void update(double dt) {
     if (game.startGame) {
       enemyCount = game.enemyCount;
-      if (cooldown <= 0 && enemyCount < 1) {
-        int enemyTypeChooser = 0; //random.nextInt(3);
-        switch (enemyTypeChooser) {
-          case 0:
-            enemyType = EnemyType.Medium;
-            break;
-          case 1:
-            enemyType = EnemyType.Big;
-          case 2:
-            enemyType = EnemyType.Small;
-        }
-        BasicEnemy basicEnemy = BasicEnemy(
-          position: spawnLocation,
-          enemyType: enemyType,
-        );
-        game.world1.add(basicEnemy);
-        game.world1.basicEnemies.add(basicEnemy);
-        resetCooldown();
-        game.enemyCount += 1;
-      }
-      cooldown -= dt;
+      _spawnEnemies();
     }
+    cooldown -= dt;
+
     super.update(dt);
+  }
+
+  void _spawnEnemies() {
+    if (cooldown <= 0 && enemyCount < game.maxEnemyCount) {
+      _determineEnemyType();
+
+      BasicEnemy basicEnemy = BasicEnemy(
+        position: spawnLocation,
+        enemyType: enemyType,
+      );
+      game.world1.add(basicEnemy);
+      game.world1.basicEnemies.add(basicEnemy);
+      game.enemyCount += 1;
+      resetCooldown();
+    }
+  }
+
+  void _determineEnemyType() {
+    switch (worldName) {
+      case 'Level1.tmx':
+        enemyType = EnemyType.Medium;
+        int enemyTypeChooser = random.nextInt(specialEnemySpawnrate);
+        if (game.hasBeenToDamage && enemyTypeChooser == 2) {
+          enemyType = EnemyType.Big;
+        }
+        if (game.hasBeenToStamina && enemyTypeChooser == 1) {
+          enemyType = EnemyType.Small;
+        }
+        break;
+      case 'Stamina.tmx':
+        enemyType = EnemyType.Small;
+        break;
+      case 'Damage.tmx':
+        enemyType = EnemyType.Big;
+        break;
+      case 'Health.tmx':
+        enemyType = EnemyType.Medium;
+      default:
+    }
+    /*int enemyTypeChooser = 0; //random.nextInt(3);
+    switch (enemyTypeChooser) {
+      case 0:
+        enemyType = EnemyType.Medium;
+        break;
+      case 1:
+        enemyType = EnemyType.Big;
+      case 2:
+        enemyType = EnemyType.Small;
+    }*/
   }
 
   void resetCooldown() {

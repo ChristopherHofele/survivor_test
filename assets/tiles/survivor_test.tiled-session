@@ -6,20 +6,20 @@
     "activeFile": "Level1.tmx",
     "expandedProjectPaths": [
         "Spring",
-        "Summer",
-        "."
+        ".",
+        "Summer"
     ],
     "fileStates": {
         "Damage.tmx": {
             "expandedObjectLayers": [
-                4,
-                5
+                5,
+                4
             ],
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 309.5,
-                "y": 482.25
+                "x": 640,
+                "y": 480
             }
         },
         "Fall_Tiles.tsx": {
@@ -39,15 +39,11 @@
             "scaleInEditor": 1
         },
         "Health.tmx": {
-            "expandedObjectLayers": [
-                3,
-                2
-            ],
             "scale": 2,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 1221,
-                "y": 504.25
+                "x": 572.5,
+                "y": 448.5
             }
         },
         "Level1.tmx": {
@@ -55,11 +51,11 @@
                 3,
                 2
             ],
-            "scale": 3,
-            "selectedLayer": 3,
+            "scale": 2,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 916.3333333333333,
-                "y": 1008.3333333333333
+                "x": 1167,
+                "y": 672.25
             }
         },
         "Spring/Spring_Cliff.tsx": {
@@ -78,8 +74,8 @@
             "scale": 1.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 528.6666666666666,
-                "y": 333.66666666666663
+                "x": 640,
+                "y": 480
             }
         },
         "Summer/Summer_Trees.tsx": {

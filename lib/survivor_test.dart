@@ -16,6 +16,7 @@ class SurvivorTest extends FlameGame
 
   int heartAmount = 0;
   int enemyCount = 0;
+  int maxEnemyCount = 12;
   int frames = 0;
   int doorsOpened = 0;
   double ticker = 0;
@@ -28,6 +29,9 @@ class SurvivorTest extends FlameGame
   late AttackButton attackButton;
   late Level world1;
   bool startGame = false;
+  bool hasBeenToDamage = false;
+  bool hasBeenToStamina = false;
+  bool hasBeenToHealth = false;
   Color background = Color.fromARGB(255, 44, 96, 26);
 
   @override
@@ -127,5 +131,9 @@ class SurvivorTest extends FlameGame
     add(world1..priority = -1);
     world1.add(player);
     camera.world = world1;
+  }
+
+  void resetMaxEnemyCount() {
+    maxEnemyCount = 12;
   }
 }

@@ -100,6 +100,7 @@ class BasicEnemy extends SpriteAnimationComponent
 
   @override
   void update(double dt) {
+    print(followPlayer);
     if (game.startGame) {
       getOutOfSpawn -= dt;
       _updateMovement(dt);
@@ -135,7 +136,6 @@ class BasicEnemy extends SpriteAnimationComponent
       //print('followingPlayer');
     } else {
       movementDirection = determineDirectionOfCorner(cornerToFollow);
-      followCornerCooldown -= dt;
       //print('followingCorner');
       if ((position - cornerToFollow).length < 2 || followCornerCooldown < 0) {
         followPlayer = true;
@@ -364,7 +364,7 @@ class BasicEnemy extends SpriteAnimationComponent
     if (isCollisionVertical(this, block, dt)) {
       //if (followCornerCooldown < 0) {
       if (block.extendedCorners.length == 2) {
-        _handleTwoCornerVerticalal(block);
+        _handleTwoCornerVertical(block);
       } else if (block.extendedCorners.length == 3) {
         _handleThreeCornerVertical(block);
       } else if (block.extendedCorners.length == 4) {
@@ -381,7 +381,7 @@ class BasicEnemy extends SpriteAnimationComponent
     }
   }
 
-  void _handleTwoCornerVerticalal(CollisionBlock block) {
+  void _handleTwoCornerVertical(CollisionBlock block) {
     followPlayer = false;
     switch (block.blockType) {
       case BlockType.Left:

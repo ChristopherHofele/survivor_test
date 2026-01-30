@@ -25,6 +25,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
     priority = -1;
     level = await TiledComponent.load(tileMapName, Vector2.all(16));
     add(level);
+    _trackVisitedWorlds();
     _addCollisions();
     _addSpawners();
     super.onLoad();
@@ -166,18 +167,35 @@ class Level extends World with HasGameReference<SurvivorTest> {
   }
 
   void _addSpawners() {
-    double spawnerID = 0;
     final spawnersLayer = level.tileMap.getLayer<ObjectGroup>('Spawners');
     if (spawnersLayer != null) {
       for (final instance in spawnersLayer.objects) {
         final spawner = Spawner(
           position: Vector2(instance.x, instance.y),
-          spawnerID: spawnerID,
+          worldName: tileMapName,
           size: instance.size,
         );
-        spawnerID += 1;
         add(spawner);
       }
+    }
+  }
+
+  void _trackVisitedWorlds() {
+    switch (tileMapName) {
+      case 'Stamina.tmx':
+        game.hasBeenToStamina = true;
+        game.maxEnemyCount = 2;
+        break;
+      case 'Health.tmx':
+        game.hasBeenToHealth = true;
+        game.maxEnemyCount = 8;
+        break;
+      case 'Damage.tmx':
+        game.hasBeenToDamage = true;
+        game.maxEnemyCount = 4;
+        break;
+      default:
+        game.resetMaxEnemyCount();
     }
   }
 }
