@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flame/components.dart';
 import 'package:survivor_test/components/items.dart';
+import 'package:survivor_test/overlays/door_price_display.dart';
 import 'package:survivor_test/survivor_test.dart';
 
 enum InteractionType { None, HealthShop, StaminaShop, DamageShop, Portal }
@@ -87,18 +88,24 @@ class CollisionBlock extends PositionComponent
         extendedCorners = [];
     }
     if (interactionType == InteractionType.Portal) {
+      DoorPriceDisplay doorPriceDisplay = DoorPriceDisplay(
+        position: position + size / 2,
+      );
       switch (destinationName) {
         case 'Level1.tmx':
           teleportCoordinates = Vector2(960, 1024);
           break;
         case 'Health.tmx':
           teleportCoordinates = Vector2(128, 496);
+          game.world1.add(doorPriceDisplay);
           break;
         case 'Stamina.tmx':
           teleportCoordinates = Vector2(690, 96);
+          game.world1.add(doorPriceDisplay);
           break;
         case 'Damage.tmx':
           teleportCoordinates = Vector2(1120, 432);
+          game.world1.add(doorPriceDisplay);
           break;
         default:
       }
