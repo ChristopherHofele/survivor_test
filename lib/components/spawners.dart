@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:survivor_test/actors/basic_enemy.dart';
+import 'package:survivor_test/actors/boss_enemy.dart';
 
 import 'package:survivor_test/survivor_test.dart';
 
@@ -17,6 +18,7 @@ class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
   late Vector2 spawnLocation;
   var random = Random();
   late EnemyType enemyType;
+  bool spawnBoss = true;
 
   @override
   FutureOr<void> onLoad() {
@@ -29,7 +31,16 @@ class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
   void update(double dt) {
     if (game.startGame) {
       enemyCount = game.enemyCount;
-      _spawnEnemies();
+      if (worldName == 'Bossroom.tmx') {
+        if (spawnBoss) {
+          BossEnemy bossEnemy = BossEnemy(position: spawnLocation);
+          game.world1.add(bossEnemy);
+          game.enemyCount += 1;
+          spawnBoss = false;
+        }
+      } else {
+        _spawnEnemies();
+      }
     }
     cooldown -= dt;
 
@@ -71,6 +82,7 @@ class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
         break;
       case 'Health.tmx':
         enemyType = EnemyType.Medium;
+        break;
       default:
     }
     /*int enemyTypeChooser = 0; //random.nextInt(3);

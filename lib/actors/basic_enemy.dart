@@ -41,16 +41,12 @@ class BasicEnemy extends SpriteAnimationComponent
   List<BasicEnemy> basicEnemies = [];
 
   bool followPlayer = true;
-  bool first = false;
 
   late String spriteName;
 
   @override
   void onLoad() {
     _initializeEnemyType();
-    if (game.enemyCount == 0) {
-      first = true;
-    }
     player = game.player;
     collisionBlocks = player.collisionBlocks;
     priority = 1;

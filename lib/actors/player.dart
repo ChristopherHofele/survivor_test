@@ -51,6 +51,8 @@ class Player extends SpriteAnimationComponent
   bool allowedTeleportation = false;
   bool hasKey = false;
 
+  KeyDisplay keyDisplay = KeyDisplay();
+
   @override
   void onLoad() {
     //debugMode = true;
@@ -125,8 +127,16 @@ class Player extends SpriteAnimationComponent
               case 'Damage.tmx':
                 if (money >= block.entryCost) {
                   allowedTeleportation = true;
+                  money -= block.entryCost;
                   game.doorsOpened += 1;
                 }
+              case 'Bossroom.tmx':
+                if (hasKey) {
+                  allowedTeleportation = true;
+                  hasKey = false;
+                  game.camera.viewport.remove(keyDisplay);
+                }
+
               default:
             }
             if (allowedTeleportation) {
@@ -262,7 +272,6 @@ class Player extends SpriteAnimationComponent
                 projectileMaximumHits += 1;
               case 'Key':
                 hasKey = true;
-                KeyDisplay keyDisplay = KeyDisplay();
                 game.camera.viewport.add(keyDisplay);
               default:
             }

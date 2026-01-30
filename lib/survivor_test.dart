@@ -145,6 +145,8 @@ class SurvivorTest extends FlameGame
       if (hasBeenToDamage && hasBeenToHealth && hasBeenToStamina) {
         keyCanSpawn = true;
       }
+    } else {
+      keyCanSpawn = false;
     }
   }
 }

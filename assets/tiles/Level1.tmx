@@ -437,7 +437,6 @@
   <object id="180" name="Health.tmx" type="Portal" x="1552" y="832" width="48" height="96"/>
   <object id="181" name="Stamina.tmx" type="Portal" x="928" y="1552" width="144" height="48"/>
   <object id="182" name="Damage.tmx" type="Portal" x="0" y="144" width="48" height="144"/>
-  <object id="183" x="768" y="0" width="96" height="48"/>
   <object id="184" x="896" y="1584" width="208" height="16"/>
   <object id="185" x="1088" y="1568" width="16" height="16"/>
   <object id="186" x="1552" y="800" width="48" height="16"/>
@@ -446,7 +445,7 @@
   <object id="189" x="0" y="112" width="64" height="16"/>
   <object id="191" x="0" y="304" width="32" height="16"/>
   <object id="192" x="0" y="128" width="16" height="176"/>
-  <object id="195" name="Bossroom" type="Portal" x="768" y="0" width="96" height="48"/>
+  <object id="195" name="Bossroom.tmx" type="Portal" x="768" y="0" width="96" height="48"/>
  </objectgroup>
  <objectgroup id="3" name="Spawners">
   <object id="58" x="352" y="288" width="64" height="64"/>

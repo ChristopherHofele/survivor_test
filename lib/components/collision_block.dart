@@ -107,6 +107,8 @@ class CollisionBlock extends PositionComponent
           teleportCoordinates = Vector2(1120, 432);
           game.world1.add(doorPriceDisplay);
           break;
+        case 'Bossroom.tmx':
+          teleportCoordinates = Vector2(608, 832);
         default:
       }
     }

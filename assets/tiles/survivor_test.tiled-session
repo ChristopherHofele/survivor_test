@@ -11,11 +11,14 @@
     ],
     "fileStates": {
         "Bossroom.tmx": {
-            "scale": 1,
-            "selectedLayer": 2,
+            "expandedObjectLayers": [
+                5
+            ],
+            "scale": 1.5,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 534,
-                "y": 425.5
+                "x": 604,
+                "y": 348.99999999999994
             }
         },
         "Damage.tmx": {
@@ -62,8 +65,8 @@
             "scale": 2,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 851.5,
-                "y": 57.25
+                "x": 897,
+                "y": 373.75
             }
         },
         "Spring/Spring_Cliff.tsx": {
