@@ -100,7 +100,6 @@ class BasicEnemy extends SpriteAnimationComponent
 
   @override
   void update(double dt) {
-    print(followPlayer);
     if (game.startGame) {
       getOutOfSpawn -= dt;
       _updateMovement(dt);

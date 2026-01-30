@@ -1,3 +1,4 @@
+import 'package:flame/extensions.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -272,6 +273,25 @@ class Player extends SpriteAnimationGroupComponent
       game.world1.add(
         Projectile(position: position, moveDirection: movementDirection),
       );
+
+      switch (current) {
+        case PlayerState.LevelTwo:
+          Vector2 leftShot = movementDirection.clone();
+          Vector2 rightShot = movementDirection.clone();
+          leftShot.rotate(0.3);
+          rightShot.rotate(-0.3);
+          game.world1.add(
+            Projectile(position: position, moveDirection: leftShot),
+          );
+          game.world1.add(
+            Projectile(position: position, moveDirection: rightShot),
+          );
+        case PlayerState.LevelThree:
+          game.world1.add(
+            Projectile(position: position, moveDirection: -movementDirection),
+          );
+        default:
+      }
     }
   }
 

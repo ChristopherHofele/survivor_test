@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:survivor_test/actors/player.dart';
 
 import 'package:survivor_test/survivor_test.dart';
 
@@ -29,7 +30,18 @@ class Projectile extends SpriteAnimationComponent
   @override
   FutureOr<void> onLoad() async {
     if (shooter == Shooter.Player) {
-      spriteName = 'Traps/Saw/FB001_red.png';
+      switch (game.world1.player.current) {
+        case PlayerState.LevelOne:
+          spriteName = 'Traps/Saw/FB001_red.png';
+          break;
+        case PlayerState.LevelTwo:
+          spriteName = 'Traps/Saw/FB001_green.png';
+          break;
+        case PlayerState.LevelThree:
+          spriteName = 'Traps/Saw/FB001_purple.png';
+          break;
+        default:
+      }
     } else {
       spriteName = 'Traps/Saw/FB001_blue.png';
     }
