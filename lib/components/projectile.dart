@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
@@ -28,21 +29,22 @@ class Projectile extends SpriteAnimationComponent
   @override
   FutureOr<void> onLoad() async {
     if (shooter == Shooter.Player) {
-      spriteName = 'Traps/Saw/On.png';
+      spriteName = 'Traps/Saw/FB001_red.png';
     } else {
-      spriteName = 'Traps/Saw/On_enemy.png';
+      spriteName = 'Traps/Saw/FB001_blue.png';
     }
 
     animation = SpriteAnimation.fromFrameData(
       game.images.fromCache(spriteName),
       SpriteAnimationData.sequenced(
-        amount: 8,
-        textureSize: Vector2(38, 38),
-        stepTime: 0.02,
+        amount: 5,
+        textureSize: Vector2(32, 32),
+        stepTime: 0.1,
       ),
     );
     add(CircleHitbox(collisionType: CollisionType.passive));
     maxHits = game.player.projectileMaximumHits;
+    angle = atan2(moveDirection.y, moveDirection.x);
     return super.onLoad();
   }
 
