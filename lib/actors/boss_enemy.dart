@@ -69,8 +69,12 @@ class BossEnemy extends SpriteComponent
   void _handleHealth() {
     if (health <= 0) {
       game.enemyCount -= 1;
-      int worth = 1;
-      Item loot = Item(position: position, worth: worth);
+      int worth = 10;
+      Item loot = Item(
+        position: position,
+        worldName: 'Bossroom.tmx',
+        worth: worth,
+      );
       game.world1.add(loot);
       game.world1.items.add(loot);
       game.world1.remove(this);

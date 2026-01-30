@@ -54,6 +54,9 @@ class Item extends SpriteAnimationComponent
         case 'Damage.tmx':
           spriteName = 'Cherries';
           break;
+        case 'Bossroom.tmx':
+          spriteName = 'Strawberry';
+          break;
         default:
       }
       amount = 17;

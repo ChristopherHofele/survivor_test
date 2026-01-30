@@ -11,15 +11,22 @@ import 'package:survivor_test/components/projectile.dart';
 import 'package:survivor_test/overlays/key_display.dart';
 import 'package:survivor_test/survivor_test.dart';
 
-class Player extends SpriteAnimationComponent
+enum PlayerState { LevelOne, LevelTwo, LevelThree }
+
+class Player extends SpriteAnimationGroupComponent
     with HasGameReference<SurvivorTest>, TapCallbacks, CollisionCallbacks {
   Player({position})
     : super(position: position, size: Vector2(64, 64), anchor: Anchor.center);
+
+  late final SpriteAnimation levelOneAnimation;
+  late final SpriteAnimation levelTwoAnimation;
+  late final SpriteAnimation levelThreeAnimation;
 
   int money = 0;
   //int invincibilityDelay = 1;
   int healthRegenerationDelay = 3;
   int projectileMaximumHits = 3;
+
   double healthRegeneration = 50;
   double health = 400;
   double maxHealth = 400;
@@ -57,14 +64,7 @@ class Player extends SpriteAnimationComponent
   void onLoad() {
     //debugMode = true;
     priority = 1;
-    animation = SpriteAnimation.fromFrameData(
-      game.images.fromCache('monster.png'),
-      SpriteAnimationData.sequenced(
-        amount: 4,
-        textureSize: Vector2(64, 60),
-        stepTime: 0.12,
-      ),
-    );
+    _loadAllAnimations();
     add(CircleHitbox());
   }
 
@@ -80,6 +80,31 @@ class Player extends SpriteAnimationComponent
       //print(collisionBlocks.length);
     }
     super.update(dt);
+  }
+
+  void _loadAllAnimations() {
+    levelOneAnimation = _spriteAnimation('LevelOne');
+    levelTwoAnimation = _spriteAnimation('LevelTwo');
+    levelThreeAnimation = _spriteAnimation('LevelThree');
+
+    animations = {
+      PlayerState.LevelOne: levelOneAnimation,
+      PlayerState.LevelTwo: levelTwoAnimation,
+      PlayerState.LevelThree: levelThreeAnimation,
+    };
+
+    current = PlayerState.LevelOne;
+  }
+
+  SpriteAnimation _spriteAnimation(String state) {
+    return SpriteAnimation.fromFrameData(
+      game.images.fromCache('$state.png'),
+      SpriteAnimationData.sequenced(
+        amount: 4,
+        stepTime: 0.12,
+        textureSize: Vector2(64, 60),
+      ),
+    );
   }
 
   void _updatePlayerMovement(double dt) {
@@ -270,9 +295,13 @@ class Player extends SpriteAnimationComponent
               case 'Cherries':
                 maxAttackCooldown = maxAttackCooldown * 0.25;
                 projectileMaximumHits += 1;
+                break;
+              case 'Strawberry':
+                _packAPunch();
               case 'Key':
                 hasKey = true;
                 game.camera.viewport.add(keyDisplay);
+
               default:
             }
           }
@@ -281,6 +310,18 @@ class Player extends SpriteAnimationComponent
       for (Item item in itemsToRemove) {
         game.world1.items.remove(item);
       }
+    }
+  }
+
+  void _packAPunch() {
+    switch (current) {
+      case PlayerState.LevelOne:
+        current = PlayerState.LevelTwo;
+
+        break;
+      case PlayerState.LevelTwo:
+        current = PlayerState.LevelThree;
+      default:
     }
   }
 }
