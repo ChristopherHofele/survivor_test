@@ -58,6 +58,7 @@ class Player extends SpriteAnimationGroupComponent
   bool isAttacking = false;
   bool allowedTeleportation = false;
   bool hasKey = false;
+  bool inside = false;
 
   KeyDisplay keyDisplay = KeyDisplay();
 
@@ -77,6 +78,7 @@ class Player extends SpriteAnimationGroupComponent
       _handleItemCollision(dt);
       _handleHealthRegeneration(dt);
       _handleAttacks(dt);
+      _updateInside();
       //print(health.toString() + ', ' + maxHealth.toString());
       //print(collisionBlocks.length);
     }
@@ -352,6 +354,20 @@ class Player extends SpriteAnimationGroupComponent
       case PlayerState.LevelTwo:
         current = PlayerState.LevelThree;
       default:
+    }
+  }
+
+  void _updateInside() {
+    if (!game.world1.pressurePlates.isEmpty) {
+      for (final plate in game.world1.pressurePlates) {
+        if (checkCollision(this, plate)) {
+          if (plate.inside) {
+            inside = true;
+          } else {
+            inside = false;
+          }
+        }
+      }
     }
   }
 }

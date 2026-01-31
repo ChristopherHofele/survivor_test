@@ -24,6 +24,7 @@ class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
   var random = Random();
   late EnemyType enemyType;
   bool spawnBoss = true;
+  bool spawnInside = false;
 
   @override
   FutureOr<void> onLoad() {
@@ -36,12 +37,12 @@ class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
   void update(double dt) {
     if (game.startGame) {
       enemyCount = game.enemyCount;
+      if (worldName == 'Stamina.tmx') {
+        _handleSpawnDirectionSwitch();
+      }
       if (worldName == 'Bossroom.tmx') {
         if (spawnBoss) {
-          BossEnemy bossEnemy = BossEnemy(position: spawnLocation);
-          game.world1.add(bossEnemy);
-          game.enemyCount += 1;
-          spawnBoss = false;
+          _spawnBoss();
         }
       } else {
         _spawnEnemies();
@@ -105,5 +106,26 @@ class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
 
   void resetCooldown() {
     cooldown = 3;
+  }
+
+  void _spawnBoss() {
+    BossEnemy bossEnemy = BossEnemy(position: spawnLocation);
+    game.world1.add(bossEnemy);
+    game.enemyCount += 1;
+    spawnBoss = false;
+  }
+
+  void _handleSpawnDirectionSwitch() {
+    if (game.world1.player.inside) {
+      if (!spawnInside) {
+        spawnDirection = spawnDirection * (-1);
+        spawnInside = true;
+      }
+    } else {
+      if (spawnInside) {
+        spawnDirection = spawnDirection * (-1);
+        spawnInside = false;
+      }
+    }
   }
 }

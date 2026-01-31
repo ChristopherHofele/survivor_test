@@ -3,31 +3,31 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Bossroom.tmx",
+    "activeFile": "Stamina.tmx",
     "expandedProjectPaths": [
         "Summer",
-        ".",
-        "Spring"
+        "Spring",
+        "."
     ],
     "fileStates": {
         "Bossroom.tmx": {
             "scale": 1.5,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 374.3333333333333,
-                "y": 619.3333333333333
+                "x": 640,
+                "y": 480.3333333333333
             }
         },
         "Damage.tmx": {
             "expandedObjectLayers": [
-                5,
-                4
+                4,
+                5
             ],
-            "scale": 2,
-            "selectedLayer": 3,
+            "scale": 0.75,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 807.75,
-                "y": 418.5
+                "x": 640,
+                "y": 480.66666666666663
             }
         },
         "Fall_Tiles.tsx": {
@@ -47,11 +47,14 @@
             "scaleInEditor": 1
         },
         "Health.tmx": {
+            "expandedObjectLayers": [
+                3
+            ],
             "scale": 1,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 889.5,
-                "y": 329
+                "x": 640,
+                "y": 480.5
             }
         },
         "Level1.tmx": {
@@ -62,8 +65,8 @@
             "scale": 1.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 396.3333333333333,
-                "y": 284
+                "x": 800,
+                "y": 799.6666666666666
             }
         },
         "Spring/Spring_Cliff.tsx": {
@@ -76,14 +79,14 @@
         },
         "Stamina.tmx": {
             "expandedObjectLayers": [
-                5,
-                6
+                6,
+                5
             ],
             "scale": 1.5,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 854.3333333333333,
-                "y": 644
+                "x": 640,
+                "y": 480.3333333333333
             }
         },
         "Summer/Summer_Trees.tsx": {
@@ -173,14 +176,14 @@
     "recentFiles": [
         "Level1.tmx",
         "Health.tmx",
-        "Stamina.tmx",
-        "Damage.tmx",
-        "Fall_Tiles.tsx",
-        "Fall_Trees.tsx",
-        "Fall_Water.tsx",
-        "Winter_Tiles.tsx",
-        "Winter_Trees.tsx",
         "Bossroom.tmx",
+        "Winter_Trees.tsx",
+        "Winter_Tiles.tsx",
+        "Fall_Water.tsx",
+        "Fall_Trees.tsx",
+        "Fall_Tiles.tsx",
+        "Damage.tmx",
+        "Stamina.tmx",
         "Summer_Water.tsx",
         "Summer_Trees.tsx"
     ],

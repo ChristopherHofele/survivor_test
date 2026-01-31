@@ -7,6 +7,7 @@ import 'package:survivor_test/actors/basic_enemy.dart';
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/components/collision_block.dart';
+import 'package:survivor_test/components/pressure_plate.dart';
 import 'package:survivor_test/components/spawners.dart';
 import 'package:survivor_test/survivor_test.dart';
 
@@ -16,6 +17,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
   final String tileMapName;
   Level({required this.player, required this.tileMapName});
   List<CollisionBlock> collisionBlocks = [];
+  List<PressurePlate> pressurePlates = [];
   List<BasicEnemy> basicEnemies = [];
   List<Item> items = [];
 
@@ -28,7 +30,27 @@ class Level extends World with HasGameReference<SurvivorTest> {
     _trackVisitedWorlds();
     _addCollisions();
     _addSpawners();
+    _addPressurePlates();
     super.onLoad();
+  }
+
+  void _trackVisitedWorlds() {
+    switch (tileMapName) {
+      case 'Stamina.tmx':
+        game.hasBeenToStamina = true;
+        game.maxEnemyCount = 2;
+        break;
+      case 'Health.tmx':
+        game.hasBeenToHealth = true;
+        game.maxEnemyCount = 8;
+        break;
+      case 'Damage.tmx':
+        game.hasBeenToDamage = true;
+        game.maxEnemyCount = 3;
+        break;
+      default:
+        game.resetMaxEnemyCount();
+    }
   }
 
   void _addCollisions() {
@@ -195,22 +217,26 @@ class Level extends World with HasGameReference<SurvivorTest> {
     }
   }
 
-  void _trackVisitedWorlds() {
-    switch (tileMapName) {
-      case 'Stamina.tmx':
-        game.hasBeenToStamina = true;
-        game.maxEnemyCount = 2;
-        break;
-      case 'Health.tmx':
-        game.hasBeenToHealth = true;
-        game.maxEnemyCount = 8;
-        break;
-      case 'Damage.tmx':
-        game.hasBeenToDamage = true;
-        game.maxEnemyCount = 3;
-        break;
-      default:
-        game.resetMaxEnemyCount();
+  void _addPressurePlates() {
+    if (tileMapName == 'Stamina.tmx') {
+      final pressurePlatesLayer = level.tileMap.getLayer<ObjectGroup>(
+        'Pressure_Plates',
+      );
+      if (pressurePlatesLayer != null) {
+        for (final instance in pressurePlatesLayer.objects) {
+          bool inside = false;
+          if (instance.class_ == 'Inside') {
+            inside = true;
+          }
+          final pressurePlate = PressurePlate(
+            position: Vector2(instance.x, instance.y),
+            size: instance.size,
+            inside: inside,
+          );
+          pressurePlates.add(pressurePlate);
+          add(pressurePlate);
+        }
+      }
     }
   }
 }
