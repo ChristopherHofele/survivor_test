@@ -89,6 +89,8 @@ class CollisionBlock extends PositionComponent
     if (interactionType == InteractionType.Portal) {
       DoorPriceDisplay doorPriceDisplay = DoorPriceDisplay(
         position: position + size / 2,
+        worldName: game.world1.tileMapName,
+        destinationName: destinationName,
       );
       switch (destinationName) {
         case 'Level1.tmx':
@@ -96,20 +98,18 @@ class CollisionBlock extends PositionComponent
           break;
         case 'Health.tmx':
           teleportCoordinates = Vector2(128, 496);
-          game.world1.add(doorPriceDisplay);
           break;
         case 'Stamina.tmx':
           teleportCoordinates = Vector2(690, 96);
-          game.world1.add(doorPriceDisplay);
           break;
         case 'Damage.tmx':
           teleportCoordinates = Vector2(1120, 432);
-          game.world1.add(doorPriceDisplay);
           break;
         case 'Bossroom.tmx':
           teleportCoordinates = Vector2(608, 832);
         default:
       }
+      game.world1.add(doorPriceDisplay);
     }
     switch (interactionType) {
       case InteractionType.HealthShop:

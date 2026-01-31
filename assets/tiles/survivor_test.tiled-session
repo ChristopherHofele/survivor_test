@@ -5,9 +5,9 @@
     },
     "activeFile": "Stamina.tmx",
     "expandedProjectPaths": [
+        ".",
         "Summer",
-        "Spring",
-        "."
+        "Spring"
     ],
     "fileStates": {
         "Bossroom.tmx": {
@@ -79,14 +79,14 @@
         },
         "Stamina.tmx": {
             "expandedObjectLayers": [
-                6,
-                5
+                5,
+                6
             ],
             "scale": 1.5,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 640,
-                "y": 480.3333333333333
+                "x": 1037.3333333333333,
+                "y": 645
             }
         },
         "Summer/Summer_Trees.tsx": {

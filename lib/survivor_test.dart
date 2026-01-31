@@ -17,6 +17,7 @@ class SurvivorTest extends FlameGame
   int heartAmount = 0;
   int enemyCount = 0;
   int maxEnemyCount = 12;
+  int enemyBaseHealth = 10;
   int frames = 0;
   int doorsOpened = 0;
   int keySpawnrate = 10;
@@ -84,6 +85,7 @@ class SurvivorTest extends FlameGame
     _updateHearts();
     _determineKeyCanSpawn();
     _updateMaxEnemyCount();
+
     super.update(dt);
   }
 

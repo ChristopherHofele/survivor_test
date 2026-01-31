@@ -81,7 +81,7 @@ class BasicEnemy extends SpriteAnimationComponent
         moveSpeed = 120;
         health = 1;
         attackCooldown = 1;
-        getOutOfSpawn = 0.7;
+        getOutOfSpawn = 0.5;
 
         break;
       case EnemyType.Medium:
@@ -89,7 +89,7 @@ class BasicEnemy extends SpriteAnimationComponent
         textureSize = Vector2.all(64);
         hitboxRadius = 16;
         moveSpeed = 80;
-        health = 1;
+        health = setMediumHealth();
         attackCooldown = 1;
         break;
       case EnemyType.Big:
@@ -510,9 +510,29 @@ class BasicEnemy extends SpriteAnimationComponent
       game.world1.add(loot);
       game.world1.items.add(loot);
       game.world1.remove(this);
-    } else if (enemyType == EnemyType.Small && selfDestruct <= 0) {
+    } else if (game.world1.tileMapName == 'Stamina.tmx' &&
+        enemyType == EnemyType.Small &&
+        selfDestruct <= 0) {
       game.enemyCount -= 1;
       game.world1.remove(this);
     }
+  }
+
+  double setMediumHealth() {
+    double initialHealth = 1;
+    switch (game.doorsOpened) {
+      case 0:
+      case 1:
+      case 2:
+        initialHealth = 1;
+        break;
+
+      case 3:
+        initialHealth = 20;
+        break;
+
+      default:
+    }
+    return initialHealth;
   }
 }

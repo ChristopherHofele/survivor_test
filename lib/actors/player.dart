@@ -26,11 +26,11 @@ class Player extends SpriteAnimationGroupComponent
   int money = 0;
   //int invincibilityDelay = 1;
   int healthRegenerationDelay = 3;
-  int projectileMaximumHits = 3;
+  int projectileMaximumHits = 2;
 
   double healthRegeneration = 50;
-  double health = 400;
-  double maxHealth = 400;
+  double health = 300;
+  double maxHealth = 300;
 
   double moveSpeed = 100;
   double playerSpeed = 0;
@@ -40,8 +40,8 @@ class Player extends SpriteAnimationGroupComponent
   double staminaDrain = 30;
   double staminaRecovery = 20;
 
-  double attackCooldown = 2;
-  double maxAttackCooldown = 2;
+  double attackCooldown = 1.6;
+  double maxAttackCooldown = 1.6;
 
   double buyCooldown = 0;
 
@@ -57,6 +57,7 @@ class Player extends SpriteAnimationGroupComponent
   bool isInjured = false;
   bool isAttacking = false;
   bool allowedTeleportation = false;
+  bool hasFruit = false;
   bool hasKey = false;
   bool inside = false;
 
@@ -145,7 +146,10 @@ class Player extends SpriteAnimationGroupComponent
           case InteractionType.Portal:
             switch (block.destinationName) {
               case 'Level1.tmx':
-                allowedTeleportation = true;
+                if (hasFruit) {
+                  allowedTeleportation = true;
+                  hasFruit = false;
+                }
                 break;
               case 'Health.tmx':
               case 'Stamina.tmx':
@@ -318,16 +322,20 @@ class Player extends SpriteAnimationGroupComponent
               case 'Apple':
                 maxHealth += 100;
                 isInjured = true;
+                hasFruit = true;
                 break;
               case 'Bananas':
-                staminaDrain -= 8;
+                staminaDrain -= 10;
+                hasFruit = true;
                 break;
               case 'Cherries':
-                maxAttackCooldown = maxAttackCooldown * 0.25;
+                maxAttackCooldown = maxAttackCooldown * 0.5;
                 projectileMaximumHits += 1;
+                hasFruit = true;
                 break;
               case 'Strawberry':
                 _packAPunch();
+                hasFruit = true;
               case 'Key':
                 hasKey = true;
                 game.camera.viewport.add(keyDisplay);
@@ -353,6 +361,7 @@ class Player extends SpriteAnimationGroupComponent
         current = PlayerState.LevelThree;
       default:
     }
+    resetMaxAttackCooldown();
   }
 
   void _updateInside() {
@@ -367,5 +376,9 @@ class Player extends SpriteAnimationGroupComponent
         }
       }
     }
+  }
+
+  void resetMaxAttackCooldown() {
+    maxAttackCooldown = 1.6;
   }
 }
