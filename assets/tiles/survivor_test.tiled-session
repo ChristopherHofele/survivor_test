@@ -3,22 +3,19 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Level1.tmx",
+    "activeFile": "Bossroom.tmx",
     "expandedProjectPaths": [
-        "Spring",
+        "Summer",
         ".",
-        "Summer"
+        "Spring"
     ],
     "fileStates": {
         "Bossroom.tmx": {
-            "expandedObjectLayers": [
-                5
-            ],
             "scale": 1.5,
-            "selectedLayer": 1,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 604,
-                "y": 348.99999999999994
+                "x": 374.3333333333333,
+                "y": 619.3333333333333
             }
         },
         "Damage.tmx": {
@@ -27,10 +24,10 @@
                 4
             ],
             "scale": 2,
-            "selectedLayer": 2,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 640,
-                "y": 480
+                "x": 807.75,
+                "y": 418.5
             }
         },
         "Fall_Tiles.tsx": {
@@ -50,11 +47,11 @@
             "scaleInEditor": 1
         },
         "Health.tmx": {
-            "scale": 2,
+            "scale": 1,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 1221,
-                "y": 504.25
+                "x": 889.5,
+                "y": 329
             }
         },
         "Level1.tmx": {
@@ -62,11 +59,11 @@
                 3,
                 2
             ],
-            "scale": 2,
-            "selectedLayer": 3,
+            "scale": 1.5,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 897,
-                "y": 373.75
+                "x": 396.3333333333333,
+                "y": 284
             }
         },
         "Spring/Spring_Cliff.tsx": {
@@ -79,14 +76,14 @@
         },
         "Stamina.tmx": {
             "expandedObjectLayers": [
-                6,
-                5
+                5,
+                6
             ],
             "scale": 1.5,
-            "selectedLayer": 4,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 792.6666666666666,
-                "y": 579.6666666666666
+                "x": 854.3333333333333,
+                "y": 644
             }
         },
         "Summer/Summer_Trees.tsx": {
@@ -169,22 +166,23 @@
         "Fall_Trees.tsx",
         "Fall_Water.tsx",
         "Winter_Tiles.tsx",
-        "Winter_Trees.tsx"
+        "Winter_Trees.tsx",
+        "Bossroom.tmx"
     ],
     "project": "survivor_test.tiled-project",
     "recentFiles": [
-        "Winter_Trees.tsx",
-        "Winter_Tiles.tsx",
-        "Fall_Water.tsx",
-        "Fall_Trees.tsx",
-        "Fall_Tiles.tsx",
-        "Damage.tmx",
-        "Stamina.tmx",
-        "Health.tmx",
         "Level1.tmx",
+        "Health.tmx",
+        "Stamina.tmx",
+        "Damage.tmx",
+        "Fall_Tiles.tsx",
+        "Fall_Trees.tsx",
+        "Fall_Water.tsx",
+        "Winter_Tiles.tsx",
+        "Winter_Trees.tsx",
+        "Bossroom.tmx",
         "Summer_Water.tsx",
-        "Summer_Trees.tsx",
-        "Summer_Tiles.tsx"
+        "Summer_Trees.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {

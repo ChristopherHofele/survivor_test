@@ -287,6 +287,16 @@ class Player extends SpriteAnimationGroupComponent
             Projectile(position: position, moveDirection: rightShot),
           );
         case PlayerState.LevelThree:
+          Vector2 leftShot = movementDirection.clone();
+          Vector2 rightShot = movementDirection.clone();
+          leftShot.rotate(0.3);
+          rightShot.rotate(-0.3);
+          game.world1.add(
+            Projectile(position: position, moveDirection: leftShot),
+          );
+          game.world1.add(
+            Projectile(position: position, moveDirection: rightShot),
+          );
           game.world1.add(
             Projectile(position: position, moveDirection: -movementDirection),
           );

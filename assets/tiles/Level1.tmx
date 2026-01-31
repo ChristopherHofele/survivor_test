@@ -448,9 +448,9 @@
   <object id="195" name="Bossroom.tmx" type="Portal" x="768" y="0" width="96" height="48"/>
  </objectgroup>
  <objectgroup id="3" name="Spawners">
-  <object id="58" x="352" y="288" width="64" height="64"/>
-  <object id="59" x="1232" y="352" width="80" height="64"/>
-  <object id="60" x="288" y="1184" width="48" height="48"/>
-  <object id="61" x="1280" y="1264" width="32" height="32"/>
+  <object id="58" type="Down_Right" x="352" y="288" width="64" height="64"/>
+  <object id="59" type="Down_Left" x="1232" y="352" width="80" height="64"/>
+  <object id="60" type="Up_Right" x="288" y="1184" width="48" height="48"/>
+  <object id="61" type="Up_Left" x="1280" y="1264" width="32" height="32"/>
  </objectgroup>
 </map>

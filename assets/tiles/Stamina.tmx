@@ -420,10 +420,10 @@
   <object id="174" x="496" y="16" width="16" height="16"/>
   <object id="175" type="Stamina_Shop" x="672" y="288" width="16" height="16"/>
  </objectgroup>
- <objectgroup id="6" name="Spawners" visible="0">
-  <object id="169" x="528" y="208" width="32" height="32"/>
-  <object id="170" x="816" y="240" width="32" height="32"/>
-  <object id="171" x="352" y="512" width="32" height="32"/>
-  <object id="172" x="848" y="672" width="32" height="32"/>
+ <objectgroup id="6" name="Spawners">
+  <object id="169" type="Up_Left" x="528" y="208" width="32" height="32"/>
+  <object id="170" type="Up_Right" x="816" y="240" width="32" height="32"/>
+  <object id="171" type="Up_Right" x="352" y="528" width="32" height="32"/>
+  <object id="172" type="Up_Left" x="848" y="672" width="32" height="32"/>
  </objectgroup>
 </map>

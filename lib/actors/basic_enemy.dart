@@ -17,15 +17,20 @@ enum EnemyType { Small, Medium, Big }
 class BasicEnemy extends SpriteAnimationComponent
     with HasGameReference<SurvivorTest>, CollisionCallbacks {
   EnemyType enemyType;
-  BasicEnemy({required position, required this.enemyType})
-    : super(position: position, size: Vector2.all(64), anchor: Anchor.center);
+  Vector2 initialMoveDirection;
+  BasicEnemy({
+    required position,
+    required this.enemyType,
+    required this.initialMoveDirection,
+  }) : super(position: position, size: Vector2.all(64), anchor: Anchor.center);
 
   late double moveSpeed;
   late double health;
   late double attackCooldown;
   late double hitboxRadius;
+  double selfDestruct = 8;
   double followCornerCooldown = 0.3;
-  double getOutOfSpawn = 3;
+  double getOutOfSpawn = 1.5;
 
   var random = Random();
 
@@ -77,6 +82,8 @@ class BasicEnemy extends SpriteAnimationComponent
         moveSpeed = 120;
         health = 1;
         attackCooldown = 1;
+        getOutOfSpawn = 0.7;
+
         break;
       case EnemyType.Medium:
         spriteName = 'enemy.png';
@@ -93,6 +100,7 @@ class BasicEnemy extends SpriteAnimationComponent
         moveSpeed = 50;
         health = 30;
         attackCooldown = 5;
+        getOutOfSpawn = 3;
         break;
     }
     size = textureSize;
@@ -101,6 +109,7 @@ class BasicEnemy extends SpriteAnimationComponent
   @override
   void update(double dt) {
     if (game.startGame) {
+      selfDestruct -= dt;
       getOutOfSpawn -= dt;
       _updateMovement(dt);
       if (getOutOfSpawn <= 0) {
@@ -125,7 +134,9 @@ class BasicEnemy extends SpriteAnimationComponent
 
   void _updateMovement(double dt) {
     followCornerCooldown -= dt;
-    if (followPlayer) {
+    if (getOutOfSpawn > 0) {
+      movementDirection = initialMoveDirection;
+    } else if (followPlayer) {
       movementDirection = determineDirectionOfPlayer(player);
       if (enemyType == EnemyType.Big) {
         followCornerCooldown = 6;
@@ -500,6 +511,9 @@ class BasicEnemy extends SpriteAnimationComponent
       Item loot = Item(position: position, worth: worth);
       game.world1.add(loot);
       game.world1.items.add(loot);
+      game.world1.remove(this);
+    } else if (enemyType == EnemyType.Small && selfDestruct <= 0) {
+      game.enemyCount -= 1;
       game.world1.remove(this);
     }
   }

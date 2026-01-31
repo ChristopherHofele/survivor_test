@@ -197,10 +197,10 @@
 </data>
  </layer>
  <objectgroup id="5" name="Spawners">
-  <object id="74" x="816" y="608" width="32" height="32"/>
-  <object id="75" x="816" y="240" width="32" height="32"/>
-  <object id="76" x="496" y="240" width="32" height="32"/>
-  <object id="77" x="464" y="592" width="32" height="32"/>
+  <object id="74" type="Up_Right" x="848" y="688" width="32" height="32"/>
+  <object id="75" type="Down_Right" x="848" y="192" width="32" height="32"/>
+  <object id="76" type="Down_Right" x="496" y="128" width="32" height="32"/>
+  <object id="77" type="Up_Left" x="432" y="688" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="4" name="Collisions">
   <object id="1" name="Level1.tmx" type="Portal" x="1184" y="352" width="96" height="144"/>

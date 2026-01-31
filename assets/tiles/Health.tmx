@@ -295,7 +295,7 @@
   <object id="37" type="NoCorners" x="1216" y="416" width="32" height="48"/>
  </objectgroup>
  <objectgroup id="3" name="Spawners">
-  <object id="4" x="432" y="256" width="32" height="32"/>
-  <object id="5" x="848" y="240" width="32" height="32"/>
+  <object id="4" type="Down_Right" x="192" y="256" width="32" height="32"/>
+  <object id="5" type="Down_Left" x="1040" y="240" width="32" height="32"/>
  </objectgroup>
 </map>

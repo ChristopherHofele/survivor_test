@@ -9,8 +9,13 @@ import 'package:survivor_test/survivor_test.dart';
 
 class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
   String worldName;
-  Spawner({required position, required this.worldName, size})
-    : super(position: position, size: size);
+  Vector2 spawnDirection;
+  Spawner({
+    required position,
+    required this.worldName,
+    required this.spawnDirection,
+    size,
+  }) : super(position: position, size: size);
 
   double cooldown = 3;
   int specialEnemySpawnrate = 20;
@@ -54,6 +59,7 @@ class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
       BasicEnemy basicEnemy = BasicEnemy(
         position: spawnLocation,
         enemyType: enemyType,
+        initialMoveDirection: spawnDirection,
       );
       game.world1.add(basicEnemy);
       game.world1.basicEnemies.add(basicEnemy);

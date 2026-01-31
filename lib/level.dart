@@ -170,9 +170,24 @@ class Level extends World with HasGameReference<SurvivorTest> {
     final spawnersLayer = level.tileMap.getLayer<ObjectGroup>('Spawners');
     if (spawnersLayer != null) {
       for (final instance in spawnersLayer.objects) {
+        Vector2 spawnDirection = Vector2.all(1);
+        switch (instance.class_) {
+          case 'Down_Right':
+            spawnDirection = Vector2.all(1);
+            break;
+          case 'Down_Left':
+            spawnDirection = Vector2(-1, 1);
+            break;
+          case 'Up_Left':
+            spawnDirection = Vector2.all(-1);
+            break;
+          case 'Up_Right':
+            spawnDirection = Vector2(1, -1);
+        }
         final spawner = Spawner(
           position: Vector2(instance.x, instance.y),
           worldName: tileMapName,
+          spawnDirection: spawnDirection,
           size: instance.size,
         );
         add(spawner);
@@ -192,7 +207,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
         break;
       case 'Damage.tmx':
         game.hasBeenToDamage = true;
-        game.maxEnemyCount = 4;
+        game.maxEnemyCount = 3;
         break;
       default:
         game.resetMaxEnemyCount();
