@@ -18,7 +18,6 @@ class Item extends SpriteAnimationComponent
 
   @override
   FutureOr<void> onLoad() {
-    debugMode = true;
     _determineSprite();
     animation = SpriteAnimation.fromFrameData(
       game.images.fromCache('Items/Fruits/${this.spriteName}.png'),

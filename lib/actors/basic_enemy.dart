@@ -27,6 +27,7 @@ class BasicEnemy extends SpriteAnimationComponent
   late double moveSpeed;
   late double health;
   late double attackCooldown;
+  double shootCooldown = 5;
   late double hitboxRadius;
   double selfDestruct = 8;
   double followCornerCooldown = 0.3;
@@ -98,7 +99,7 @@ class BasicEnemy extends SpriteAnimationComponent
         hitboxRadius = 32;
         moveSpeed = 50;
         health = 30;
-        attackCooldown = 5;
+        attackCooldown = 1;
         getOutOfSpawn = 3;
         break;
     }
@@ -114,18 +115,12 @@ class BasicEnemy extends SpriteAnimationComponent
       if (getOutOfSpawn <= 0) {
         _handleCollisions(dt);
       }
-      if (enemyType == EnemyType.Big && attackCooldown <= 0) {
-        game.world1.add(
-          Projectile(
-            position: position,
-            moveDirection: movementDirection,
-            shooter: Shooter.Enemy,
-          ),
-        );
-        attackCooldown = 5;
+      if (enemyType == EnemyType.Big && shootCooldown <= 0) {
+        _shoot();
       }
       _handleHealth();
       attackCooldown -= dt;
+      shootCooldown -= dt;
     }
     super.update(dt);
   }
@@ -534,5 +529,16 @@ class BasicEnemy extends SpriteAnimationComponent
       default:
     }
     return initialHealth;
+  }
+
+  void _shoot() {
+    game.world1.add(
+      Projectile(
+        position: position,
+        moveDirection: determineDirectionOfPlayer(player),
+        shooter: Shooter.Enemy,
+      ),
+    );
+    shootCooldown = 5;
   }
 }
