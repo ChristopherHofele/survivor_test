@@ -43,7 +43,6 @@ class BasicEnemy extends SpriteAnimationComponent
   late Vector2 textureSize;
 
   List<CollisionBlock> collisionBlocks = [];
-  List<BasicEnemy> basicEnemies = [];
 
   bool followPlayer = true;
 
@@ -125,7 +124,6 @@ class BasicEnemy extends SpriteAnimationComponent
         );
         attackCooldown = 5;
       }
-      basicEnemies = game.world1.basicEnemies;
       _handleHealth();
       attackCooldown -= dt;
     }
@@ -143,10 +141,9 @@ class BasicEnemy extends SpriteAnimationComponent
       } else {
         followCornerCooldown = 2;
       }
-      //print('followingPlayer');
     } else {
       movementDirection = determineDirectionOfCorner(cornerToFollow);
-      //print('followingCorner');
+
       if ((position - cornerToFollow).length < 2 || followCornerCooldown < 0) {
         followPlayer = true;
       }
@@ -501,6 +498,7 @@ class BasicEnemy extends SpriteAnimationComponent
   void _handleHealth() {
     if (health <= 0) {
       game.enemyCount -= 1;
+      game.world1.enemiesDefeated += 1;
       int worth = 1;
       if (game.keyCanSpawn && game.world1.tileMapName == 'Level1.tmx') {
         int spawnParlay = random.nextInt(game.keySpawnrate);

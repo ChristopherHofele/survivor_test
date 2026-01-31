@@ -20,9 +20,21 @@ class SurvivorTest extends FlameGame
   int frames = 0;
   int doorsOpened = 0;
   int keySpawnrate = 10;
+  int enemyThresholdsBroken = 0;
   double ticker = 0;
 
-  List<int> doorPrices = [2, 1, 4, 0, 0, 0, 0, 0, 0, 0];
+  List<int> doorPrices = [20, 40, 50, 100, 0, 0, 0, 0, 0, 0];
+  List<int> zeroDoorsMaxEnemyCounts = [1, 4, 8];
+  List<int> oneDoorsMaxEnemyCounts = [8, 12, 16];
+  List<int> twoDoorsMaxEnemyCounts = [10, 14, 20];
+  List<int> threeDoorsMaxEnemyCounts = [12, 14, 20];
+  List<List> maxEnemyCounts = [];
+
+  List<int> zeroDoorsEnemyThresholds = [4, 40];
+  List<int> oneDoorsEnemyThresholds = [40, 80];
+  List<int> twoDoorsEnemyThresholds = [50, 100];
+  List<int> threeDoorsEnemyThresholds = [100, 200];
+  List<List> enemyThresholds = [];
 
   late Player player;
   late JoystickComponent joystick;
@@ -38,6 +50,7 @@ class SurvivorTest extends FlameGame
 
   @override
   Future<void> onLoad() async {
+    _initializeLists();
     player = Player(position: Vector2(960, 960));
     await images.loadAllImages();
     loadWorld(player, 'Level1.tmx');
@@ -70,6 +83,7 @@ class SurvivorTest extends FlameGame
     }
     _updateHearts();
     _determineKeyCanSpawn();
+    _updateMaxEnemyCount();
     super.update(dt);
   }
 
@@ -148,5 +162,34 @@ class SurvivorTest extends FlameGame
     } else {
       keyCanSpawn = false;
     }
+  }
+
+  void _updateMaxEnemyCount() {
+    if (world1.tileMapName == 'Level1.tmx') {
+      if (world1.enemiesDefeated >= enemyThresholds[doorsOpened][1]) {
+        enemyThresholdsBroken = 2;
+      } else if (world1.enemiesDefeated >= enemyThresholds[doorsOpened][0]) {
+        enemyThresholdsBroken = 1;
+      } else {
+        enemyThresholdsBroken = 0;
+      }
+      maxEnemyCount = maxEnemyCounts[doorsOpened][enemyThresholdsBroken];
+    }
+    print(maxEnemyCount);
+  }
+
+  void _initializeLists() {
+    maxEnemyCounts = [
+      zeroDoorsMaxEnemyCounts,
+      oneDoorsMaxEnemyCounts,
+      twoDoorsMaxEnemyCounts,
+      threeDoorsMaxEnemyCounts,
+    ];
+    enemyThresholds = [
+      zeroDoorsEnemyThresholds,
+      oneDoorsEnemyThresholds,
+      twoDoorsEnemyThresholds,
+      threeDoorsEnemyThresholds,
+    ];
   }
 }

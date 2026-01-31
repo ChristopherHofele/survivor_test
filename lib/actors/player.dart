@@ -79,8 +79,6 @@ class Player extends SpriteAnimationGroupComponent
       _handleHealthRegeneration(dt);
       _handleAttacks(dt);
       _updateInside();
-      //print(health.toString() + ', ' + maxHealth.toString());
-      //print(collisionBlocks.length);
     }
     super.update(dt);
   }
@@ -132,7 +130,6 @@ class Player extends SpriteAnimationGroupComponent
       flipHorizontallyAroundCenter();
     }
     stamina = stamina.clamp(0, 100);
-    //print(position);
   }
 
   void _handleBlockCollisions(double dt) {
@@ -156,7 +153,9 @@ class Player extends SpriteAnimationGroupComponent
                 if (money >= block.entryCost) {
                   allowedTeleportation = true;
                   money -= block.entryCost;
-                  game.doorsOpened += 1;
+                  if (game.doorsOpened < 3) {
+                    game.doorsOpened += 1;
+                  }
                 }
               case 'Bossroom.tmx':
                 if (hasKey) {
@@ -185,7 +184,6 @@ class Player extends SpriteAnimationGroupComponent
         }
       }
       if (collisionCounter >= 2) {
-        print('two collisions');
         break;
       }
     }

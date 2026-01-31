@@ -40,7 +40,6 @@ class CollisionBlock extends PositionComponent
   @override
   FutureOr<void> onLoad() {
     entryCost = game.doorPrices[game.doorsOpened];
-    print(entryCost);
     switch (blockType) {
       case BlockType.NoCorners:
         extendedCorners.add(Vector2(position.x, position.y));

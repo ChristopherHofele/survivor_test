@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
-import 'package:flame/image_composition.dart';
 import 'package:flame_tiled/flame_tiled.dart';
-import 'package:survivor_test/actors/basic_enemy.dart';
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/components/collision_block.dart';
@@ -16,9 +14,12 @@ class Level extends World with HasGameReference<SurvivorTest> {
   final Player player;
   final String tileMapName;
   Level({required this.player, required this.tileMapName});
+
+  int enemiesDefeated = 0;
+
   List<CollisionBlock> collisionBlocks = [];
   List<PressurePlate> pressurePlates = [];
-  List<BasicEnemy> basicEnemies = [];
+
   List<Item> items = [];
 
   @override

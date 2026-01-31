@@ -63,8 +63,10 @@ class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
         initialMoveDirection: spawnDirection,
       );
       game.world1.add(basicEnemy);
-      game.world1.basicEnemies.add(basicEnemy);
       game.enemyCount += 1;
+      resetCooldown();
+    }
+    if (enemyCount == game.maxEnemyCount) {
       resetCooldown();
     }
   }
