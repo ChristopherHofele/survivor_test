@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Stamina.tmx",
+    "activeFile": "Health.tmx",
     "expandedProjectPaths": [
+        "Spring",
         ".",
-        "Summer",
-        "Spring"
+        "Summer"
     ],
     "fileStates": {
         "Bossroom.tmx": {
@@ -51,9 +51,9 @@
                 3
             ],
             "scale": 1,
-            "selectedLayer": 5,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 640,
+                "x": 258,
                 "y": 480.5
             }
         },
@@ -175,7 +175,6 @@
     "project": "survivor_test.tiled-project",
     "recentFiles": [
         "Level1.tmx",
-        "Health.tmx",
         "Bossroom.tmx",
         "Winter_Trees.tsx",
         "Winter_Tiles.tsx",
@@ -184,6 +183,7 @@
         "Fall_Tiles.tsx",
         "Damage.tmx",
         "Stamina.tmx",
+        "Health.tmx",
         "Summer_Water.tsx",
         "Summer_Trees.tsx"
     ],
