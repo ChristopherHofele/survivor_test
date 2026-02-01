@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Health.tmx",
+    "activeFile": "Level1.tmx",
     "expandedProjectPaths": [
-        "Spring",
+        "Summer",
         ".",
-        "Summer"
+        "Spring"
     ],
     "fileStates": {
         "Bossroom.tmx": {
@@ -15,19 +15,19 @@
             "selectedLayer": 5,
             "viewCenter": {
                 "x": 640,
-                "y": 480.3333333333333
+                "y": 480.33333333333337
             }
         },
         "Damage.tmx": {
             "expandedObjectLayers": [
-                4,
-                5
+                5,
+                4
             ],
             "scale": 0.75,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 640,
-                "y": 480.66666666666663
+                "x": 291.99999999999994,
+                "y": 480.66666666666674
             }
         },
         "Fall_Tiles.tsx": {
@@ -53,19 +53,19 @@
             "scale": 1,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 258,
-                "y": 480.5
+                "x": -344,
+                "y": 542.5
             }
         },
         "Level1.tmx": {
             "expandedObjectLayers": [
-                3,
-                2
+                2,
+                3
             ],
             "scale": 1.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 800,
+                "x": 799.9999999999999,
                 "y": 799.6666666666666
             }
         },
@@ -79,13 +79,13 @@
         },
         "Stamina.tmx": {
             "expandedObjectLayers": [
-                5,
-                6
+                6,
+                5
             ],
             "scale": 1.5,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 1037.3333333333333,
+                "x": 15.333333333333314,
                 "y": 645
             }
         },
@@ -174,7 +174,6 @@
     ],
     "project": "survivor_test.tiled-project",
     "recentFiles": [
-        "Level1.tmx",
         "Bossroom.tmx",
         "Winter_Trees.tsx",
         "Winter_Tiles.tsx",
@@ -184,6 +183,7 @@
         "Damage.tmx",
         "Stamina.tmx",
         "Health.tmx",
+        "Level1.tmx",
         "Summer_Water.tsx",
         "Summer_Trees.tsx"
     ],
