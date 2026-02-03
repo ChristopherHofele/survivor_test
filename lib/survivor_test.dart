@@ -49,19 +49,29 @@ class SurvivorTest extends FlameGame
   bool hasBeenToHealth = false;
   bool keyCanSpawn = false;
   Color background = Color.fromARGB(255, 44, 96, 26);
+  late AudioPool shootSound;
 
   @override
   Future<void> onLoad() async {
     _initializeLists();
     player = Player(position: Vector2(960, 960));
     await images.loadAllImages();
-    await FlameAudio.audioCache.loadAll(['the_return_of_the_8_bit_era.mp3']);
+    await FlameAudio.audioCache.loadAll([
+      'the_return_of_the_8_bit_era.mp3',
+      'power_off.mp3',
+    ]);
     FlameAudio.bgm.initialize;
+    shootSound = await AudioPool.createFromAsset(
+      path: 'power_off.mp3',
+      minPlayers: 3,
+      maxPlayers: 6,
+      audioCache: FlameAudio.audioCache,
+    );
     loadWorld(player, 'Level1.tmx');
     camera = CameraComponent.withFixedResolution(
       world: world1,
       width: size.x,
-      height: size.y + 300,
+      height: size.y,
     );
     camera.follow(player);
     addControls();

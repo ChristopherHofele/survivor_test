@@ -42,7 +42,7 @@ class CollisionBlock extends PositionComponent
 
   @override
   FutureOr<void> onLoad() {
-    debugMode = true;
+    //debugMode = true;
     entryCost = game.doorPrices[game.doorsOpened];
     switch (blockType) {
       case BlockType.NoCorners:

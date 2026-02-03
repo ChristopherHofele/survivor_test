@@ -1,4 +1,3 @@
-import 'package:flame/extensions.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -277,6 +276,7 @@ class Player extends SpriteAnimationGroupComponent
       game.world1.add(
         Projectile(position: position, moveDirection: movementDirection),
       );
+      game.shootSound.start();
 
       switch (current) {
         case PlayerState.LevelTwo:

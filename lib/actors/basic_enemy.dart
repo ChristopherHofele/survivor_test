@@ -53,7 +53,7 @@ class BasicEnemy extends SpriteAnimationComponent
 
   @override
   void onLoad() {
-    debugMode = true;
+    //debugMode = true;
     _initializeEnemyType();
     player = game.player;
     collisionBlocks = player.collisionBlocks;
