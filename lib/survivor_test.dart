@@ -61,7 +61,7 @@ class SurvivorTest extends FlameGame
     camera = CameraComponent.withFixedResolution(
       world: world1,
       width: size.x,
-      height: size.y,
+      height: size.y + 300,
     );
     camera.follow(player);
     addControls();
@@ -82,10 +82,10 @@ class SurvivorTest extends FlameGame
     }
     ticker += dt;
 
-    if (ticker >= 77) {
+    /*if (ticker >= 77) {
       FlameAudio.bgm.play('the_return_of_the_8_bit_era.mp3');
       ticker = 0;
-    }
+    }*/
     _updateHearts();
     _determineKeyCanSpawn();
     _updateMaxEnemyCount();

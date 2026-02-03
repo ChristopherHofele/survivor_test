@@ -41,6 +41,7 @@ class BasicEnemy extends SpriteAnimationComponent
   late Vector2 textureSize;
   Vector2 movementDirection = Vector2.zero();
   Vector2 velocity = Vector2.zero();
+  Vector2 directionOfPlayer = Vector2.zero();
   Vector2 cornerToFollow = Vector2.zero();
 
   List<CollisionBlock> collisionBlocks = [];
@@ -113,6 +114,7 @@ class BasicEnemy extends SpriteAnimationComponent
     if (game.startGame) {
       selfDestruct -= dt;
       getOutOfSpawn -= dt;
+      directionOfPlayer = determineDirectionOfPlayer(player);
       _updateMovement(dt);
       if (getOutOfSpawn <= 0) {
         _handleCollisions(dt);
@@ -123,8 +125,8 @@ class BasicEnemy extends SpriteAnimationComponent
       _handleHealth();
       attackCooldown -= dt;
       shootCooldown -= dt;
-      print(followPlayer);
-      print(followCornerCooldown);
+      //print(followPlayer);
+      //print(followCornerCooldown);
       ignoreCorner = false;
     }
     super.update(dt);
@@ -136,7 +138,7 @@ class BasicEnemy extends SpriteAnimationComponent
       movementDirection = initialMoveDirection;
     } else {
       if (followPlayer) {
-        movementDirection = determineDirectionOfPlayer(player);
+        movementDirection = directionOfPlayer;
         if (enemyType == EnemyType.Big) {
           followCornerCooldown = 6;
         } else {
@@ -237,13 +239,21 @@ class BasicEnemy extends SpriteAnimationComponent
   void _handleHorizontalCollisions(double dt, CollisionBlock block) {
     if (isCollisionHorizontal(this, block, dt)) {
       //if (followCornerCooldown < 0) {
-      if (block.extendedCorners.length == 2) {
-        _handleTwoCornerHorizontal(block);
-      } else if (block.extendedCorners.length == 3) {
-        _handleThreeCornerHorizontal(block);
-      } else if (block.extendedCorners.length == 4) {
-        _handleFourCornerHorizontal(block);
+      switch (block.extendedCorners.length) {
+        case 0:
+          _handleOneCornerHorizontal(block);
+        case 2:
+          _handleTwoCornerHorizontal(block);
+          break;
+        case 3:
+          _handleThreeCornerHorizontal(block);
+          break;
+        case 4:
+          _handleFourCornerHorizontal(block);
+          break;
+        default:
       }
+
       //}
       if (velocity.x > 0) {
         velocity.x = 0;
@@ -252,6 +262,34 @@ class BasicEnemy extends SpriteAnimationComponent
         velocity.x = 0;
         position.x = block.x + block.width + this.width / 2;
       }
+    }
+  }
+
+  void _handleOneCornerHorizontal(CollisionBlock block) {
+    if (!ignoreCorner) {
+      followPlayer = false;
+    }
+    double yToCompare = 0;
+    switch (block.blockType) {
+      case BlockType.DownRight:
+      case BlockType.UpRight:
+        yToCompare =
+            (player.x - block.position.x) * block.comparisonVector.y +
+            block.position.y;
+        if (yToCompare > player.y) {
+          cornerToFollow = Vector2(
+            position.x,
+            position.y - block.height,
+          ); // goUp
+        } else {
+          cornerToFollow = Vector2(
+            position.x,
+            position.y + block.height,
+          ); //goDown
+        }
+
+        break;
+      default:
     }
   }
 
@@ -381,12 +419,19 @@ class BasicEnemy extends SpriteAnimationComponent
   void _handleVerticalCollisons(double dt, CollisionBlock block) {
     if (isCollisionVertical(this, block, dt)) {
       //if (followCornerCooldown < 0) {
-      if (block.extendedCorners.length == 2) {
-        _handleTwoCornerVertical(block);
-      } else if (block.extendedCorners.length == 3) {
-        _handleThreeCornerVertical(block);
-      } else if (block.extendedCorners.length == 4) {
-        _handleFourCornerVertical(block);
+      switch (block.extendedCorners.length) {
+        case 0:
+          _handleOneCornerVertical(block);
+        case 2:
+          _handleTwoCornerVertical(block);
+          break;
+        case 3:
+          _handleThreeCornerVertical(block);
+          break;
+        case 4:
+          _handleFourCornerVertical(block);
+          break;
+        default:
       }
       // }
       if (velocity.y > 0) {
@@ -396,6 +441,50 @@ class BasicEnemy extends SpriteAnimationComponent
         velocity.y = 0;
         position.y = block.y + block.height + this.height / 2;
       }
+    }
+  }
+
+  void _handleOneCornerVertical(CollisionBlock block) {
+    if (!ignoreCorner) {
+      followPlayer = false;
+    }
+    double yToCompare = 0;
+    switch (block.blockType) {
+      case BlockType.DownRight:
+        print('DownRightVertical + $directionOfPlayer');
+
+        yToCompare =
+            (player.x - block.position.x) * block.comparisonVector.y +
+            block.position.y;
+        if (yToCompare > player.y) {
+          cornerToFollow = Vector2(
+            position.x + block.width,
+            position.y,
+          ); // goRight
+        } else {
+          cornerToFollow = Vector2(
+            position.x - block.width,
+            position.y,
+          ); //goLeft
+        }
+
+      case BlockType.UpRight:
+        yToCompare =
+            (player.x - block.position.x) * block.comparisonVector.y +
+            block.position.y;
+        if (yToCompare > player.y) {
+          cornerToFollow = Vector2(
+            position.x - block.width,
+            position.y,
+          ); //goLeft
+        } else {
+          cornerToFollow = Vector2(
+            position.x + block.width,
+            position.y,
+          ); // goRight
+        }
+        break;
+      default:
     }
   }
 

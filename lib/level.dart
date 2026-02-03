@@ -104,6 +104,24 @@ class Level extends World with HasGameReference<SurvivorTest> {
             collisionBlocks.add(block);
             add(block);
             break;
+          case 'Down_Right':
+            final block = CollisionBlock(
+              position: Vector2(collision.x, collision.y),
+              size: Vector2(collision.width, collision.height),
+              blockType: BlockType.DownRight,
+            );
+            collisionBlocks.add(block);
+            add(block);
+            break;
+          case 'Up_Right':
+            final block = CollisionBlock(
+              position: Vector2(collision.x, collision.y),
+              size: Vector2(collision.width, collision.height),
+              blockType: BlockType.UpRight,
+            );
+            collisionBlocks.add(block);
+            add(block);
+            break;
           case 'Top':
             final block = CollisionBlock(
               position: Vector2(collision.x, collision.y),

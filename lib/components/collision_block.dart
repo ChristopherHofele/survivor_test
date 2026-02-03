@@ -8,6 +8,8 @@ import 'package:survivor_test/survivor_test.dart';
 enum InteractionType { None, HealthShop, StaminaShop, DamageShop, Portal }
 
 enum BlockType {
+  DownRight,
+  UpRight,
   Left,
   TopLeft,
   Top,
@@ -35,6 +37,7 @@ class CollisionBlock extends PositionComponent
 
   int entryCost = 0;
   Vector2 teleportCoordinates = Vector2.zero();
+  Vector2 comparisonVector = Vector2.zero();
   List<Vector2> extendedCorners = [];
 
   @override
@@ -47,6 +50,12 @@ class CollisionBlock extends PositionComponent
         extendedCorners.add(Vector2(position.x + size.x, position.y));
         extendedCorners.add(Vector2(position.x + size.x, position.y + size.y));
         extendedCorners.add(Vector2(position.x, position.y + size.y));
+        break;
+      case BlockType.DownRight:
+        comparisonVector = Vector2(1, 1);
+        break;
+      case BlockType.UpRight:
+        comparisonVector = Vector2(1, -1);
         break;
       case BlockType.Left:
         extendedCorners.add(Vector2(position.x + size.x, position.y));
