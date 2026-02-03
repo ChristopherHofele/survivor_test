@@ -6,8 +6,8 @@
     "activeFile": "Level1.tmx",
     "expandedProjectPaths": [
         "Summer",
-        ".",
-        "Spring"
+        "Spring",
+        "."
     ],
     "fileStates": {
         "Bossroom.tmx": {
@@ -15,19 +15,19 @@
             "selectedLayer": 5,
             "viewCenter": {
                 "x": 640,
-                "y": 480.33333333333337
+                "y": 480.3333333333333
             }
         },
         "Damage.tmx": {
             "expandedObjectLayers": [
-                5,
-                4
+                4,
+                5
             ],
             "scale": 0.75,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 291.99999999999994,
-                "y": 480.66666666666674
+                "x": 640,
+                "y": 480.66666666666663
             }
         },
         "Fall_Tiles.tsx": {
@@ -53,19 +53,19 @@
             "scale": 1,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": -344,
-                "y": 542.5
+                "x": 640,
+                "y": 480.5
             }
         },
         "Level1.tmx": {
             "expandedObjectLayers": [
-                2,
-                3
+                3,
+                2
             ],
             "scale": 1.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 799.9999999999999,
+                "x": 800,
                 "y": 799.6666666666666
             }
         },
@@ -85,8 +85,8 @@
             "scale": 1.5,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 15.333333333333314,
-                "y": 645
+                "x": 640,
+                "y": 480.3333333333333
             }
         },
         "Summer/Summer_Trees.tsx": {

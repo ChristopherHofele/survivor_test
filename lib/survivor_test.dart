@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/painting.dart';
 
 import 'package:survivor_test/actors/player.dart';
@@ -54,6 +55,8 @@ class SurvivorTest extends FlameGame
     _initializeLists();
     player = Player(position: Vector2(960, 960));
     await images.loadAllImages();
+    await FlameAudio.audioCache.loadAll(['the_return_of_the_8_bit_era.mp3']);
+    FlameAudio.bgm.initialize;
     loadWorld(player, 'Level1.tmx');
     camera = CameraComponent.withFixedResolution(
       world: world1,
@@ -64,6 +67,7 @@ class SurvivorTest extends FlameGame
     addControls();
     addHearts();
     addMoney();
+    FlameAudio.bgm.play('the_return_of_the_8_bit_era.mp3');
   }
 
   @override
@@ -77,9 +81,9 @@ class SurvivorTest extends FlameGame
       overlays.add('GameOver');
     }
     ticker += dt;
-    frames += 1;
-    if (ticker >= 1) {
-      frames = 0;
+
+    if (ticker >= 77) {
+      FlameAudio.bgm.play('the_return_of_the_8_bit_era.mp3');
       ticker = 0;
     }
     _updateHearts();
@@ -177,7 +181,7 @@ class SurvivorTest extends FlameGame
       }
       maxEnemyCount = maxEnemyCounts[doorsOpened][enemyThresholdsBroken];
     }
-    print(maxEnemyCount);
+    //print(maxEnemyCount);
   }
 
   void _initializeLists() {
