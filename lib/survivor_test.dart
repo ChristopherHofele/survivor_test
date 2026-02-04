@@ -49,16 +49,22 @@ class SurvivorTest extends FlameGame
   bool hasBeenToHealth = false;
   bool keyCanSpawn = false;
   Color background = Color.fromARGB(255, 44, 96, 26);
-  late AudioPool shootSound;
+  late AudioPool shootSoundPlayer;
+  late AudioPool shootSoundEnemy;
 
   @override
   Future<void> onLoad() async {
     _initializeLists();
-    player = Player(position: Vector2(960, 960));
+    player = Player(position: Vector2(960, 1020));
     await images.loadAllImages();
     await FlameAudio.audioCache.loadAll([
       'the_return_of_the_8_bit_era.mp3',
-      'power_off.mp3',
+      'Evening Harmony.mp3',
+      'Gentle Breeze.mp3',
+      'Golden Gleam.mp3',
+      'Sunlight Through Leaves.mp3',
+      'Sword Unsheath 2.wav',
+      'Fireball 1.wav',
     ]);
     FlameAudio.bgm.initialize;
 
@@ -66,14 +72,14 @@ class SurvivorTest extends FlameGame
     camera = CameraComponent.withFixedResolution(
       world: world1,
       width: size.x,
-      height: size.y + 300,
+      height: size.y,
     );
     camera.follow(player);
     addControls();
     addHearts();
     addMoney();
-    shootSound = await FlameAudio.createPool(
-      'power_off.mp3',
+    shootSoundPlayer = await FlameAudio.createPool(
+      'Fireball 1.wav',
       minPlayers: 3,
       maxPlayers: 6,
       audioContext: AudioContext(
@@ -81,7 +87,15 @@ class SurvivorTest extends FlameGame
         iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
       ),
     );
-    FlameAudio.bgm.play('the_return_of_the_8_bit_era.mp3');
+    shootSoundEnemy = await FlameAudio.createPool(
+      'Sword Unsheath 2.wav',
+      minPlayers: 3,
+      maxPlayers: 6,
+      audioContext: AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      ),
+    );
   }
 
   @override

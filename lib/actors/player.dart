@@ -276,7 +276,7 @@ class Player extends SpriteAnimationGroupComponent
       game.world1.add(
         Projectile(position: position, moveDirection: movementDirection),
       );
-      game.shootSound.start();
+      game.shootSoundPlayer.start();
 
       switch (current) {
         case PlayerState.LevelTwo:

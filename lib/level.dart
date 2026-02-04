@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/components/items.dart';
@@ -32,6 +33,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
     _addCollisions();
     _addSpawners();
     _addPressurePlates();
+    _changeBGM();
     super.onLoad();
   }
 
@@ -256,6 +258,26 @@ class Level extends World with HasGameReference<SurvivorTest> {
           add(pressurePlate);
         }
       }
+    }
+  }
+
+  void _changeBGM() {
+    switch (tileMapName) {
+      case 'Level1.tmx':
+        FlameAudio.bgm.play('Sunlight Through Leaves.mp3');
+        break;
+      case 'Health.tmx':
+        FlameAudio.bgm.play('Gentle Breeze.mp3');
+        break;
+      case 'Damage.tmx':
+        FlameAudio.bgm.play('Evening Harmony.mp3');
+        break;
+      case 'Stamina.tmx':
+        FlameAudio.bgm.play('Golden Gleam.mp3');
+        break;
+      case 'Bossroom.tmx':
+        FlameAudio.bgm.play('the_return_of_the_8_bit_era.mp3');
+      default:
     }
   }
 }

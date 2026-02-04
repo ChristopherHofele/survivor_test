@@ -664,6 +664,7 @@ class BasicEnemy extends SpriteAnimationComponent
         shooter: Shooter.Enemy,
       ),
     );
+    game.shootSoundEnemy.start();
     shootCooldown = 5;
   }
 }
