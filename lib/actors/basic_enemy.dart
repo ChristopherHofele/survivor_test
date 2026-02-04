@@ -118,7 +118,7 @@ class BasicEnemy extends SpriteAnimationComponent
       if (ignoreCorner) {
         ignoreCornerCooldown -= dt;
       }
-      directionOfPlayer = determineDirectionOfPlayer(player);
+      directionOfPlayer = determineDirectionOfPlayer(player, this);
       _updateMovement(dt);
       if (getOutOfSpawn <= 0) {
         _handleCollisions(dt);
@@ -214,14 +214,6 @@ class BasicEnemy extends SpriteAnimationComponent
       );
     }
     super.onCollisionStart(intersectionPoints, other);
-  }
-
-  Vector2 determineDirectionOfPlayer(player) {
-    Vector2 directionOfPlayer = Vector2.zero();
-    directionOfPlayer.x = player.position.x - position.x;
-    directionOfPlayer.y = player.position.y - position.y;
-    directionOfPlayer.normalize();
-    return directionOfPlayer;
   }
 
   Vector2 determineDirectionOfCorner(Vector2 corner) {
@@ -624,7 +616,7 @@ class BasicEnemy extends SpriteAnimationComponent
       int worth = 1;
       if (game.keyCanSpawn && game.world1.tileMapName == 'Level1.tmx') {
         int spawnParlay = random.nextInt(game.keySpawnrate);
-        if (spawnParlay == 2) {
+        if (spawnParlay == 1) {
           worth = 0;
         }
       }
@@ -662,7 +654,7 @@ class BasicEnemy extends SpriteAnimationComponent
     game.world1.add(
       Projectile(
         position: position,
-        moveDirection: determineDirectionOfPlayer(player),
+        moveDirection: directionOfPlayer,
         shooter: Shooter.Enemy,
       ),
     );

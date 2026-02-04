@@ -4,27 +4,45 @@ import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flame_audio/flame_audio.dart';
 
 import 'package:survivor_test/actors/player.dart';
+import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/components/projectile.dart';
 import 'package:survivor_test/level.dart';
 import 'package:survivor_test/survivor_test.dart';
+
+enum BossState {
+  Idle,
+  SingleShot,
+  Charge,
+  Return,
+  MultiDirectionShot,
+  SpinAttack,
+}
 
 class BossEnemy extends SpriteComponent
     with HasGameReference<SurvivorTest>, CollisionCallbacks {
   BossEnemy({required position})
     : super(position: position, size: Vector2.all(256), anchor: Anchor.center);
 
+  int stateChooser = 0;
   late double health;
   late double attackCooldown;
   late double hitboxRadius;
+  BossState bossState = BossState.Idle;
 
   var random = Random();
 
   late final Player player;
   late final Level level;
   Vector2 lookDirection = Vector2.zero();
+
+  bool actionCompleted = false;
+  bool isDeciding = false;
+  bool introStarted = false;
+  bool introFinished = false;
 
   @override
   FutureOr<void> onLoad() async {
@@ -39,13 +57,18 @@ class BossEnemy extends SpriteComponent
       ),
     );
     health = 200;
-
     return super.onLoad();
   }
 
   @override
   void update(double dt) {
-    _handleHealth();
+    _executeIntro();
+    if (introFinished) {
+      lookDirection = determineDirectionOfPlayer(game.player, this);
+      _handleHealth();
+      _decideState();
+      _executeAction();
+    }
     super.update(dt);
   }
 
@@ -79,5 +102,83 @@ class BossEnemy extends SpriteComponent
       game.world1.items.add(loot);
       game.world1.remove(this);
     }
+  }
+
+  void _decideState() async {
+    if (bossState == BossState.Idle && !isDeciding) {
+      isDeciding = true;
+      Future.delayed(Duration(seconds: 1), () {
+        _randomlyChooseNextState();
+      });
+    } else if (actionCompleted) {
+      bossState = BossState.Idle;
+    }
+    actionCompleted = false;
+  }
+
+  void _executeAction() async {
+    switch (bossState) {
+      case BossState.Idle:
+        break;
+      case BossState.SingleShot:
+        _shootAtPlayer();
+        break;
+      case BossState.Charge:
+        //charge at player
+        // notify when done
+        break;
+      case BossState.Return:
+        //return to middle of arena
+        //notify when middle reached
+        break;
+      case BossState.MultiDirectionShot:
+        //shoot in 8 directions then change by 22.5 degrees shoot again,
+        //change angle back and shoot again
+        //notify when done
+        break;
+      case BossState.SpinAttack:
+      // shoot at certain intervals while spinning
+      // do 3 spins then notify when done
+    }
+  }
+
+  void _executeIntro() async {
+    if (introStarted == false) {
+      print('Intro started');
+      introStarted = true;
+      FlameAudio.play('Wave Attack 1.wav');
+      Future.delayed(Duration(seconds: 3), () {
+        _finishIntro();
+      });
+    }
+  }
+
+  void _shootAtPlayer() {
+    game.world1.add(
+      Projectile(
+        position: position,
+        moveDirection: lookDirection,
+        shooter: Shooter.Enemy,
+      ),
+    );
+    game.shootSoundEnemy.start();
+    actionCompleted = true;
+  }
+
+  void _randomlyChooseNextState() {
+    stateChooser = random.nextInt(3);
+    switch (stateChooser) {
+      case 0:
+        bossState = BossState.SingleShot;
+        break;
+      default:
+    }
+    print(stateChooser);
+    isDeciding = false;
+  }
+
+  void _finishIntro() {
+    FlameAudio.bgm.play('the_return_of_the_8_bit_era.mp3');
+    introFinished = true;
   }
 }

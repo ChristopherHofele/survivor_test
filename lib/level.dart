@@ -275,8 +275,6 @@ class Level extends World with HasGameReference<SurvivorTest> {
       case 'Stamina.tmx':
         FlameAudio.bgm.play('Golden Gleam.mp3');
         break;
-      case 'Bossroom.tmx':
-        FlameAudio.bgm.play('the_return_of_the_8_bit_era.mp3');
       default:
     }
   }

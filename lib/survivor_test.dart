@@ -21,7 +21,7 @@ class SurvivorTest extends FlameGame
   int enemyBaseHealth = 10;
   int frames = 0;
   int doorsOpened = 0;
-  int keySpawnrate = 10;
+  int keySpawnrate = 2;
   int enemyThresholdsBroken = 0;
   double ticker = 0;
 
@@ -47,13 +47,14 @@ class SurvivorTest extends FlameGame
   bool hasBeenToDamage = false;
   bool hasBeenToStamina = false;
   bool hasBeenToHealth = false;
-  bool keyCanSpawn = false;
+  bool keyCanSpawn = true;
   Color background = Color.fromARGB(255, 44, 96, 26);
   late AudioPool shootSoundPlayer;
   late AudioPool shootSoundEnemy;
   late AudioPool gotHitSoundPlayer;
   late AudioPool gotHitSoundEnemy;
   late AudioPool eatFruitSound;
+
   @override
   Future<void> onLoad() async {
     _initializeLists();
@@ -70,6 +71,7 @@ class SurvivorTest extends FlameGame
       'Sword Unsheath 2.wav',
       'Fireball 1.wav',
       'Apple Crunch.mp3',
+      'Wave Attack 1.wav',
     ]);
     FlameAudio.bgm.initialize;
 
@@ -147,7 +149,7 @@ class SurvivorTest extends FlameGame
       ticker = 0;
     }*/
     _updateHearts();
-    _determineKeyCanSpawn();
+    //_determineKeyCanSpawn();
     _updateMaxEnemyCount();
 
     super.update(dt);
@@ -220,7 +222,7 @@ class SurvivorTest extends FlameGame
     maxEnemyCount = 12;
   }
 
-  void _determineKeyCanSpawn() {
+  /*void _determineKeyCanSpawn() {
     if (player.hasKey == false) {
       if (hasBeenToDamage && hasBeenToHealth && hasBeenToStamina) {
         keyCanSpawn = true;
@@ -228,7 +230,7 @@ class SurvivorTest extends FlameGame
     } else {
       keyCanSpawn = false;
     }
-  }
+  }*/
 
   void _updateMaxEnemyCount() {
     if (world1.tileMapName == 'Level1.tmx') {
