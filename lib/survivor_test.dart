@@ -71,7 +71,7 @@ class SurvivorTest extends FlameGame
     camera = CameraComponent.withFixedResolution(
       world: world1,
       width: size.x,
-      height: size.y,
+      height: size.y + 300,
     );
     camera.follow(player);
     addControls();
