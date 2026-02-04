@@ -61,12 +61,7 @@ class SurvivorTest extends FlameGame
       'power_off.mp3',
     ]);
     FlameAudio.bgm.initialize;
-    shootSound = await AudioPool.createFromAsset(
-      path: 'power_off.mp3',
-      minPlayers: 3,
-      maxPlayers: 6,
-      audioCache: FlameAudio.audioCache,
-    );
+
     loadWorld(player, 'Level1.tmx');
     camera = CameraComponent.withFixedResolution(
       world: world1,
@@ -77,6 +72,15 @@ class SurvivorTest extends FlameGame
     addControls();
     addHearts();
     addMoney();
+    shootSound = await FlameAudio.createPool(
+      'power_off.mp3',
+      minPlayers: 3,
+      maxPlayers: 6,
+      audioContext: AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      ),
+    );
     FlameAudio.bgm.play('the_return_of_the_8_bit_era.mp3');
   }
 
