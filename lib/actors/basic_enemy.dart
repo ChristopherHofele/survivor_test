@@ -135,8 +135,8 @@ class BasicEnemy extends SpriteAnimationComponent
         ignoreCorner = false;
         ignoreCornerCooldown = 0.3;
       }
-      print(ignoreCornerCooldown);
-      print(ignoreCorner);
+      //print(ignoreCornerCooldown);
+      //print(ignoreCorner);
     }
     super.update(dt);
   }
@@ -203,8 +203,10 @@ class BasicEnemy extends SpriteAnimationComponent
     PositionComponent other,
   ) {
     if (other is Projectile && other.shooter == Shooter.Player) {
+      game.gotHitSoundEnemy.start;
       health -= other.damage;
       other.hitCounter += 1;
+      game.playHitSoundEnemy();
       add(
         OpacityEffect.fadeOut(
           EffectController(alternate: true, duration: 0.1, repeatCount: 5),

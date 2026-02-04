@@ -232,6 +232,7 @@ class Player extends SpriteAnimationGroupComponent
     if (other is Projectile && other.shooter == Shooter.Enemy) {
       health -= 100;
       gotHit = true;
+      game.shootSoundPlayer.start();
     }
     super.onCollisionStart(intersectionPoints, other);
   }
@@ -242,6 +243,7 @@ class Player extends SpriteAnimationGroupComponent
       health -= 100;
       gotHit = true;
       other.attackCooldown = 1;
+      game.gotHitSoundPlayer.start();
     }
 
     super.onCollision(intersectionPoints, other);
@@ -323,19 +325,23 @@ class Player extends SpriteAnimationGroupComponent
                 maxHealth += 100;
                 isInjured = true;
                 hasFruit = true;
+                game.eatFruitSound.start();
                 break;
               case 'Bananas':
                 staminaDrain -= 10;
                 hasFruit = true;
+                game.eatFruitSound.start();
                 break;
               case 'Cherries':
                 maxAttackCooldown = maxAttackCooldown * 0.5;
                 projectileMaximumHits += 1;
                 hasFruit = true;
+                game.eatFruitSound.start();
                 break;
               case 'Strawberry':
                 _packAPunch();
                 hasFruit = true;
+                game.eatFruitSound.start();
               case 'Key':
                 hasKey = true;
                 game.camera.viewport.add(keyDisplay);

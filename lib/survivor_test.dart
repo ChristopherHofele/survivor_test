@@ -51,7 +51,9 @@ class SurvivorTest extends FlameGame
   Color background = Color.fromARGB(255, 44, 96, 26);
   late AudioPool shootSoundPlayer;
   late AudioPool shootSoundEnemy;
-
+  late AudioPool gotHitSoundPlayer;
+  late AudioPool gotHitSoundEnemy;
+  late AudioPool eatFruitSound;
   @override
   Future<void> onLoad() async {
     _initializeLists();
@@ -63,8 +65,11 @@ class SurvivorTest extends FlameGame
       'Gentle Breeze.mp3',
       'Golden Gleam.mp3',
       'Sunlight Through Leaves.mp3',
+      'Sword Blocked 1.wav',
+      'Bow Blocked 1.wav',
       'Sword Unsheath 2.wav',
       'Fireball 1.wav',
+      'Apple Crunch.mp3',
     ]);
     FlameAudio.bgm.initialize;
 
@@ -91,6 +96,33 @@ class SurvivorTest extends FlameGame
       'Sword Unsheath 2.wav',
       minPlayers: 3,
       maxPlayers: 6,
+      audioContext: AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      ),
+    );
+    gotHitSoundPlayer = await FlameAudio.createPool(
+      'Bow Blocked 1.wav',
+      minPlayers: 1,
+      maxPlayers: 2,
+      audioContext: AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      ),
+    );
+    gotHitSoundEnemy = await FlameAudio.createPool(
+      'Sword Blocked 1.wav',
+      minPlayers: 1,
+      maxPlayers: 6,
+      audioContext: AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      ),
+    );
+    eatFruitSound = await FlameAudio.createPool(
+      'Apple Crunch.mp3',
+      minPlayers: 1,
+      maxPlayers: 2,
       audioContext: AudioContext(
         android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
         iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
@@ -225,5 +257,9 @@ class SurvivorTest extends FlameGame
       twoDoorsEnemyThresholds,
       threeDoorsEnemyThresholds,
     ];
+  }
+
+  void playHitSoundEnemy() {
+    gotHitSoundEnemy.start();
   }
 }
