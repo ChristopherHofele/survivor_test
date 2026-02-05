@@ -21,7 +21,7 @@ class SurvivorTest extends FlameGame
   int enemyBaseHealth = 10;
   int frames = 0;
   int doorsOpened = 0;
-  int keySpawnrate = 30;
+  int keySpawnrate = 20;
   int enemyThresholdsBroken = 0;
   double ticker = 0;
 
