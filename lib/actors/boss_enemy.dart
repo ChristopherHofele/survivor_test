@@ -28,9 +28,11 @@ class BossEnemy extends SpriteComponent
     : super(position: position, size: Vector2.all(256), anchor: Anchor.center);
 
   int stateChooser = 0;
+  int spinAttackCounter = 0;
   late double health;
   late double attackCooldown;
   late double hitboxRadius;
+  double multiPurposeTicker = 0;
   BossState bossState = BossState.Idle;
 
   var random = Random();
@@ -38,11 +40,15 @@ class BossEnemy extends SpriteComponent
   late final Player player;
   late final Level level;
   Vector2 lookDirection = Vector2.zero();
+  Vector2 spinAttackDirection = Vector2.zero();
+
+  List<Vector2> spinAttacks = [];
 
   bool actionCompleted = false;
   bool isDeciding = false;
   bool introStarted = false;
   bool introFinished = false;
+  bool isAttacking = false;
 
   @override
   FutureOr<void> onLoad() async {
@@ -64,6 +70,7 @@ class BossEnemy extends SpriteComponent
   void update(double dt) {
     _executeIntro();
     if (introFinished) {
+      multiPurposeTicker -= dt;
       lookDirection = determineDirectionOfPlayer(game.player, this);
       _handleHealth();
       _decideState();
@@ -112,6 +119,7 @@ class BossEnemy extends SpriteComponent
       });
     } else if (actionCompleted) {
       bossState = BossState.Idle;
+      isAttacking = false;
     }
     actionCompleted = false;
   }
@@ -137,8 +145,9 @@ class BossEnemy extends SpriteComponent
         //notify when done
         break;
       case BossState.SpinAttack:
-      // shoot at certain intervals while spinning
-      // do 3 spins then notify when done
+        // shoot at certain intervals while spinning
+        // do 3 spins then notify when done
+        _spinAttack();
     }
   }
 
@@ -154,22 +163,18 @@ class BossEnemy extends SpriteComponent
   }
 
   void _shootAtPlayer() {
-    game.world1.add(
-      Projectile(
-        position: position,
-        moveDirection: lookDirection,
-        shooter: Shooter.Enemy,
-      ),
-    );
-    game.shootSoundEnemy.start();
+    _launchProjectile(lookDirection);
     actionCompleted = true;
   }
 
   void _randomlyChooseNextState() {
-    stateChooser = random.nextInt(3);
+    stateChooser = random.nextInt(4);
     switch (stateChooser) {
       case 0:
         bossState = BossState.SingleShot;
+        break;
+      case 1:
+        bossState = BossState.SpinAttack;
         break;
       default:
     }
@@ -180,5 +185,34 @@ class BossEnemy extends SpriteComponent
   void _finishIntro() {
     FlameAudio.bgm.play('the_return_of_the_8_bit_era.mp3');
     introFinished = true;
+  }
+
+  void _launchProjectile(Vector2 direction) {
+    game.world1.add(
+      Projectile(
+        position: position,
+        moveDirection: direction,
+        shooter: Shooter.Enemy,
+      ),
+    );
+    game.shootSoundEnemy.start();
+  }
+
+  void _spinAttack() {
+    if (spinAttacks.isEmpty) {
+      spinAttacks.add(lookDirection.clone());
+    }
+    if (multiPurposeTicker <= 0 && spinAttacks.length < 40) {
+      multiPurposeTicker = 0.2;
+      spinAttacks.add(spinAttacks[spinAttackCounter].clone());
+      spinAttackCounter += 1;
+      spinAttacks[spinAttackCounter].rotate(spinAttackCounter * 0.1);
+      _launchProjectile(spinAttacks[spinAttackCounter]);
+    }
+    if (spinAttacks.length >= 40) {
+      spinAttackCounter = 0;
+      spinAttacks = [];
+      actionCompleted = true;
+    }
   }
 }
