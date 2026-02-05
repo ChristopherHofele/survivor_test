@@ -234,6 +234,7 @@ class Player extends SpriteAnimationGroupComponent
       health -= 100;
       gotHit = true;
       game.shootSoundPlayer.start();
+      other.removeFromParent();
     }
     super.onCollisionStart(intersectionPoints, other);
   }

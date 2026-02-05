@@ -121,7 +121,8 @@ class BossEnemy extends SpriteComponent
   ) {
     if (other is Projectile && other.shooter == Shooter.Player) {
       health -= other.damage;
-      other.hitCounter += 1;
+      other.removeFromParent();
+      game.gotHitSoundEnemy.start();
       add(
         OpacityEffect.fadeOut(
           EffectController(alternate: true, duration: 0.1, repeatCount: 5),
