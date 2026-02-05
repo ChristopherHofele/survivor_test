@@ -21,7 +21,7 @@ class SurvivorTest extends FlameGame
   int enemyBaseHealth = 10;
   int frames = 0;
   int doorsOpened = 0;
-  int keySpawnrate = 2;
+  int keySpawnrate = 30;
   int enemyThresholdsBroken = 0;
   double ticker = 0;
 
@@ -47,7 +47,7 @@ class SurvivorTest extends FlameGame
   bool hasBeenToDamage = false;
   bool hasBeenToStamina = false;
   bool hasBeenToHealth = false;
-  bool keyCanSpawn = true;
+  bool keyCanSpawn = false;
   Color background = Color.fromARGB(255, 44, 96, 26);
   late AudioPool shootSoundPlayer;
   late AudioPool shootSoundEnemy;
