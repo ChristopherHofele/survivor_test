@@ -174,15 +174,6 @@ class BossEnemy extends SpriteComponent
           isAttacking = false;
         }
     }
-    /*if (bossState == BossState.Idle && !isDeciding) {
-      isDeciding = true;
-      Future.delayed(Duration(seconds: 1), () {
-        _randomlyChooseNextState();
-      });
-    } else if (actionCompleted) {
-      bossState = BossState.Idle;
-      isAttacking = false;
-    }*/
     actionCompleted = false;
   }
 
@@ -234,6 +225,12 @@ class BossEnemy extends SpriteComponent
     stateChooser = random.nextInt(10);
     switch (stateChooser) {
       case 0:
+      case 4:
+      case 5:
+      case 6:
+      case 7:
+      case 8:
+      case 9:
         bossState = BossState.SingleShot;
         break;
       case 1:
@@ -327,7 +324,7 @@ class BossEnemy extends SpriteComponent
       hasHitWall = false;
     }
     if (!hasHitWall) {
-      velocity = chargeTargetPosition * moveSpeed * 3;
+      velocity = chargeTargetPosition * moveSpeed * 5;
       position += velocity * dt;
       for (final block in player.collisionBlocks) {
         if (checkCollision(this, block)) {
