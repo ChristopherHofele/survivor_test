@@ -9,6 +9,7 @@ import 'package:flame_audio/flame_audio.dart';
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/items.dart';
+import 'package:survivor_test/components/mine.dart';
 import 'package:survivor_test/components/projectile.dart';
 import 'package:survivor_test/level.dart';
 import 'package:survivor_test/survivor_test.dart';
@@ -123,6 +124,15 @@ class BossEnemy extends SpriteComponent
       health -= other.damage;
       other.removeFromParent();
       game.gotHitSoundEnemy.start();
+      add(
+        OpacityEffect.fadeOut(
+          EffectController(alternate: true, duration: 0.1, repeatCount: 5),
+        ),
+      );
+    }
+    if (other is Mine && other.isExploding) {
+      health -= other.damage;
+
       add(
         OpacityEffect.fadeOut(
           EffectController(alternate: true, duration: 0.1, repeatCount: 5),

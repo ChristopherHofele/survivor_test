@@ -8,15 +8,19 @@ import 'package:survivor_test/actors/boss_enemy.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/components/items.dart';
+import 'package:survivor_test/components/mine.dart';
 import 'package:survivor_test/components/projectile.dart';
 import 'package:survivor_test/overlays/key_display.dart';
 import 'package:survivor_test/survivor_test.dart';
+
+enum CharacterChoice { FireGuy, MineFellow, MeleeLad, DashMan }
 
 enum PlayerState { LevelOne, LevelTwo, LevelThree }
 
 class Player extends SpriteAnimationGroupComponent
     with HasGameReference<SurvivorTest>, TapCallbacks, CollisionCallbacks {
-  Player({position})
+  CharacterChoice characterChoice;
+  Player({position, required this.characterChoice})
     : super(position: position, size: Vector2(64, 64), anchor: Anchor.center);
 
   late final SpriteAnimation levelOneAnimation;
@@ -86,9 +90,19 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _loadAllAnimations() {
-    levelOneAnimation = _spriteAnimation('LevelOne');
-    levelTwoAnimation = _spriteAnimation('LevelTwo');
-    levelThreeAnimation = _spriteAnimation('LevelThree');
+    switch (characterChoice) {
+      case CharacterChoice.FireGuy:
+        levelOneAnimation = _spriteAnimation('LevelOne');
+        levelTwoAnimation = _spriteAnimation('LevelTwo');
+        levelThreeAnimation = _spriteAnimation('LevelThree');
+
+        break;
+      case CharacterChoice.MineFellow:
+        levelOneAnimation = _spriteAnimation('MineFellowOne');
+        levelTwoAnimation = _spriteAnimation('MineFellowTwo');
+        levelThreeAnimation = _spriteAnimation('MineFellowThree');
+      default:
+    }
 
     animations = {
       PlayerState.LevelOne: levelOneAnimation,
@@ -105,7 +119,7 @@ class Player extends SpriteAnimationGroupComponent
       SpriteAnimationData.sequenced(
         amount: 4,
         stepTime: 0.12,
-        textureSize: Vector2(64, 60),
+        textureSize: Vector2(64, 64),
       ),
     );
   }
@@ -281,45 +295,14 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _handleAttacks(double dt) {
-    if (movementDirection != Vector2(0, 0)) {
-      shootDirection = movementDirection;
-    }
     attackCooldown -= dt;
-    if (isAttacking && attackCooldown <= 0) {
-      attackCooldown = maxAttackCooldown;
-      game.world1.add(
-        Projectile(position: position, moveDirection: shootDirection),
-      );
-      game.shootSoundPlayer.start();
-
-      switch (current) {
-        case PlayerState.LevelTwo:
-          Vector2 leftShot = movementDirection.clone();
-          Vector2 rightShot = movementDirection.clone();
-          leftShot.rotate(0.3);
-          rightShot.rotate(-0.3);
-          game.world1.add(
-            Projectile(position: position, moveDirection: leftShot),
-          );
-          game.world1.add(
-            Projectile(position: position, moveDirection: rightShot),
-          );
-        case PlayerState.LevelThree:
-          Vector2 leftShot = movementDirection.clone();
-          Vector2 rightShot = movementDirection.clone();
-          leftShot.rotate(0.3);
-          rightShot.rotate(-0.3);
-          game.world1.add(
-            Projectile(position: position, moveDirection: leftShot),
-          );
-          game.world1.add(
-            Projectile(position: position, moveDirection: rightShot),
-          );
-          game.world1.add(
-            Projectile(position: position, moveDirection: -movementDirection),
-          );
-        default:
-      }
+    switch (characterChoice) {
+      case CharacterChoice.FireGuy:
+        _fireGuyAttacks();
+        break;
+      case CharacterChoice.MineFellow:
+        _mineFellowAttacks();
+      default:
     }
   }
 
@@ -398,5 +381,54 @@ class Player extends SpriteAnimationGroupComponent
 
   void resetMaxAttackCooldown() {
     maxAttackCooldown = 1.6;
+  }
+
+  void _fireGuyAttacks() {
+    if (movementDirection != Vector2(0, 0)) {
+      shootDirection = movementDirection;
+    }
+    if (isAttacking && attackCooldown <= 0) {
+      attackCooldown = maxAttackCooldown;
+      game.world1.add(
+        Projectile(position: position, moveDirection: shootDirection),
+      );
+      game.shootSoundPlayer.start();
+
+      switch (current) {
+        case PlayerState.LevelTwo:
+          Vector2 leftShot = movementDirection.clone();
+          Vector2 rightShot = movementDirection.clone();
+          leftShot.rotate(0.3);
+          rightShot.rotate(-0.3);
+          game.world1.add(
+            Projectile(position: position, moveDirection: leftShot),
+          );
+          game.world1.add(
+            Projectile(position: position, moveDirection: rightShot),
+          );
+        case PlayerState.LevelThree:
+          Vector2 leftShot = movementDirection.clone();
+          Vector2 rightShot = movementDirection.clone();
+          leftShot.rotate(0.3);
+          rightShot.rotate(-0.3);
+          game.world1.add(
+            Projectile(position: position, moveDirection: leftShot),
+          );
+          game.world1.add(
+            Projectile(position: position, moveDirection: rightShot),
+          );
+          game.world1.add(
+            Projectile(position: position, moveDirection: -movementDirection),
+          );
+        default:
+      }
+    }
+  }
+
+  void _mineFellowAttacks() {
+    if (isAttacking && attackCooldown <= 0) {
+      attackCooldown = maxAttackCooldown;
+      game.world1.add(Mine(position: position));
+    }
   }
 }

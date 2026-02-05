@@ -21,7 +21,7 @@ class SurvivorTest extends FlameGame
   int enemyBaseHealth = 10;
   int frames = 0;
   int doorsOpened = 0;
-  int keySpawnrate = 20;
+  int keySpawnrate = 2;
   int enemyThresholdsBroken = 0;
   double ticker = 0;
 
@@ -47,11 +47,12 @@ class SurvivorTest extends FlameGame
   bool hasBeenToDamage = false;
   bool hasBeenToStamina = false;
   bool hasBeenToHealth = false;
-  bool keyCanSpawn = false;
+  bool keyCanSpawn = true;
 
   Color background = Color.fromARGB(255, 44, 96, 26);
   late AudioPool shootSoundPlayer;
   late AudioPool shootSoundEnemy;
+  late AudioPool explosionSound;
   late AudioPool gotHitSoundPlayer;
   late AudioPool gotHitSoundEnemy;
   late AudioPool eatFruitSound;
@@ -59,7 +60,10 @@ class SurvivorTest extends FlameGame
   @override
   Future<void> onLoad() async {
     _initializeLists();
-    player = Player(position: Vector2(960, 1020));
+    player = Player(
+      position: Vector2(960, 1020),
+      characterChoice: CharacterChoice.MineFellow,
+    );
     await images.loadAllImages();
     await FlameAudio.audioCache.loadAll([
       'the_return_of_the_8_bit_era.mp3',
@@ -73,6 +77,7 @@ class SurvivorTest extends FlameGame
       'Fireball 1.wav',
       'Apple Crunch.mp3',
       'Wave Attack 1.wav',
+      'Explosion.mp3',
     ]);
     FlameAudio.bgm.initialize;
 
@@ -97,6 +102,15 @@ class SurvivorTest extends FlameGame
     );
     shootSoundEnemy = await FlameAudio.createPool(
       'Sword Unsheath 2.wav',
+      minPlayers: 3,
+      maxPlayers: 6,
+      audioContext: AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      ),
+    );
+    explosionSound = await FlameAudio.createPool(
+      'Explosion.mp3',
       minPlayers: 3,
       maxPlayers: 6,
       audioContext: AudioContext(
