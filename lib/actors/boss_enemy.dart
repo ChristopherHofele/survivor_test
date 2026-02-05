@@ -231,7 +231,7 @@ class BossEnemy extends SpriteComponent
   }
 
   void _randomlyChooseNextState() {
-    stateChooser = random.nextInt(5);
+    stateChooser = random.nextInt(10);
     switch (stateChooser) {
       case 0:
         bossState = BossState.SingleShot;

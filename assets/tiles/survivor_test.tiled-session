@@ -5,9 +5,9 @@
     },
     "activeFile": "Level1.tmx",
     "expandedProjectPaths": [
-        "Summer",
+        "Spring",
         ".",
-        "Spring"
+        "Summer"
     ],
     "fileStates": {
         "Bossroom.tmx": {
@@ -65,8 +65,8 @@
             "scale": 1.5,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 800,
-                "y": 799.6666666666666
+                "x": 1342,
+                "y": 924.3333333333333
             }
         },
         "Spring/Spring_Cliff.tsx": {
