@@ -317,16 +317,16 @@ class Level extends World with HasGameReference<SurvivorTest> {
         game.camera.follow(player);
         break;
       case 'Health.tmx':
-        game.camera.moveTo(Vector2(128 + game.size.x / 2, 496));
+        game.camera.moveTo(Vector2(game.size.x / 2, 496));
         break;
       case 'Stamina.tmx':
-        game.camera.moveTo(Vector2(690, 96 + game.size.y / 2));
+        game.camera.moveTo(Vector2(690, game.size.y / 2));
         break;
       case 'Damage.tmx':
-        game.camera.moveTo(Vector2(1120 - game.size.x / 2, 432));
+        game.camera.moveTo(Vector2(level.width - game.size.x / 2, 432));
         break;
       case 'Bossroom.tmx':
-        game.camera.moveTo(Vector2(608, 832 - game.size.y / 2));
+        game.camera.moveTo(Vector2(608, level.height - game.size.y / 2));
       default:
     }
   }

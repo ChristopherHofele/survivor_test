@@ -83,7 +83,7 @@ class BasicEnemy extends SpriteAnimationComponent
         spriteName = 'enemy_small.png';
         textureSize = Vector2.all(32);
         hitboxRadius = 16;
-        moveSpeed = 120;
+        moveSpeed = 140;
         health = 1;
         attackCooldown = 1;
         getOutOfSpawn = 0.5;

@@ -46,6 +46,7 @@ class Player extends SpriteAnimationGroupComponent
   double buyCooldown = 0;
 
   Vector2 movementDirection = Vector2.zero();
+  Vector2 shootDirection = Vector2.zero();
   Vector2 velocity = Vector2.zero();
 
   List<CollisionBlock> collisionBlocks = [];
@@ -280,11 +281,14 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _handleAttacks(double dt) {
+    if (movementDirection != Vector2(0, 0)) {
+      shootDirection = movementDirection;
+    }
     attackCooldown -= dt;
     if (isAttacking && attackCooldown <= 0) {
       attackCooldown = maxAttackCooldown;
       game.world1.add(
-        Projectile(position: position, moveDirection: movementDirection),
+        Projectile(position: position, moveDirection: shootDirection),
       );
       game.shootSoundPlayer.start();
 
