@@ -156,7 +156,7 @@ class BasicEnemy extends SpriteAnimationComponent
       }
       if (followPlayer == false) {
         movementDirection = determineDirectionOfCorner(cornerToFollow, this);
-        print('Following Corner');
+        //print('Following Corner');
 
         if ((position - cornerToFollow).length < 2 ||
             followCornerCooldown < 0) {
@@ -449,7 +449,7 @@ class BasicEnemy extends SpriteAnimationComponent
     double yToCompare = 0;
     switch (block.blockType) {
       case BlockType.DownRight:
-        print('DownRightVertical + $directionOfPlayer');
+        //print('DownRightVertical + $directionOfPlayer');
 
         yToCompare =
             (player.x - block.position.x) * block.comparisonVector.y +
