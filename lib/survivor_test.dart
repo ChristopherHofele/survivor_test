@@ -48,6 +48,7 @@ class SurvivorTest extends FlameGame
   bool hasBeenToStamina = false;
   bool hasBeenToHealth = false;
   bool keyCanSpawn = false;
+
   Color background = Color.fromARGB(255, 44, 96, 26);
   late AudioPool shootSoundPlayer;
   late AudioPool shootSoundEnemy;
@@ -144,12 +145,8 @@ class SurvivorTest extends FlameGame
     }
     ticker += dt;
 
-    /*if (ticker >= 77) {
-      FlameAudio.bgm.play('the_return_of_the_8_bit_era.mp3');
-      ticker = 0;
-    }*/
     _updateHearts();
-    //_determineKeyCanSpawn();
+    _determineKeyCanSpawn();
     _updateMaxEnemyCount();
 
     super.update(dt);
@@ -222,7 +219,7 @@ class SurvivorTest extends FlameGame
     maxEnemyCount = 12;
   }
 
-  /*void _determineKeyCanSpawn() {
+  void _determineKeyCanSpawn() {
     if (player.hasKey == false) {
       if (hasBeenToDamage && hasBeenToHealth && hasBeenToStamina) {
         keyCanSpawn = true;
@@ -230,7 +227,7 @@ class SurvivorTest extends FlameGame
     } else {
       keyCanSpawn = false;
     }
-  }*/
+  }
 
   void _updateMaxEnemyCount() {
     if (world1.tileMapName == 'Level1.tmx') {

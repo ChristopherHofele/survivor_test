@@ -23,6 +23,9 @@ class Level extends World with HasGameReference<SurvivorTest> {
 
   List<Item> items = [];
 
+  bool dontFollowVertically = false;
+  bool dontFollowHorizontally = false;
+
   @override
   FutureOr<void> onLoad() async {
     //debugMode = true;
@@ -34,6 +37,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
     _addSpawners();
     _addPressurePlates();
     _changeBGM();
+    _setInitialCameraPosition();
     super.onLoad();
   }
 
@@ -275,6 +279,54 @@ class Level extends World with HasGameReference<SurvivorTest> {
       case 'Stamina.tmx':
         FlameAudio.bgm.play('Golden Gleam.mp3');
         break;
+      default:
+    }
+  }
+
+  @override
+  void update(double dt) {
+    updateCameraPosition();
+    super.update(dt);
+  }
+
+  void updateCameraPosition() {
+    if ((player.position.x > level.width - game.size.x / 2 - 10) ||
+        (player.position.x < game.size.x / 2 + 10)) {
+      dontFollowHorizontally = true;
+    }
+    if ((player.position.y > level.height - game.size.y / 2 - 10) ||
+        (player.position.y < game.size.y / 2 + 10)) {
+      dontFollowVertically = true;
+    }
+    if (dontFollowHorizontally && dontFollowVertically) {
+      game.camera.stop();
+    } else if (dontFollowHorizontally) {
+      game.camera.follow(player, verticalOnly: true);
+    } else if (dontFollowVertically) {
+      game.camera.follow(player, horizontalOnly: true);
+    } else {
+      game.camera.follow(player);
+    }
+    dontFollowHorizontally = false;
+    dontFollowVertically = false;
+  }
+
+  void _setInitialCameraPosition() {
+    switch (tileMapName) {
+      case 'Level1.tmx':
+        game.camera.follow(player);
+        break;
+      case 'Health.tmx':
+        game.camera.moveTo(Vector2(128 + game.size.x / 2, 496));
+        break;
+      case 'Stamina.tmx':
+        game.camera.moveTo(Vector2(690, 96 + game.size.y / 2));
+        break;
+      case 'Damage.tmx':
+        game.camera.moveTo(Vector2(1120 - game.size.x / 2, 432));
+        break;
+      case 'Bossroom.tmx':
+        game.camera.moveTo(Vector2(608, 832 - game.size.y / 2));
       default:
     }
   }
