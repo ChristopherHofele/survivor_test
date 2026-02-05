@@ -4,6 +4,7 @@ import 'package:flame/events.dart';
 import 'package:flame/effects.dart';
 
 import 'package:survivor_test/actors/basic_enemy.dart';
+import 'package:survivor_test/actors/boss_enemy.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/components/items.dart';
@@ -240,6 +241,12 @@ class Player extends SpriteAnimationGroupComponent
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     if (other is BasicEnemy && other.attackCooldown <= 0) {
+      health -= 100;
+      gotHit = true;
+      other.attackCooldown = 1;
+      game.gotHitSoundPlayer.start();
+    }
+    if (other is BossEnemy && other.attackCooldown <= 0) {
       health -= 100;
       gotHit = true;
       other.attackCooldown = 1;

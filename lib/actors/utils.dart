@@ -63,3 +63,11 @@ Vector2 determineDirectionOfPlayer(Player player, enemy) {
   directionOfPlayer.normalize();
   return directionOfPlayer;
 }
+
+Vector2 determineDirectionOfCorner(Vector2 corner, enemy) {
+  Vector2 directionOfCorner = Vector2.zero();
+  directionOfCorner.x = corner.x - enemy.position.x;
+  directionOfCorner.y = corner.y - enemy.position.y;
+  directionOfCorner.normalize();
+  return directionOfCorner;
+}

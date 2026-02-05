@@ -155,7 +155,7 @@ class BasicEnemy extends SpriteAnimationComponent
         }
       }
       if (followPlayer == false) {
-        movementDirection = determineDirectionOfCorner(cornerToFollow);
+        movementDirection = determineDirectionOfCorner(cornerToFollow, this);
         print('Following Corner');
 
         if ((position - cornerToFollow).length < 2 ||
@@ -214,14 +214,6 @@ class BasicEnemy extends SpriteAnimationComponent
       );
     }
     super.onCollisionStart(intersectionPoints, other);
-  }
-
-  Vector2 determineDirectionOfCorner(Vector2 corner) {
-    Vector2 directionOfCorner = Vector2.zero();
-    directionOfCorner.x = corner.x - position.x;
-    directionOfCorner.y = corner.y - position.y;
-    directionOfCorner.normalize();
-    return directionOfCorner;
   }
 
   void _handleCollisions(double dt) {

@@ -16,7 +16,8 @@ import 'package:survivor_test/survivor_test.dart';
 enum BossState {
   Idle,
   SingleShot,
-  Charge,
+  ChargeUp,
+  ChargeAt,
   Return,
   MultiDirectionShot,
   SpinAttack,
@@ -30,8 +31,9 @@ class BossEnemy extends SpriteComponent
   int stateChooser = 0;
   int attackCounter = 0;
   late double health;
-  late double attackCooldown;
+  double attackCooldown = 1;
   late double hitboxRadius;
+  double moveSpeed = 100;
   double multiPurposeTicker = 0;
   BossState bossState = BossState.Idle;
 
@@ -39,8 +41,12 @@ class BossEnemy extends SpriteComponent
 
   late final Player player;
   late final Level level;
+  Vector2 spawnPosition = Vector2.zero();
   Vector2 lookDirection = Vector2.zero();
   Vector2 spinAttackDirection = Vector2.zero();
+  Vector2 chargeUpPosition = Vector2.zero();
+  Vector2 chargeTargetPosition = Vector2.zero();
+  Vector2 velocity = Vector2.zero();
 
   List<Vector2> spinAttacks = [];
   List<Vector2> multiDirectionAttacks = [];
@@ -70,9 +76,11 @@ class BossEnemy extends SpriteComponent
   bool introStarted = false;
   bool introFinished = false;
   bool isAttacking = false;
+  bool hasHitWall = false;
 
   @override
   FutureOr<void> onLoad() async {
+    //debugMode = true;
     sprite = await Sprite.load('Boss.png');
     hitboxRadius = 128;
     add(
@@ -87,18 +95,21 @@ class BossEnemy extends SpriteComponent
     for (Vector2 vector in eightDirectionsRotated) {
       vector.rotate(0.4124);
     }
+    spawnPosition = position.clone();
+    player = game.player;
     return super.onLoad();
   }
 
   @override
   void update(double dt) {
+    attackCooldown -= dt;
     _executeIntro();
     if (introFinished) {
       multiPurposeTicker -= dt;
 
       _handleHealth();
       _decideState();
-      _executeAction();
+      _executeAction(dt);
     }
     super.update(dt);
   }
@@ -136,7 +147,33 @@ class BossEnemy extends SpriteComponent
   }
 
   void _decideState() async {
-    if (bossState == BossState.Idle && !isDeciding) {
+    switch (bossState) {
+      case BossState.Idle:
+        if (!isDeciding) {
+          isDeciding = true;
+          Future.delayed(Duration(seconds: 1), () {
+            _randomlyChooseNextState();
+          });
+        }
+        break;
+      case BossState.ChargeUp:
+        if (actionCompleted) {
+          bossState = BossState.ChargeAt;
+          isAttacking = false;
+        }
+        break;
+      case BossState.ChargeAt:
+        if (actionCompleted) {
+          bossState = BossState.Return;
+          isAttacking = false;
+        }
+      default:
+        if (actionCompleted) {
+          bossState = BossState.Idle;
+          isAttacking = false;
+        }
+    }
+    /*if (bossState == BossState.Idle && !isDeciding) {
       isDeciding = true;
       Future.delayed(Duration(seconds: 1), () {
         _randomlyChooseNextState();
@@ -144,35 +181,34 @@ class BossEnemy extends SpriteComponent
     } else if (actionCompleted) {
       bossState = BossState.Idle;
       isAttacking = false;
-    }
+    }*/
     actionCompleted = false;
   }
 
-  void _executeAction() async {
+  void _executeAction(double dt) async {
     switch (bossState) {
       case BossState.Idle:
-        lookDirection = determineDirectionOfPlayer(game.player, this);
+        lookDirection = determineDirectionOfPlayer(player, this);
         break;
       case BossState.SingleShot:
         _shootAtPlayer();
         break;
-      case BossState.Charge:
+      case BossState.ChargeUp:
+        _chargeUp(dt);
         //charge at player
         // notify when done
         break;
+      case BossState.ChargeAt:
+        _chargeAtPlayer(dt);
       case BossState.Return:
+        _returnToSpawn(dt);
         //return to middle of arena
         //notify when middle reached
         break;
       case BossState.MultiDirectionShot:
         _multiDirectionShot();
-        //shoot in 8 directions then change by 22.5 degrees shoot again,
-        //change angle back and shoot again
-        //notify when done
         break;
       case BossState.SpinAttack:
-        // shoot at certain intervals while spinning
-        // do 3 spins then notify when done
         _spinAttack();
     }
   }
@@ -194,7 +230,7 @@ class BossEnemy extends SpriteComponent
   }
 
   void _randomlyChooseNextState() {
-    stateChooser = random.nextInt(4);
+    stateChooser = random.nextInt(5);
     switch (stateChooser) {
       case 0:
         bossState = BossState.SingleShot;
@@ -204,6 +240,9 @@ class BossEnemy extends SpriteComponent
         break;
       case 2:
         bossState = BossState.MultiDirectionShot;
+        break;
+      case 3:
+        bossState = BossState.ChargeUp;
         break;
       default:
     }
@@ -262,6 +301,48 @@ class BossEnemy extends SpriteComponent
     }
     if (attackCounter >= 6) {
       attackCounter = 0;
+      actionCompleted = true;
+    }
+  }
+
+  void _chargeUp(double dt) {
+    if (!isAttacking) {
+      chargeUpPosition = position - lookDirection * 100;
+      FlameAudio.play('Wave Attack 1.wav');
+      isAttacking = true;
+    }
+    if ((position - chargeUpPosition).length > 2) {
+      velocity = determineDirectionOfCorner(chargeUpPosition, this) * moveSpeed;
+      position += velocity * dt;
+    } else {
+      actionCompleted = true;
+    }
+  }
+
+  void _chargeAtPlayer(double dt) {
+    if (!isAttacking) {
+      chargeTargetPosition = lookDirection.clone();
+      isAttacking = true;
+      hasHitWall = false;
+    }
+    if (!hasHitWall) {
+      velocity = chargeTargetPosition * moveSpeed * 3;
+      position += velocity * dt;
+      for (final block in player.collisionBlocks) {
+        if (checkCollision(this, block)) {
+          hasHitWall = true;
+        }
+      }
+    } else {
+      actionCompleted = true;
+    }
+  }
+
+  void _returnToSpawn(double dt) {
+    if ((position - spawnPosition).length > 2) {
+      velocity = determineDirectionOfCorner(spawnPosition, this) * moveSpeed;
+      position += velocity * dt;
+    } else {
       actionCompleted = true;
     }
   }
