@@ -20,8 +20,8 @@
         },
         "Damage.tmx": {
             "expandedObjectLayers": [
-                5,
-                4
+                4,
+                5
             ],
             "scale": 0.75,
             "selectedLayer": 2,
@@ -79,8 +79,8 @@
         },
         "Stamina.tmx": {
             "expandedObjectLayers": [
-                5,
-                6
+                6,
+                5
             ],
             "scale": 1.5,
             "selectedLayer": 5,

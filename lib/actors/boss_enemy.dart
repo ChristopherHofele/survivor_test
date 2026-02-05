@@ -28,7 +28,7 @@ class BossEnemy extends SpriteComponent
     : super(position: position, size: Vector2.all(256), anchor: Anchor.center);
 
   int stateChooser = 0;
-  int spinAttackCounter = 0;
+  int attackCounter = 0;
   late double health;
   late double attackCooldown;
   late double hitboxRadius;
@@ -43,6 +43,27 @@ class BossEnemy extends SpriteComponent
   Vector2 spinAttackDirection = Vector2.zero();
 
   List<Vector2> spinAttacks = [];
+  List<Vector2> multiDirectionAttacks = [];
+  List<Vector2> allEightDirections = [
+    Vector2(0, -1),
+    Vector2(1, -1),
+    Vector2(1, 0),
+    Vector2.all(1),
+    Vector2(0, 1),
+    Vector2(-1, 1),
+    Vector2(-1, 0),
+    Vector2.all(-1),
+  ];
+  List<Vector2> eightDirectionsRotated = [
+    Vector2(0, -1),
+    Vector2(1, -1),
+    Vector2(1, 0),
+    Vector2.all(1),
+    Vector2(0, 1),
+    Vector2(-1, 1),
+    Vector2(-1, 0),
+    Vector2.all(-1),
+  ];
 
   bool actionCompleted = false;
   bool isDeciding = false;
@@ -63,6 +84,9 @@ class BossEnemy extends SpriteComponent
       ),
     );
     health = 200;
+    for (Vector2 vector in eightDirectionsRotated) {
+      vector.rotate(0.4124);
+    }
     return super.onLoad();
   }
 
@@ -71,7 +95,7 @@ class BossEnemy extends SpriteComponent
     _executeIntro();
     if (introFinished) {
       multiPurposeTicker -= dt;
-      lookDirection = determineDirectionOfPlayer(game.player, this);
+
       _handleHealth();
       _decideState();
       _executeAction();
@@ -127,6 +151,7 @@ class BossEnemy extends SpriteComponent
   void _executeAction() async {
     switch (bossState) {
       case BossState.Idle:
+        lookDirection = determineDirectionOfPlayer(game.player, this);
         break;
       case BossState.SingleShot:
         _shootAtPlayer();
@@ -140,6 +165,7 @@ class BossEnemy extends SpriteComponent
         //notify when middle reached
         break;
       case BossState.MultiDirectionShot:
+        _multiDirectionShot();
         //shoot in 8 directions then change by 22.5 degrees shoot again,
         //change angle back and shoot again
         //notify when done
@@ -176,6 +202,9 @@ class BossEnemy extends SpriteComponent
       case 1:
         bossState = BossState.SpinAttack;
         break;
+      case 2:
+        bossState = BossState.MultiDirectionShot;
+        break;
       default:
     }
     print(stateChooser);
@@ -187,7 +216,7 @@ class BossEnemy extends SpriteComponent
     introFinished = true;
   }
 
-  void _launchProjectile(Vector2 direction) {
+  void _launchProjectile(Vector2 direction, {bool soundON = true}) {
     game.world1.add(
       Projectile(
         position: position,
@@ -195,23 +224,44 @@ class BossEnemy extends SpriteComponent
         shooter: Shooter.Enemy,
       ),
     );
-    game.shootSoundEnemy.start();
+    if (soundON) {
+      game.shootSoundEnemy.start();
+    }
   }
 
   void _spinAttack() {
-    if (spinAttacks.isEmpty) {
-      spinAttacks.add(lookDirection.clone());
-    }
     if (multiPurposeTicker <= 0 && spinAttacks.length < 40) {
       multiPurposeTicker = 0.2;
-      spinAttacks.add(spinAttacks[spinAttackCounter].clone());
-      spinAttackCounter += 1;
-      spinAttacks[spinAttackCounter].rotate(spinAttackCounter * 0.1);
-      _launchProjectile(spinAttacks[spinAttackCounter]);
+      if (attackCounter > 0) {
+        lookDirection.rotate(0.3);
+      }
+      spinAttacks.add(lookDirection.clone());
+      _launchProjectile(spinAttacks[attackCounter]);
+      attackCounter += 1;
     }
     if (spinAttacks.length >= 40) {
-      spinAttackCounter = 0;
+      attackCounter = 0;
       spinAttacks = [];
+      actionCompleted = true;
+    }
+  }
+
+  void _multiDirectionShot() {
+    if (multiPurposeTicker <= 0 && attackCounter < 6) {
+      attackCounter += 1;
+      multiPurposeTicker = 0.7;
+      if ((attackCounter % 2) == 0) {
+        multiDirectionAttacks = eightDirectionsRotated;
+      } else {
+        multiDirectionAttacks = allEightDirections;
+      }
+      game.shootSoundEnemy.start();
+      for (final vector in multiDirectionAttacks) {
+        _launchProjectile(vector, soundON: false);
+      }
+    }
+    if (attackCounter >= 6) {
+      attackCounter = 0;
       actionCompleted = true;
     }
   }
