@@ -1,10 +1,10 @@
-import 'package:flame/extensions.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/effects.dart';
 
 import 'package:survivor_test/actors/basic_enemy.dart';
+import 'package:survivor_test/actors/boss_enemy.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/components/items.dart';
@@ -233,6 +233,8 @@ class Player extends SpriteAnimationGroupComponent
     if (other is Projectile && other.shooter == Shooter.Enemy) {
       health -= 100;
       gotHit = true;
+      game.shootSoundPlayer.start();
+      other.removeFromParent();
     }
     super.onCollisionStart(intersectionPoints, other);
   }
@@ -243,6 +245,13 @@ class Player extends SpriteAnimationGroupComponent
       health -= 100;
       gotHit = true;
       other.attackCooldown = 1;
+      game.gotHitSoundPlayer.start();
+    }
+    if (other is BossEnemy && other.attackCooldown <= 0) {
+      health -= 100;
+      gotHit = true;
+      other.attackCooldown = 1;
+      game.gotHitSoundPlayer.start();
     }
 
     super.onCollision(intersectionPoints, other);
@@ -277,6 +286,7 @@ class Player extends SpriteAnimationGroupComponent
       game.world1.add(
         Projectile(position: position, moveDirection: movementDirection),
       );
+      game.shootSoundPlayer.start();
 
       switch (current) {
         case PlayerState.LevelTwo:
@@ -323,19 +333,23 @@ class Player extends SpriteAnimationGroupComponent
                 maxHealth += 100;
                 isInjured = true;
                 hasFruit = true;
+                game.eatFruitSound.start();
                 break;
               case 'Bananas':
                 staminaDrain -= 10;
                 hasFruit = true;
+                game.eatFruitSound.start();
                 break;
               case 'Cherries':
                 maxAttackCooldown = maxAttackCooldown * 0.5;
                 projectileMaximumHits += 1;
                 hasFruit = true;
+                game.eatFruitSound.start();
                 break;
               case 'Strawberry':
                 _packAPunch();
                 hasFruit = true;
+                game.eatFruitSound.start();
               case 'Key':
                 hasKey = true;
                 game.camera.viewport.add(keyDisplay);

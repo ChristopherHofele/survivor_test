@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/painting.dart';
 
 import 'package:survivor_test/actors/player.dart';
@@ -20,7 +21,7 @@ class SurvivorTest extends FlameGame
   int enemyBaseHealth = 10;
   int frames = 0;
   int doorsOpened = 0;
-  int keySpawnrate = 10;
+  int keySpawnrate = 2;
   int enemyThresholdsBroken = 0;
   double ticker = 0;
 
@@ -46,14 +47,34 @@ class SurvivorTest extends FlameGame
   bool hasBeenToDamage = false;
   bool hasBeenToStamina = false;
   bool hasBeenToHealth = false;
-  bool keyCanSpawn = false;
+  bool keyCanSpawn = true;
   Color background = Color.fromARGB(255, 44, 96, 26);
+  late AudioPool shootSoundPlayer;
+  late AudioPool shootSoundEnemy;
+  late AudioPool gotHitSoundPlayer;
+  late AudioPool gotHitSoundEnemy;
+  late AudioPool eatFruitSound;
 
   @override
   Future<void> onLoad() async {
     _initializeLists();
-    player = Player(position: Vector2(960, 960));
+    player = Player(position: Vector2(960, 1020));
     await images.loadAllImages();
+    await FlameAudio.audioCache.loadAll([
+      'the_return_of_the_8_bit_era.mp3',
+      'Evening Harmony.mp3',
+      'Gentle Breeze.mp3',
+      'Golden Gleam.mp3',
+      'Sunlight Through Leaves.mp3',
+      'Sword Blocked 1.wav',
+      'Bow Blocked 1.wav',
+      'Sword Unsheath 2.wav',
+      'Fireball 1.wav',
+      'Apple Crunch.mp3',
+      'Wave Attack 1.wav',
+    ]);
+    FlameAudio.bgm.initialize;
+
     loadWorld(player, 'Level1.tmx');
     camera = CameraComponent.withFixedResolution(
       world: world1,
@@ -64,6 +85,51 @@ class SurvivorTest extends FlameGame
     addControls();
     addHearts();
     addMoney();
+    shootSoundPlayer = await FlameAudio.createPool(
+      'Fireball 1.wav',
+      minPlayers: 3,
+      maxPlayers: 6,
+      audioContext: AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      ),
+    );
+    shootSoundEnemy = await FlameAudio.createPool(
+      'Sword Unsheath 2.wav',
+      minPlayers: 3,
+      maxPlayers: 6,
+      audioContext: AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      ),
+    );
+    gotHitSoundPlayer = await FlameAudio.createPool(
+      'Bow Blocked 1.wav',
+      minPlayers: 1,
+      maxPlayers: 2,
+      audioContext: AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      ),
+    );
+    gotHitSoundEnemy = await FlameAudio.createPool(
+      'Sword Blocked 1.wav',
+      minPlayers: 1,
+      maxPlayers: 6,
+      audioContext: AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      ),
+    );
+    eatFruitSound = await FlameAudio.createPool(
+      'Apple Crunch.mp3',
+      minPlayers: 1,
+      maxPlayers: 2,
+      audioContext: AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      ),
+    );
   }
 
   @override
@@ -77,13 +143,13 @@ class SurvivorTest extends FlameGame
       overlays.add('GameOver');
     }
     ticker += dt;
-    frames += 1;
-    if (ticker >= 1) {
-      frames = 0;
+
+    /*if (ticker >= 77) {
+      FlameAudio.bgm.play('the_return_of_the_8_bit_era.mp3');
       ticker = 0;
-    }
+    }*/
     _updateHearts();
-    _determineKeyCanSpawn();
+    //_determineKeyCanSpawn();
     _updateMaxEnemyCount();
 
     super.update(dt);
@@ -156,7 +222,7 @@ class SurvivorTest extends FlameGame
     maxEnemyCount = 12;
   }
 
-  void _determineKeyCanSpawn() {
+  /*void _determineKeyCanSpawn() {
     if (player.hasKey == false) {
       if (hasBeenToDamage && hasBeenToHealth && hasBeenToStamina) {
         keyCanSpawn = true;
@@ -164,7 +230,7 @@ class SurvivorTest extends FlameGame
     } else {
       keyCanSpawn = false;
     }
-  }
+  }*/
 
   void _updateMaxEnemyCount() {
     if (world1.tileMapName == 'Level1.tmx') {
@@ -177,7 +243,7 @@ class SurvivorTest extends FlameGame
       }
       maxEnemyCount = maxEnemyCounts[doorsOpened][enemyThresholdsBroken];
     }
-    print(maxEnemyCount);
+    //print(maxEnemyCount);
   }
 
   void _initializeLists() {
@@ -193,5 +259,9 @@ class SurvivorTest extends FlameGame
       twoDoorsEnemyThresholds,
       threeDoorsEnemyThresholds,
     ];
+  }
+
+  void playHitSoundEnemy() {
+    gotHitSoundEnemy.start();
   }
 }

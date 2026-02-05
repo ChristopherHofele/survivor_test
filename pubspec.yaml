@@ -13,6 +13,7 @@ dependencies:
     sdk: flutter
   flame: ^1.33.0
   flame_tiled: ^3.0.9
+  flame_audio: ^2.11.13
 
 flutter:
   assets:

@@ -1,3 +1,6 @@
+import 'package:flame/extensions.dart';
+import 'package:survivor_test/actors/player.dart';
+
 bool checkCollision(player, block) {
   final playerX = player.position.x;
   final playerY = player.position.y;
@@ -51,4 +54,20 @@ bool isCollisionHorizontal(player, block, dt) {
       correctedY + buffer + playerHeight / 2 > blockY &&
       playerX - playerHeight / 2 < blockX + blockWidth &&
       playerX + playerWidth / 2 > blockX);
+}
+
+Vector2 determineDirectionOfPlayer(Player player, enemy) {
+  Vector2 directionOfPlayer = Vector2.zero();
+  directionOfPlayer.x = player.position.x - enemy.position.x;
+  directionOfPlayer.y = player.position.y - enemy.position.y;
+  directionOfPlayer.normalize();
+  return directionOfPlayer;
+}
+
+Vector2 determineDirectionOfCorner(Vector2 corner, enemy) {
+  Vector2 directionOfCorner = Vector2.zero();
+  directionOfCorner.x = corner.x - enemy.position.x;
+  directionOfCorner.y = corner.y - enemy.position.y;
+  directionOfCorner.normalize();
+  return directionOfCorner;
 }

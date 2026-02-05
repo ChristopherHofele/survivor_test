@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/components/items.dart';
@@ -32,6 +33,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
     _addCollisions();
     _addSpawners();
     _addPressurePlates();
+    _changeBGM();
     super.onLoad();
   }
 
@@ -100,6 +102,24 @@ class Level extends World with HasGameReference<SurvivorTest> {
               position: Vector2(collision.x, collision.y),
               size: Vector2(collision.width, collision.height),
               blockType: BlockType.NoCorners,
+            );
+            collisionBlocks.add(block);
+            add(block);
+            break;
+          case 'Down_Right':
+            final block = CollisionBlock(
+              position: Vector2(collision.x, collision.y),
+              size: Vector2(collision.width, collision.height),
+              blockType: BlockType.DownRight,
+            );
+            collisionBlocks.add(block);
+            add(block);
+            break;
+          case 'Up_Right':
+            final block = CollisionBlock(
+              position: Vector2(collision.x, collision.y),
+              size: Vector2(collision.width, collision.height),
+              blockType: BlockType.UpRight,
             );
             collisionBlocks.add(block);
             add(block);
@@ -238,6 +258,24 @@ class Level extends World with HasGameReference<SurvivorTest> {
           add(pressurePlate);
         }
       }
+    }
+  }
+
+  void _changeBGM() {
+    switch (tileMapName) {
+      case 'Level1.tmx':
+        FlameAudio.bgm.play('Sunlight Through Leaves.mp3');
+        break;
+      case 'Health.tmx':
+        FlameAudio.bgm.play('Gentle Breeze.mp3');
+        break;
+      case 'Damage.tmx':
+        FlameAudio.bgm.play('Evening Harmony.mp3');
+        break;
+      case 'Stamina.tmx':
+        FlameAudio.bgm.play('Golden Gleam.mp3');
+        break;
+      default:
     }
   }
 }
