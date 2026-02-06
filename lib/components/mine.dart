@@ -45,7 +45,7 @@ class Mine extends SpriteAnimationGroupComponent
         spriteName = 'CherryBombTwo.png';
         break;
       case PlayerState.LevelThree:
-        spriteName = 'CherryombThree.png';
+        spriteName = 'CherryBombThree.png';
         break;
       default:
     }
@@ -60,7 +60,7 @@ class Mine extends SpriteAnimationGroupComponent
     explodingAnimation = SpriteAnimation.fromFrameData(
       game.images.fromCache('explosion-b.png'),
       SpriteAnimationData.sequenced(
-        amount: 12,
+        amount: 11,
         textureSize: Vector2(160, 96),
         stepTime: 0.083,
       ),
@@ -92,6 +92,9 @@ class Mine extends SpriteAnimationGroupComponent
     );
     add(hitboxSmall);
     hitboxSmall.position += Vector2(80, 40);
+    if (soundON) {
+      game.fuseSound.start();
+    }
     return super.onLoad();
   }
 

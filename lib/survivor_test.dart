@@ -53,6 +53,7 @@ class SurvivorTest extends FlameGame
   late AudioPool shootSoundPlayer;
   late AudioPool shootSoundEnemy;
   late AudioPool explosionSound;
+  late AudioPool fuseSound;
   late AudioPool gotHitSoundPlayer;
   late AudioPool gotHitSoundEnemy;
   late AudioPool eatFruitSound;
@@ -78,6 +79,7 @@ class SurvivorTest extends FlameGame
       'Apple Crunch.mp3',
       'Wave Attack 1.wav',
       'Explosion.mp3',
+      'Fuse.mp3',
     ]);
     FlameAudio.bgm.initialize;
 
@@ -111,8 +113,17 @@ class SurvivorTest extends FlameGame
     );
     explosionSound = await FlameAudio.createPool(
       'Explosion.mp3',
-      minPlayers: 3,
-      maxPlayers: 6,
+      minPlayers: 1,
+      maxPlayers: 3,
+      audioContext: AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      ),
+    );
+    fuseSound = await FlameAudio.createPool(
+      'Fuse.mp3',
+      minPlayers: 1,
+      maxPlayers: 3,
       audioContext: AudioContext(
         android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
         iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),

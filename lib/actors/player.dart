@@ -110,7 +110,7 @@ class Player extends SpriteAnimationGroupComponent
       PlayerState.LevelThree: levelThreeAnimation,
     };
 
-    current = PlayerState.LevelOne;
+    current = PlayerState.LevelThree;
   }
 
   SpriteAnimation _spriteAnimation(String state) {
@@ -428,11 +428,24 @@ class Player extends SpriteAnimationGroupComponent
   void _mineFellowAttacks() {
     if (isAttacking && attackCooldown <= 0) {
       attackCooldown = maxAttackCooldown;
-      game.world1.add(
-        Mine(position: position, moveDirection: Vector2.zero(), soundON: true),
-      );
+
       switch (current) {
+        case PlayerState.LevelOne:
+          game.world1.add(
+            Mine(
+              position: position,
+              moveDirection: Vector2.zero(),
+              soundON: true,
+            ),
+          );
         case PlayerState.LevelTwo:
+          game.world1.add(
+            Mine(
+              position: position,
+              moveDirection: Vector2.zero(),
+              soundON: true,
+            ),
+          );
           game.world1.add(
             Mine(
               position: position,
@@ -440,8 +453,28 @@ class Player extends SpriteAnimationGroupComponent
               soundON: false,
             ),
           );
+
           break;
         case PlayerState.LevelThree:
+          Vector2 leftShot = movementDirection.clone();
+          Vector2 rightShot = movementDirection.clone();
+          leftShot *= -1;
+          rightShot *= -1;
+          leftShot.rotate(0.3);
+          rightShot.rotate(-0.3);
+          game.world1.add(
+            Mine(
+              position: position,
+              moveDirection: movementDirection,
+              soundON: true,
+            ),
+          );
+          game.world1.add(
+            Mine(position: position, moveDirection: leftShot, soundON: false),
+          );
+          game.world1.add(
+            Mine(position: position, moveDirection: rightShot, soundON: false),
+          );
           break;
         default:
       }
