@@ -81,7 +81,7 @@ class BossEnemy extends SpriteComponent
 
   @override
   FutureOr<void> onLoad() async {
-    //debugMode = true;
+    debugMode = true;
     sprite = await Sprite.load('Boss.png');
     hitboxRadius = 128;
     add(

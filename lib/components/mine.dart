@@ -4,12 +4,15 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
 import 'package:survivor_test/survivor_test.dart';
+import 'package:survivor_test/actors/player.dart';
 
 enum MineState { Planted, Exploding }
 
 class Mine extends SpriteAnimationGroupComponent
     with HasGameReference<SurvivorTest> {
-  Mine({required position})
+  Vector2 moveDirection;
+  bool soundON;
+  Mine({required position, required this.moveDirection, required this.soundON})
     : super(position: position, size: Vector2(32, 32), anchor: Anchor.center);
 
   int hitCounter = 0;
@@ -23,6 +26,8 @@ class Mine extends SpriteAnimationGroupComponent
   bool isExploding = false;
   bool startedExploding = false;
 
+  late String spriteName;
+
   late final SpriteAnimation plantedAnimation;
   late final SpriteAnimation explodingAnimation;
 
@@ -32,8 +37,20 @@ class Mine extends SpriteAnimationGroupComponent
   @override
   FutureOr<void> onLoad() async {
     //debugMode = true;
+    switch (game.world1.player.current) {
+      case PlayerState.LevelOne:
+        spriteName = 'CherryBomb.png';
+        break;
+      case PlayerState.LevelTwo:
+        spriteName = 'CherryBombTwo.png';
+        break;
+      case PlayerState.LevelThree:
+        spriteName = 'CherryombThree.png';
+        break;
+      default:
+    }
     plantedAnimation = SpriteAnimation.fromFrameData(
-      game.images.fromCache('Bomb.png'),
+      game.images.fromCache(spriteName),
       SpriteAnimationData.sequenced(
         amount: 3,
         textureSize: Vector2(32, 32),
@@ -83,7 +100,9 @@ class Mine extends SpriteAnimationGroupComponent
     _handleStates(dt);
     if (current == MineState.Exploding) {
       if (!startedExploding) {
-        game.explosionSound.start();
+        if (soundON) {
+          game.explosionSound.start();
+        }
         startedExploding = true;
       }
       isExploding = true;
@@ -97,6 +116,10 @@ class Mine extends SpriteAnimationGroupComponent
 
   void _handleStates(double dt) {
     fuse -= dt;
+    if (fuse > 2) {
+      velocity = moveDirection * moveSpeed;
+      position += velocity * dt;
+    }
     if (fuse <= 0) {
       current = MineState.Exploding;
       size = Vector2(160, 96);

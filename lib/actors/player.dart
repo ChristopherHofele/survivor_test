@@ -70,7 +70,7 @@ class Player extends SpriteAnimationGroupComponent
 
   @override
   void onLoad() {
-    //debugMode = true;
+    debugMode = true;
     priority = 1;
     _loadAllAnimations();
     add(CircleHitbox());
@@ -428,7 +428,23 @@ class Player extends SpriteAnimationGroupComponent
   void _mineFellowAttacks() {
     if (isAttacking && attackCooldown <= 0) {
       attackCooldown = maxAttackCooldown;
-      game.world1.add(Mine(position: position));
+      game.world1.add(
+        Mine(position: position, moveDirection: Vector2.zero(), soundON: true),
+      );
+      switch (current) {
+        case PlayerState.LevelTwo:
+          game.world1.add(
+            Mine(
+              position: position,
+              moveDirection: movementDirection,
+              soundON: false,
+            ),
+          );
+          break;
+        case PlayerState.LevelThree:
+          break;
+        default:
+      }
     }
   }
 }
