@@ -8,6 +8,7 @@ import 'package:survivor_test/actors/boss_enemy.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/components/items.dart';
+import 'package:survivor_test/components/lightning_ball.dart';
 import 'package:survivor_test/components/melee.dart';
 import 'package:survivor_test/components/mine.dart';
 import 'package:survivor_test/components/projectile.dart';
@@ -19,7 +20,11 @@ enum CharacterChoice { FireGuy, MineFellow, MeleeLad, DashMan }
 enum PlayerState { LevelOne, LevelTwo, LevelThree }
 
 class Player extends SpriteAnimationGroupComponent
-    with HasGameReference<SurvivorTest>, TapCallbacks, CollisionCallbacks {
+    with
+        HasGameReference<SurvivorTest>,
+        TapCallbacks,
+        CollisionCallbacks,
+        HasVisibility {
   CharacterChoice characterChoice;
   Player({position, required this.characterChoice})
     : super(position: position, size: Vector2(64, 64), anchor: Anchor.center);
@@ -72,6 +77,7 @@ class Player extends SpriteAnimationGroupComponent
   @override
   void onLoad() {
     //debugMode = true;
+    isVisible = true;
     priority = 1;
     _loadAllAnimations();
     add(CircleHitbox());
@@ -109,7 +115,11 @@ class Player extends SpriteAnimationGroupComponent
         levelTwoAnimation = _spriteAnimation('MeleeLadTwo');
         levelThreeAnimation = _spriteAnimation('MeleeLadThree');
         break;
-      default:
+      case CharacterChoice.DashMan:
+        levelOneAnimation = _spriteAnimation('DashManOne');
+        levelTwoAnimation = _spriteAnimation('DashManTwo');
+        levelThreeAnimation = _spriteAnimation('DashManThree');
+        break;
     }
 
     animations = {
@@ -118,7 +128,7 @@ class Player extends SpriteAnimationGroupComponent
       PlayerState.LevelThree: levelThreeAnimation,
     };
 
-    current = PlayerState.LevelThree;
+    current = PlayerState.LevelOne;
   }
 
   SpriteAnimation _spriteAnimation(String state) {
@@ -133,11 +143,13 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _updatePlayerMovement(double dt) {
-    if (stamina <= 0) {
-      canDash = false;
-    }
-    if (stamina >= 50) {
-      canDash = true;
+    if (isVisible) {
+      if (stamina <= 0) {
+        canDash = false;
+      }
+      if (stamina >= 50) {
+        canDash = true;
+      }
     }
     if (isDashing && canDash) {
       playerSpeed = moveSpeed * dashBoostMultiplier;
@@ -146,7 +158,11 @@ class Player extends SpriteAnimationGroupComponent
       playerSpeed = moveSpeed;
       stamina += staminaRecovery * dt;
     }
-    velocity = movementDirection * playerSpeed;
+    if (isVisible) {
+      velocity = movementDirection * playerSpeed;
+    } else {
+      velocity = shootDirection * playerSpeed;
+    }
     position += velocity * dt;
     if (velocity.x < 0 && scale.x > 0) {
       flipHorizontallyAroundCenter();
@@ -254,9 +270,11 @@ class Player extends SpriteAnimationGroupComponent
     PositionComponent other,
   ) {
     if (other is Projectile && other.shooter == Shooter.Enemy) {
-      health -= 100;
-      gotHit = true;
-      game.shootSoundPlayer.start();
+      if (isVisible) {
+        health -= 100;
+        gotHit = true;
+        game.gotHitSoundPlayer.start();
+      }
       other.removeFromParent();
     }
     super.onCollisionStart(intersectionPoints, other);
@@ -264,19 +282,20 @@ class Player extends SpriteAnimationGroupComponent
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (other is BasicEnemy && other.attackCooldown <= 0) {
-      health -= 100;
-      gotHit = true;
-      other.attackCooldown = 1;
-      game.gotHitSoundPlayer.start();
+    if (isVisible) {
+      if (other is BasicEnemy && other.attackCooldown <= 0) {
+        health -= 100;
+        gotHit = true;
+        other.attackCooldown = 1;
+        game.gotHitSoundPlayer.start();
+      }
+      if (other is BossEnemy && other.attackCooldown <= 0) {
+        health -= 100;
+        gotHit = true;
+        other.attackCooldown = 1;
+        game.gotHitSoundPlayer.start();
+      }
     }
-    if (other is BossEnemy && other.attackCooldown <= 0) {
-      health -= 100;
-      gotHit = true;
-      other.attackCooldown = 1;
-      game.gotHitSoundPlayer.start();
-    }
-
     super.onCollision(intersectionPoints, other);
   }
 
@@ -314,7 +333,8 @@ class Player extends SpriteAnimationGroupComponent
       case CharacterChoice.MeleeLad:
         _meleeLadAttacks();
         break;
-      default:
+      case CharacterChoice.DashMan:
+        _dashManAttacks();
     }
   }
 
@@ -557,6 +577,13 @@ class Player extends SpriteAnimationGroupComponent
           break;
         default:
       }
+    }
+  }
+
+  void _dashManAttacks() {
+    if (isAttacking && attackCooldown <= 0 && isVisible) {
+      attackCooldown = maxAttackCooldown;
+      game.world1.add(LightningBall(position: position));
     }
   }
 }

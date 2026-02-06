@@ -8,6 +8,7 @@ import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/components/items.dart';
+import 'package:survivor_test/components/lightning_ball.dart';
 import 'package:survivor_test/components/melee.dart';
 import 'package:survivor_test/components/mine.dart';
 import 'package:survivor_test/components/projectile.dart';
@@ -178,8 +179,7 @@ class BasicEnemy extends SpriteAnimationComponent
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (other is BasicEnemy && intersectionPoints.length == 2 ||
-        other is Player && intersectionPoints.length == 2) {
+    if (other is BasicEnemy && intersectionPoints.length == 2) {
       final mid =
           (intersectionPoints.elementAt(0) + intersectionPoints.elementAt(1)) /
           2;
@@ -195,8 +195,29 @@ class BasicEnemy extends SpriteAnimationComponent
           break;
         }
       }
-      super.onCollision(intersectionPoints, other);
     }
+    if (other is Player && intersectionPoints.length == 2) {
+      if (other.isVisible) {
+        final mid =
+            (intersectionPoints.elementAt(0) +
+                intersectionPoints.elementAt(1)) /
+            2;
+
+        final collisionNormal = absoluteCenter - mid;
+        final separationDistance = (hitboxRadius) - collisionNormal.length + 1;
+        collisionNormal.normalize();
+
+        position += collisionNormal.scaled(separationDistance);
+        for (final block in collisionBlocks) {
+          if (checkCollision(this, block)) {
+            position -= collisionNormal.scaled(separationDistance);
+            break;
+          }
+        }
+      }
+    }
+
+    super.onCollision(intersectionPoints, other);
   }
 
   @override
@@ -223,6 +244,14 @@ class BasicEnemy extends SpriteAnimationComponent
       );
     }
     if (other is Melee) {
+      health -= other.damage;
+      add(
+        OpacityEffect.fadeOut(
+          EffectController(alternate: true, duration: 0.1, repeatCount: 5),
+        ),
+      );
+    }
+    if (other is LightningBall) {
       health -= other.damage;
       add(
         OpacityEffect.fadeOut(
