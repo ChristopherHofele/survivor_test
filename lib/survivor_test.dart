@@ -54,6 +54,7 @@ class SurvivorTest extends FlameGame
   late AudioPool shootSoundEnemy;
   late AudioPool explosionSound;
   late AudioPool fuseSound;
+  late AudioPool slashSound;
   late AudioPool gotHitSoundPlayer;
   late AudioPool gotHitSoundEnemy;
   late AudioPool eatFruitSound;
@@ -63,7 +64,7 @@ class SurvivorTest extends FlameGame
     _initializeLists();
     player = Player(
       position: Vector2(960, 1020),
-      characterChoice: CharacterChoice.MineFellow,
+      characterChoice: CharacterChoice.MeleeLad,
     );
     await images.loadAllImages();
     await FlameAudio.audioCache.loadAll([
@@ -80,6 +81,8 @@ class SurvivorTest extends FlameGame
       'Wave Attack 1.wav',
       'Explosion.mp3',
       'Fuse.mp3',
+      'Slash.mp3',
+      'UpgradedSlash.mp3',
     ]);
     FlameAudio.bgm.initialize;
 
@@ -122,6 +125,15 @@ class SurvivorTest extends FlameGame
     );
     fuseSound = await FlameAudio.createPool(
       'Fuse.mp3',
+      minPlayers: 1,
+      maxPlayers: 3,
+      audioContext: AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      ),
+    );
+    slashSound = await FlameAudio.createPool(
+      'Slash.mp3',
       minPlayers: 1,
       maxPlayers: 3,
       audioContext: AudioContext(

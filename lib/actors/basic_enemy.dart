@@ -8,6 +8,7 @@ import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/components/items.dart';
+import 'package:survivor_test/components/melee.dart';
 import 'package:survivor_test/components/mine.dart';
 import 'package:survivor_test/components/projectile.dart';
 import 'package:survivor_test/level.dart';
@@ -214,6 +215,14 @@ class BasicEnemy extends SpriteAnimationComponent
       );
     }
     if (other is Mine && other.isExploding) {
+      health -= other.damage;
+      add(
+        OpacityEffect.fadeOut(
+          EffectController(alternate: true, duration: 0.1, repeatCount: 5),
+        ),
+      );
+    }
+    if (other is Melee) {
       health -= other.damage;
       add(
         OpacityEffect.fadeOut(

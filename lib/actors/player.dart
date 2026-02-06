@@ -8,6 +8,7 @@ import 'package:survivor_test/actors/boss_enemy.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/components/items.dart';
+import 'package:survivor_test/components/melee.dart';
 import 'package:survivor_test/components/mine.dart';
 import 'package:survivor_test/components/projectile.dart';
 import 'package:survivor_test/overlays/key_display.dart';
@@ -50,7 +51,7 @@ class Player extends SpriteAnimationGroupComponent
   double buyCooldown = 0;
 
   Vector2 movementDirection = Vector2.zero();
-  Vector2 shootDirection = Vector2.zero();
+  Vector2 shootDirection = Vector2(0, 1);
   Vector2 velocity = Vector2.zero();
 
   List<CollisionBlock> collisionBlocks = [];
@@ -70,7 +71,7 @@ class Player extends SpriteAnimationGroupComponent
 
   @override
   void onLoad() {
-    debugMode = true;
+    //debugMode = true;
     priority = 1;
     _loadAllAnimations();
     add(CircleHitbox());
@@ -80,6 +81,7 @@ class Player extends SpriteAnimationGroupComponent
   void update(double dt) {
     if (game.startGame) {
       _updatePlayerMovement(dt);
+      _saveShootDirection();
       _handleBlockCollisions(dt);
       _handleItemCollision(dt);
       _handleHealthRegeneration(dt);
@@ -101,6 +103,12 @@ class Player extends SpriteAnimationGroupComponent
         levelOneAnimation = _spriteAnimation('MineFellowOne');
         levelTwoAnimation = _spriteAnimation('MineFellowTwo');
         levelThreeAnimation = _spriteAnimation('MineFellowThree');
+        break;
+      case CharacterChoice.MeleeLad:
+        levelOneAnimation = _spriteAnimation('MeleeLadOne');
+        levelTwoAnimation = _spriteAnimation('MeleeLadTwo');
+        levelThreeAnimation = _spriteAnimation('MeleeLadThree');
+        break;
       default:
     }
 
@@ -302,6 +310,10 @@ class Player extends SpriteAnimationGroupComponent
         break;
       case CharacterChoice.MineFellow:
         _mineFellowAttacks();
+        break;
+      case CharacterChoice.MeleeLad:
+        _meleeLadAttacks();
+        break;
       default:
     }
   }
@@ -384,9 +396,6 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _fireGuyAttacks() {
-    if (movementDirection != Vector2(0, 0)) {
-      shootDirection = movementDirection;
-    }
     if (isAttacking && attackCooldown <= 0) {
       attackCooldown = maxAttackCooldown;
       game.world1.add(
@@ -449,15 +458,15 @@ class Player extends SpriteAnimationGroupComponent
           game.world1.add(
             Mine(
               position: position,
-              moveDirection: movementDirection,
+              moveDirection: shootDirection,
               soundON: false,
             ),
           );
 
           break;
         case PlayerState.LevelThree:
-          Vector2 leftShot = movementDirection.clone();
-          Vector2 rightShot = movementDirection.clone();
+          Vector2 leftShot = shootDirection.clone();
+          Vector2 rightShot = shootDirection.clone();
           leftShot *= -1;
           rightShot *= -1;
           leftShot.rotate(0.3);
@@ -465,7 +474,7 @@ class Player extends SpriteAnimationGroupComponent
           game.world1.add(
             Mine(
               position: position,
-              moveDirection: movementDirection,
+              moveDirection: shootDirection,
               soundON: true,
             ),
           );
@@ -474,6 +483,76 @@ class Player extends SpriteAnimationGroupComponent
           );
           game.world1.add(
             Mine(position: position, moveDirection: rightShot, soundON: false),
+          );
+          break;
+        default:
+      }
+    }
+  }
+
+  void _saveShootDirection() {
+    if (movementDirection != Vector2(0, 0)) {
+      shootDirection = movementDirection;
+    }
+  }
+
+  void _meleeLadAttacks() {
+    if (isAttacking && attackCooldown <= 0) {
+      attackCooldown = maxAttackCooldown;
+
+      switch (current) {
+        case PlayerState.LevelOne:
+          game.world1.add(
+            Melee(
+              position: position + shootDirection * size.x,
+              meleeDirection: shootDirection,
+              strength: 0,
+              soundON: true,
+            ),
+          );
+          break;
+        case PlayerState.LevelTwo:
+          game.world1.add(
+            Melee(
+              position: position + shootDirection * size.x,
+              meleeDirection: shootDirection,
+              strength: 0,
+              soundON: true,
+            ),
+          );
+          game.world1.add(
+            Melee(
+              position: position + shootDirection * size.x,
+              meleeDirection: shootDirection,
+              strength: 1,
+              soundON: false,
+            ),
+          );
+          break;
+        case PlayerState.LevelThree:
+          game.world1.add(
+            Melee(
+              position: position + shootDirection * size.x,
+              meleeDirection: shootDirection,
+              strength: 0,
+              soundON: true,
+            ),
+          );
+          game.world1.add(
+            Melee(
+              position: position + shootDirection * size.x * 1.5,
+              meleeDirection: shootDirection,
+              strength: 1,
+              soundON: false,
+            ),
+          );
+          game.world1.add(
+            Melee(
+              position: position + shootDirection * size.x * 1.5,
+              meleeDirection: shootDirection,
+              strength: 2,
+              soundON: false,
+            ),
           );
           break;
         default:

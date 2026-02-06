@@ -15,8 +15,6 @@ class Mine extends SpriteAnimationGroupComponent
   Mine({required position, required this.moveDirection, required this.soundON})
     : super(position: position, size: Vector2(32, 32), anchor: Anchor.center);
 
-  int hitCounter = 0;
-
   double damage = 20;
   double moveSpeed = 200;
   double fuse = 2.5;
