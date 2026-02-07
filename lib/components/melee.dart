@@ -34,13 +34,13 @@ class Melee extends SpriteAnimationComponent
   FutureOr<void> onLoad() async {
     //debugMode = true;
     switch (game.world1.player.current) {
-      case PlayerState.LevelOne:
+      case CharacterState.LevelOne:
         spriteName = 'MeleeOne.png';
         textureSize = Vector2(114, 64);
         xPositionOffset = 57;
 
         break;
-      case PlayerState.LevelTwo:
+      case CharacterState.LevelTwo:
         if (strength == 1) {
           size *= 2;
           spriteName = 'MeleeTwo.png';
@@ -52,7 +52,7 @@ class Melee extends SpriteAnimationComponent
           xPositionOffset = 57;
         }
         break;
-      case PlayerState.LevelThree:
+      case CharacterState.LevelThree:
         if (strength == 2) {
           size *= 4;
           spriteName = 'MeleeThree.png';

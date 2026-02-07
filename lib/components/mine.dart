@@ -36,13 +36,13 @@ class Mine extends SpriteAnimationGroupComponent
   FutureOr<void> onLoad() async {
     //debugMode = true;
     switch (game.world1.player.current) {
-      case PlayerState.LevelOne:
+      case CharacterState.LevelOne:
         spriteName = 'CherryBomb.png';
         break;
-      case PlayerState.LevelTwo:
+      case CharacterState.LevelTwo:
         spriteName = 'CherryBombTwo.png';
         break;
-      case PlayerState.LevelThree:
+      case CharacterState.LevelThree:
         spriteName = 'CherryBombThree.png';
         break;
       default:

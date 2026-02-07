@@ -9,6 +9,7 @@ import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/components/lightning_ball.dart';
+import 'package:survivor_test/components/lightning_chain.dart';
 import 'package:survivor_test/components/melee.dart';
 import 'package:survivor_test/components/mine.dart';
 import 'package:survivor_test/components/projectile.dart';
@@ -17,7 +18,7 @@ import 'package:survivor_test/survivor_test.dart';
 
 enum CharacterChoice { FireGuy, MineFellow, MeleeLad, DashMan }
 
-enum PlayerState { LevelOne, LevelTwo, LevelThree }
+enum CharacterState { LevelOne, LevelTwo, LevelThree }
 
 class Player extends SpriteAnimationGroupComponent
     with
@@ -60,6 +61,7 @@ class Player extends SpriteAnimationGroupComponent
   Vector2 velocity = Vector2.zero();
 
   List<CollisionBlock> collisionBlocks = [];
+  List<LightningBall> lightningBalls = [];
   //List<BasicEnemy> basicEnemies = [];
 
   bool isDashing = false;
@@ -71,6 +73,7 @@ class Player extends SpriteAnimationGroupComponent
   bool hasFruit = false;
   bool hasKey = false;
   bool inside = false;
+  bool zapFinished = false;
 
   KeyDisplay keyDisplay = KeyDisplay();
 
@@ -123,12 +126,12 @@ class Player extends SpriteAnimationGroupComponent
     }
 
     animations = {
-      PlayerState.LevelOne: levelOneAnimation,
-      PlayerState.LevelTwo: levelTwoAnimation,
-      PlayerState.LevelThree: levelThreeAnimation,
+      CharacterState.LevelOne: levelOneAnimation,
+      CharacterState.LevelTwo: levelTwoAnimation,
+      CharacterState.LevelThree: levelThreeAnimation,
     };
 
-    current = PlayerState.LevelOne;
+    current = CharacterState.LevelTwo;
   }
 
   SpriteAnimation _spriteAnimation(String state) {
@@ -334,7 +337,7 @@ class Player extends SpriteAnimationGroupComponent
         _meleeLadAttacks();
         break;
       case CharacterChoice.DashMan:
-        _dashManAttacks();
+        _dashManAttacks(dt);
     }
   }
 
@@ -386,12 +389,12 @@ class Player extends SpriteAnimationGroupComponent
 
   void _packAPunch() {
     switch (current) {
-      case PlayerState.LevelOne:
-        current = PlayerState.LevelTwo;
+      case CharacterState.LevelOne:
+        current = CharacterState.LevelTwo;
 
         break;
-      case PlayerState.LevelTwo:
-        current = PlayerState.LevelThree;
+      case CharacterState.LevelTwo:
+        current = CharacterState.LevelThree;
       default:
     }
     resetMaxAttackCooldown();
@@ -424,7 +427,7 @@ class Player extends SpriteAnimationGroupComponent
       game.shootSoundPlayer.start();
 
       switch (current) {
-        case PlayerState.LevelTwo:
+        case CharacterState.LevelTwo:
           Vector2 leftShot = movementDirection.clone();
           Vector2 rightShot = movementDirection.clone();
           leftShot.rotate(0.3);
@@ -435,7 +438,7 @@ class Player extends SpriteAnimationGroupComponent
           game.world1.add(
             Projectile(position: position, moveDirection: rightShot),
           );
-        case PlayerState.LevelThree:
+        case CharacterState.LevelThree:
           Vector2 leftShot = movementDirection.clone();
           Vector2 rightShot = movementDirection.clone();
           leftShot.rotate(0.3);
@@ -459,7 +462,7 @@ class Player extends SpriteAnimationGroupComponent
       attackCooldown = maxAttackCooldown;
 
       switch (current) {
-        case PlayerState.LevelOne:
+        case CharacterState.LevelOne:
           game.world1.add(
             Mine(
               position: position,
@@ -467,7 +470,7 @@ class Player extends SpriteAnimationGroupComponent
               soundON: true,
             ),
           );
-        case PlayerState.LevelTwo:
+        case CharacterState.LevelTwo:
           game.world1.add(
             Mine(
               position: position,
@@ -484,7 +487,7 @@ class Player extends SpriteAnimationGroupComponent
           );
 
           break;
-        case PlayerState.LevelThree:
+        case CharacterState.LevelThree:
           Vector2 leftShot = shootDirection.clone();
           Vector2 rightShot = shootDirection.clone();
           leftShot *= -1;
@@ -521,7 +524,7 @@ class Player extends SpriteAnimationGroupComponent
       attackCooldown = maxAttackCooldown;
 
       switch (current) {
-        case PlayerState.LevelOne:
+        case CharacterState.LevelOne:
           game.world1.add(
             Melee(
               position: position + shootDirection * size.x,
@@ -531,7 +534,7 @@ class Player extends SpriteAnimationGroupComponent
             ),
           );
           break;
-        case PlayerState.LevelTwo:
+        case CharacterState.LevelTwo:
           game.world1.add(
             Melee(
               position: position + shootDirection * size.x,
@@ -549,7 +552,7 @@ class Player extends SpriteAnimationGroupComponent
             ),
           );
           break;
-        case PlayerState.LevelThree:
+        case CharacterState.LevelThree:
           game.world1.add(
             Melee(
               position: position + shootDirection * size.x,
@@ -580,10 +583,93 @@ class Player extends SpriteAnimationGroupComponent
     }
   }
 
-  void _dashManAttacks() {
-    if (isAttacking && attackCooldown <= 0 && isVisible) {
-      attackCooldown = maxAttackCooldown;
-      game.world1.add(LightningBall(position: position));
+  void _dashManAttacks(double dt) {
+    if (isAttacking && attackCooldown <= 0) {
+      if (isVisible) {
+        attackCooldown = maxAttackCooldown;
+        game.world1.add(LightningBall(position: position, isStationary: false));
+      }
+      switch (current) {
+        case CharacterState.LevelTwo:
+          zapFinished = false;
+          LightningBall lightningBall = LightningBall(position: position);
+          game.world1.add(lightningBall);
+          lightningBalls.add(lightningBall);
+          if (lightningBalls.length == 2) {
+            executeLevelTwoZap();
+          }
+
+          //spawn stationary orb
+          //remember position and connect with lightning
+          break;
+        case CharacterState.LevelThree:
+          zapFinished = false;
+          LightningBall lightningBall = LightningBall(position: position);
+          game.world1.add(lightningBall);
+          lightningBalls.add(lightningBall);
+          if (lightningBalls.length == 4) {
+            executeLevelThreeZap();
+          }
+
+          break;
+        default:
+      }
     }
+  }
+
+  void executeZap() {
+    if (!lightningBalls.isEmpty) {
+      int lightningBallPairs = lightningBalls.length - 2;
+      for (int i = 0; i < lightningBallPairs; i++) {
+        game.world1.add(
+          LightningChain(
+            position: lightningBalls[i].position,
+            endPosition: lightningBalls[i + 2].position,
+          ),
+        );
+      }
+      lightningBalls = [];
+    }
+  }
+
+  void executeLevelThreeZap() {
+    for (int i = 0; i < 3; i++) {
+      game.world1.add(
+        LightningChain(
+          position: lightningBalls[i].position,
+          endPosition: lightningBalls[i + 1].position,
+        ),
+      );
+    }
+    game.world1.add(
+      LightningChain(
+        position: lightningBalls[3].position,
+        endPosition: lightningBalls[0].position,
+      ),
+    );
+    game.world1.add(
+      LightningChain(
+        position: lightningBalls[0].position,
+        endPosition: lightningBalls[2].position,
+      ),
+    );
+    game.world1.add(
+      LightningChain(
+        position: lightningBalls[1].position,
+        endPosition: lightningBalls[3].position,
+      ),
+    );
+
+    lightningBalls = [];
+  }
+
+  void executeLevelTwoZap() {
+    game.world1.add(
+      LightningChain(
+        position: lightningBalls[0].position,
+        endPosition: lightningBalls[1].position,
+      ),
+    );
+    lightningBalls = [];
   }
 }

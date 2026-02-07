@@ -9,6 +9,7 @@ import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/components/lightning_ball.dart';
+import 'package:survivor_test/components/lightning_chain.dart';
 import 'package:survivor_test/components/melee.dart';
 import 'package:survivor_test/components/mine.dart';
 import 'package:survivor_test/components/projectile.dart';
@@ -252,6 +253,14 @@ class BasicEnemy extends SpriteAnimationComponent
       );
     }
     if (other is LightningBall) {
+      health -= other.damage;
+      add(
+        OpacityEffect.fadeOut(
+          EffectController(alternate: true, duration: 0.1, repeatCount: 5),
+        ),
+      );
+    }
+    if (other is LightningChain) {
       health -= other.damage;
       add(
         OpacityEffect.fadeOut(

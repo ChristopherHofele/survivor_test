@@ -2,19 +2,23 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+
 import 'package:survivor_test/survivor_test.dart';
 
 class LightningBall extends SpriteAnimationComponent
     with HasGameReference<SurvivorTest> {
-  LightningBall({required position})
+  bool isStationary;
+  LightningBall({required position, this.isStationary = true})
     : super(position: position, size: Vector2(64, 64), anchor: Anchor.center);
 
   double damage = 20;
+  double zapDuration = 1;
   double duration = 1;
 
   @override
   FutureOr<void> onLoad() async {
     priority = 2;
+
     animation = SpriteAnimation.fromFrameData(
       game.images.fromCache('LightningBall.png'),
       SpriteAnimationData.sequenced(
@@ -23,28 +27,41 @@ class LightningBall extends SpriteAnimationComponent
         stepTime: 0.083,
       ),
     );
-    add(CircleHitbox(collisionType: CollisionType.passive));
-    game.player.isVisible = false;
-    game.electricitySound.start();
+    if (!isStationary) {
+      add(CircleHitbox(collisionType: CollisionType.passive));
+      game.player.isVisible = false;
+      game.electricitySound.start();
+    }
     return super.onLoad();
   }
 
   @override
   void update(double dt) {
     duration -= dt;
-    position = game.player.position;
-    game.player.isDashing = true;
-    game.player.canDash = true;
-    _handleExistence();
+    if (!isStationary) {
+      position = game.player.position;
+      game.player.isDashing = true;
+      game.player.canDash = true;
+    }
+    _handleExistence(dt);
     super.update(dt);
   }
 
-  void _handleExistence() {
-    if (duration <= 0) {
-      game.player.isVisible = true;
-      game.player.isDashing = false;
-      game.player.canDash = false;
-      removeFromParent();
+  void _handleExistence(double dt) {
+    switch (isStationary) {
+      case true:
+        if (game.player.zapFinished) {
+          removeFromParent();
+        }
+        break;
+      case false:
+        if (duration <= 0) {
+          game.player.isVisible = true;
+          game.player.isDashing = false;
+          game.player.canDash = false;
+          //game.player.executeZap();
+          removeFromParent();
+        }
     }
   }
 }
