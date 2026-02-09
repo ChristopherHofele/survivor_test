@@ -10,6 +10,7 @@ import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/components/lightning_ball.dart';
+import 'package:survivor_test/components/lightning_chain.dart';
 import 'package:survivor_test/components/melee.dart';
 import 'package:survivor_test/components/mine.dart';
 import 'package:survivor_test/components/projectile.dart';
@@ -106,6 +107,7 @@ class BossEnemy extends SpriteComponent
 
   @override
   void update(double dt) {
+    angle = -atan2(lookDirection.x, lookDirection.y);
     attackCooldown -= dt;
     _executeIntro();
     if (introFinished) {
@@ -161,7 +163,21 @@ class BossEnemy extends SpriteComponent
     super.onCollisionStart(intersectionPoints, other);
   }
 
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    if (other is LightningChain) {
+      health -= other.damage;
+      add(
+        OpacityEffect.fadeOut(
+          EffectController(alternate: true, duration: 0.1, repeatCount: 5),
+        ),
+      );
+    }
+    super.onCollision(intersectionPoints, other);
+  }
+
   void _handleHealth() {
+    print(health);
     if (health <= 0) {
       game.enemyCount -= 1;
       int worth = 10;
@@ -236,7 +252,6 @@ class BossEnemy extends SpriteComponent
 
   void _executeIntro() async {
     if (introStarted == false) {
-      print('Intro started');
       introStarted = true;
       FlameAudio.play('Wave Attack 1.wav');
       Future.delayed(Duration(seconds: 3), () {
@@ -335,7 +350,7 @@ class BossEnemy extends SpriteComponent
   void _chargeUp(double dt) {
     if (!isAttacking) {
       chargeUpPosition = position - lookDirection * 100;
-      FlameAudio.play('Wave Attack 1.wav');
+      // FlameAudio.play('Wave Attack 1.wav');
       isAttacking = true;
     }
     if ((position - chargeUpPosition).length > 2) {

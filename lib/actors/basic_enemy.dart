@@ -217,6 +217,14 @@ class BasicEnemy extends SpriteAnimationComponent
         }
       }
     }
+    if (other is LightningChain) {
+      health -= other.damage;
+      add(
+        OpacityEffect.fadeOut(
+          EffectController(alternate: true, duration: 0.1, repeatCount: 5),
+        ),
+      );
+    }
 
     super.onCollision(intersectionPoints, other);
   }
@@ -260,14 +268,7 @@ class BasicEnemy extends SpriteAnimationComponent
         ),
       );
     }
-    if (other is LightningChain) {
-      health -= other.damage;
-      add(
-        OpacityEffect.fadeOut(
-          EffectController(alternate: true, duration: 0.1, repeatCount: 5),
-        ),
-      );
-    }
+
     super.onCollisionStart(intersectionPoints, other);
   }
 

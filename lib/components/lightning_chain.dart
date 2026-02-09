@@ -15,7 +15,7 @@ class LightningChain extends SpriteAnimationComponent
         anchor: Anchor.centerLeft,
       );
 
-  double damage = 5;
+  double damage = 0.083;
   double duration = 2;
   late Vector2 zapDirection;
   late RectangleHitbox hitbox;
