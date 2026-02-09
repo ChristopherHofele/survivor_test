@@ -2,7 +2,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/effects.dart';
-import 'package:flame_audio/flame_audio.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 
 import 'package:survivor_test/actors/basic_enemy.dart';
 import 'package:survivor_test/actors/boss_enemy.dart';
@@ -78,18 +78,22 @@ class Player extends SpriteAnimationGroupComponent
 
   KeyDisplay keyDisplay = KeyDisplay();
 
-  late AudioPool shootSoundPlayer;
-  late AudioPool explosionSound;
-  late AudioPool fuseSound;
-  late AudioPool slashSound;
-  late AudioPool electricitySound;
-  late AudioPool lightningChainSound;
+  late AudioSource gotHitSoundPlayer;
+  late AudioSource explosionSound;
+  late AudioSource fuseSound;
+  late AudioSource slashSound;
+  late AudioSource electricitySound;
+  late AudioSource lightningChainSound;
+  late AudioSource shootSound;
+  late AudioSource eatFruitSound;
 
   @override
-  void onLoad() {
+  void onLoad() async {
     //debugMode = true;
+
     isVisible = true;
     priority = 1;
+
     _loadSounds();
     _loadAllAnimations();
     _initializeCharacterStats();
@@ -283,12 +287,12 @@ class Player extends SpriteAnimationGroupComponent
   void onCollisionStart(
     Set<Vector2> intersectionPoints,
     PositionComponent other,
-  ) {
+  ) async {
     if (other is Projectile && other.shooter == Shooter.Enemy) {
       if (isVisible) {
         health -= 100;
         gotHit = true;
-        game.gotHitSoundPlayer.start();
+        await SoLoud.instance.play(gotHitSoundPlayer);
       }
       other.removeFromParent();
     }
@@ -296,19 +300,22 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   @override
-  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+  void onCollision(
+    Set<Vector2> intersectionPoints,
+    PositionComponent other,
+  ) async {
     if (isVisible) {
       if (other is BasicEnemy && other.attackCooldown <= 0) {
         health -= 100;
         gotHit = true;
         other.attackCooldown = 1;
-        game.gotHitSoundPlayer.start();
+        await SoLoud.instance.play(gotHitSoundPlayer);
       }
       if (other is BossEnemy && other.attackCooldown <= 0) {
         health -= 100;
         gotHit = true;
         other.attackCooldown = 1;
-        game.gotHitSoundPlayer.start();
+        await SoLoud.instance.play(gotHitSoundPlayer);
       }
     }
     super.onCollision(intersectionPoints, other);
@@ -353,7 +360,7 @@ class Player extends SpriteAnimationGroupComponent
     }
   }
 
-  void _handleItemCollision(double dt) {
+  void _handleItemCollision(double dt) async {
     if (game.world1.items.length != 0) {
       List<Item> itemsToRemove = [];
       for (final item in game.world1.items) {
@@ -367,23 +374,23 @@ class Player extends SpriteAnimationGroupComponent
                 maxHealth += 100;
                 isInjured = true;
                 hasFruit = true;
-                game.eatFruitSound.start();
+                await SoLoud.instance.play(eatFruitSound);
                 break;
               case 'Bananas':
                 staminaDrain -= 10;
                 hasFruit = true;
-                game.eatFruitSound.start();
+                await SoLoud.instance.play(eatFruitSound);
                 break;
               case 'Cherries':
                 maxAttackCooldown = maxAttackCooldown * 0.5;
                 projectileMaximumHits += 1;
                 hasFruit = true;
-                game.eatFruitSound.start();
+                await SoLoud.instance.play(eatFruitSound);
                 break;
               case 'Strawberry':
                 _packAPunch();
                 hasFruit = true;
-                game.eatFruitSound.start();
+                await SoLoud.instance.play(eatFruitSound);
               case 'Key':
                 hasKey = true;
                 game.camera.viewport.add(keyDisplay);
@@ -436,7 +443,8 @@ class Player extends SpriteAnimationGroupComponent
       game.world1.add(
         Projectile(position: position, moveDirection: shootDirection),
       );
-      shootSoundPlayer.start();
+
+      SoLoud.instance.play(shootSound);
 
       switch (current) {
         case CharacterState.LevelTwo:
@@ -595,12 +603,12 @@ class Player extends SpriteAnimationGroupComponent
     }
   }
 
-  void _dashManAttacks(double dt) {
+  void _dashManAttacks(double dt) async {
     if (isAttacking && attackCooldown <= 0) {
       if (isVisible) {
         attackCooldown = maxAttackCooldown;
         game.world1.add(LightningBall(position: position, isStationary: false));
-        electricitySound.start();
+        await SoLoud.instance.play(electricitySound);
       }
       switch (current) {
         case CharacterState.LevelTwo:
@@ -637,7 +645,7 @@ class Player extends SpriteAnimationGroupComponent
     }
   }
 
-  void executeLevelThreeZap() {
+  void executeLevelThreeZap() async {
     for (int i = 0; i < 3; i++) {
       game.world1.add(
         LightningChain(
@@ -664,18 +672,18 @@ class Player extends SpriteAnimationGroupComponent
         endPosition: lightningBalls[3].position,
       ),
     );
-    lightningChainSound.start();
+    await SoLoud.instance.play(lightningChainSound);
     lightningBalls = [];
   }
 
-  void executeLevelTwoZap() {
+  void executeLevelTwoZap() async {
     game.world1.add(
       LightningChain(
         position: lightningBalls[0].position,
         endPosition: lightningBalls[1].position,
       ),
     );
-    lightningChainSound.start();
+    await SoLoud.instance.play(lightningChainSound);
     lightningBalls = [];
   }
 
@@ -692,86 +700,48 @@ class Player extends SpriteAnimationGroupComponent
   void _loadSounds() async {
     switch (characterChoice) {
       case CharacterChoice.FireGuy:
-        shootSoundPlayer = await FlameAudio.createPool(
-          'Fireball 1.wav',
-          minPlayers: 3,
-          maxPlayers: 6,
-          audioContext: AudioContext(
-            android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-            iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-          ),
+        shootSound = await SoLoud.instance.loadAsset(
+          'assets/audio/Fireball 1.wav',
+          mode: LoadMode.memory,
         );
         break;
       case CharacterChoice.MineFellow:
-        explosionSound = await FlameAudio.createPool(
-          'Explosion.mp3',
-          minPlayers: 1,
-          maxPlayers: 3,
-          audioContext: AudioContext(
-            android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-            iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-          ),
+        explosionSound = await SoLoud.instance.loadAsset(
+          'assets/audio/Explosion.mp3',
+          mode: LoadMode.memory,
         );
-        fuseSound = await FlameAudio.createPool(
-          'Fuse.mp3',
-          minPlayers: 1,
-          maxPlayers: 3,
-          audioContext: AudioContext(
-            android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-            iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-          ),
+        fuseSound = await SoLoud.instance.loadAsset(
+          'assets/audio/Fuse.mp3',
+          mode: LoadMode.memory,
         );
+
         break;
       case CharacterChoice.MeleeLad:
-        slashSound = await FlameAudio.createPool(
-          'Slash.mp3',
-          minPlayers: 1,
-          maxPlayers: 3,
-          audioContext: AudioContext(
-            android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-            iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-          ),
+        slashSound = await SoLoud.instance.loadAsset(
+          'assets/audio/Slash.mp3',
+          mode: LoadMode.memory,
         );
         break;
       case CharacterChoice.DashMan:
-        electricitySound = await FlameAudio.createPool(
-          'ElectricDash.mp3',
-          minPlayers: 1,
-          maxPlayers: 2,
-          audioContext: AudioContext(
-            android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-            iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-          ),
+        electricitySound = await SoLoud.instance.loadAsset(
+          'assets/audio/ElectricDash.mp3',
+          mode: LoadMode.memory,
         );
-        lightningChainSound = await FlameAudio.createPool(
-          'LightningChain.mp3',
-          minPlayers: 1,
-          maxPlayers: 2,
-          audioContext: AudioContext(
-            android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-            iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-          ),
+
+        lightningChainSound = await SoLoud.instance.loadAsset(
+          'assets/audio/LightningChain.mp3',
+          mode: LoadMode.memory,
         );
         break;
     }
 
-    electricitySound = await FlameAudio.createPool(
-      'ElectricDash.mp3',
-      minPlayers: 1,
-      maxPlayers: 2,
-      audioContext: AudioContext(
-        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-      ),
+    gotHitSoundPlayer = await SoLoud.instance.loadAsset(
+      'assets/audio/Bow Blocked 1.wav',
+      mode: LoadMode.memory,
     );
-    lightningChainSound = await FlameAudio.createPool(
-      'LightningChain.mp3',
-      minPlayers: 1,
-      maxPlayers: 2,
-      audioContext: AudioContext(
-        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-      ),
+    eatFruitSound = await SoLoud.instance.loadAsset(
+      'assets/audio/Apple Crunch.mp3',
+      mode: LoadMode.memory,
     );
   }
 }

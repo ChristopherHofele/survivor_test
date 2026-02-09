@@ -3,6 +3,7 @@ import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/overlays/attack_button.dart';
@@ -49,18 +50,15 @@ class SurvivorTest extends FlameGame
 
   Color background = Color.fromARGB(255, 44, 96, 26);
 
-  late AudioPool shootSoundEnemy;
-
-  late AudioPool gotHitSoundPlayer;
-  late AudioPool gotHitSoundEnemy;
-  late AudioPool eatFruitSound;
+  late AudioSource shootSoundEnemy;
+  late AudioSource gotHitSoundEnemy;
 
   @override
   Future<void> onLoad() async {
     _initializeLists();
     player = Player(
       position: Vector2(960, 1020),
-      characterChoice: CharacterChoice.MeleeLad,
+      characterChoice: CharacterChoice.DashMan,
     );
     await images.loadAllImages();
     await FlameAudio.audioCache.loadAll([
@@ -94,43 +92,13 @@ class SurvivorTest extends FlameGame
     addControls();
     addHearts();
     addMoney();
-
-    shootSoundEnemy = await FlameAudio.createPool(
-      'Sword Unsheath 2.wav',
-      minPlayers: 3,
-      maxPlayers: 6,
-      audioContext: AudioContext(
-        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-      ),
+    gotHitSoundEnemy = await SoLoud.instance.loadAsset(
+      'assets/audio/Sword Blocked 1.wav',
+      mode: LoadMode.memory,
     );
-
-    gotHitSoundPlayer = await FlameAudio.createPool(
-      'Bow Blocked 1.wav',
-      minPlayers: 1,
-      maxPlayers: 2,
-      audioContext: AudioContext(
-        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-      ),
-    );
-    gotHitSoundEnemy = await FlameAudio.createPool(
-      'Sword Blocked 1.wav',
-      minPlayers: 1,
-      maxPlayers: 6,
-      audioContext: AudioContext(
-        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-      ),
-    );
-    eatFruitSound = await FlameAudio.createPool(
-      'Apple Crunch.mp3',
-      minPlayers: 1,
-      maxPlayers: 2,
-      audioContext: AudioContext(
-        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-      ),
+    shootSoundEnemy = await SoLoud.instance.loadAsset(
+      'assets/audio/Sword Unsheath 2.wav',
+      mode: LoadMode.memory,
     );
   }
 
@@ -257,9 +225,5 @@ class SurvivorTest extends FlameGame
       twoDoorsEnemyThresholds,
       threeDoorsEnemyThresholds,
     ];
-  }
-
-  void playHitSoundEnemy() {
-    gotHitSoundEnemy.start();
   }
 }

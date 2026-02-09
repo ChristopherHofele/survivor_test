@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/actors/utils.dart';
@@ -50,6 +51,7 @@ class BasicEnemy extends SpriteAnimationComponent
   Vector2 cornerToFollow = Vector2.zero();
 
   List<CollisionBlock> collisionBlocks = [];
+  List<Mine> alreadyHit = [];
 
   bool followPlayer = true;
   bool ignoreCorner = false;
@@ -57,9 +59,10 @@ class BasicEnemy extends SpriteAnimationComponent
   late String spriteName;
 
   @override
-  void onLoad() {
+  void onLoad() async {
     //debugMode = true;
     _initializeEnemyType();
+
     player = game.player;
     collisionBlocks = player.collisionBlocks;
     priority = 1;
@@ -225,7 +228,15 @@ class BasicEnemy extends SpriteAnimationComponent
         ),
       );
     }
-
+    if (other is Mine && other.isExploding && !alreadyHit.contains(other)) {
+      health -= other.damage;
+      alreadyHit.add(other);
+      add(
+        OpacityEffect.fadeOut(
+          EffectController(alternate: true, duration: 0.1, repeatCount: 5),
+        ),
+      );
+    }
     super.onCollision(intersectionPoints, other);
   }
 
@@ -233,19 +244,11 @@ class BasicEnemy extends SpriteAnimationComponent
   void onCollisionStart(
     Set<Vector2> intersectionPoints,
     PositionComponent other,
-  ) {
+  ) async {
     if (other is Projectile && other.shooter == Shooter.Player) {
       health -= other.damage;
       other.hitCounter += 1;
-      game.playHitSoundEnemy();
-      add(
-        OpacityEffect.fadeOut(
-          EffectController(alternate: true, duration: 0.1, repeatCount: 5),
-        ),
-      );
-    }
-    if (other is Mine && other.isExploding) {
-      health -= other.damage;
+      await SoLoud.instance.play(game.gotHitSoundEnemy);
       add(
         OpacityEffect.fadeOut(
           EffectController(alternate: true, duration: 0.1, repeatCount: 5),
@@ -698,7 +701,7 @@ class BasicEnemy extends SpriteAnimationComponent
     return initialHealth;
   }
 
-  void _shoot() {
+  void _shoot() async {
     game.world1.add(
       Projectile(
         position: position,
@@ -706,7 +709,7 @@ class BasicEnemy extends SpriteAnimationComponent
         shooter: Shooter.Enemy,
       ),
     );
-    game.shootSoundEnemy.start();
+    await SoLoud.instance.play(game.shootSoundEnemy);
     shootCooldown = 5;
   }
 }

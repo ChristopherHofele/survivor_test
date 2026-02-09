@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 
 import 'package:survivor_test/survivor_test.dart';
 import 'package:survivor_test/actors/player.dart';
@@ -34,7 +35,7 @@ class Mine extends SpriteAnimationGroupComponent
   late CircleHitbox hitboxSmall;
   @override
   FutureOr<void> onLoad() async {
-    //debugMode = true;
+    debugMode = true;
     switch (game.world1.player.current) {
       case CharacterState.LevelOne:
         spriteName = 'CherryBomb.png';
@@ -91,18 +92,18 @@ class Mine extends SpriteAnimationGroupComponent
     add(hitboxSmall);
     hitboxSmall.position += Vector2(80, 40);
     if (soundON) {
-      game.player.fuseSound.start();
+      await SoLoud.instance.play(game.player.fuseSound);
     }
     return super.onLoad();
   }
 
   @override
-  void update(double dt) {
+  void update(double dt) async {
     _handleStates(dt);
     if (current == MineState.Exploding) {
       if (!startedExploding) {
         if (soundON) {
-          game.player.explosionSound.start();
+          await SoLoud.instance.play(game.player.explosionSound);
         }
         startedExploding = true;
       }

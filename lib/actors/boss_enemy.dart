@@ -5,6 +5,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame_audio/flame_audio.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/actors/utils.dart';
@@ -54,6 +55,7 @@ class BossEnemy extends SpriteComponent
 
   List<Vector2> spinAttacks = [];
   List<Vector2> multiDirectionAttacks = [];
+  List<Mine> alreadyHit = [];
   List<Vector2> allEightDirections = [
     Vector2(0, -1),
     Vector2(1, -1),
@@ -84,7 +86,7 @@ class BossEnemy extends SpriteComponent
 
   @override
   FutureOr<void> onLoad() async {
-    //debugMode = true;
+    debugMode = true;
     priority = 1;
     sprite = await Sprite.load('Boss.png');
     hitboxRadius = 108;
@@ -107,6 +109,7 @@ class BossEnemy extends SpriteComponent
 
   @override
   void update(double dt) {
+    print(health);
     angle = -atan2(lookDirection.x, lookDirection.y);
     attackCooldown -= dt;
     _executeIntro();
@@ -128,22 +131,14 @@ class BossEnemy extends SpriteComponent
     if (other is Projectile && other.shooter == Shooter.Player) {
       health -= other.damage;
       other.removeFromParent();
-      game.gotHitSoundEnemy.start();
+      SoLoud.instance.play(game.gotHitSoundEnemy);
       add(
         OpacityEffect.fadeOut(
           EffectController(alternate: true, duration: 0.1, repeatCount: 5),
         ),
       );
     }
-    if (other is Mine && other.isExploding) {
-      health -= other.damage;
 
-      add(
-        OpacityEffect.fadeOut(
-          EffectController(alternate: true, duration: 0.1, repeatCount: 5),
-        ),
-      );
-    }
     if (other is Melee) {
       health -= other.damage;
       add(
@@ -167,6 +162,15 @@ class BossEnemy extends SpriteComponent
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     if (other is LightningChain) {
       health -= other.damage;
+      add(
+        OpacityEffect.fadeOut(
+          EffectController(alternate: true, duration: 0.1, repeatCount: 5),
+        ),
+      );
+    }
+    if (other is Mine && other.isExploding && !alreadyHit.contains(other)) {
+      health -= other.damage;
+      alreadyHit.add(other);
       add(
         OpacityEffect.fadeOut(
           EffectController(alternate: true, duration: 0.1, repeatCount: 5),
@@ -297,7 +301,7 @@ class BossEnemy extends SpriteComponent
     introFinished = true;
   }
 
-  void _launchProjectile(Vector2 direction, {bool soundON = true}) {
+  void _launchProjectile(Vector2 direction, {bool soundON = true}) async {
     game.world1.add(
       Projectile(
         position: position,
@@ -306,7 +310,7 @@ class BossEnemy extends SpriteComponent
       ),
     );
     if (soundON) {
-      game.shootSoundEnemy.start();
+      await SoLoud.instance.play(game.shootSoundEnemy);
     }
   }
 
@@ -327,7 +331,7 @@ class BossEnemy extends SpriteComponent
     }
   }
 
-  void _multiDirectionShot() {
+  void _multiDirectionShot() async {
     if (multiPurposeTicker <= 0 && attackCounter < 6) {
       attackCounter += 1;
       multiPurposeTicker = 0.7;
@@ -336,7 +340,7 @@ class BossEnemy extends SpriteComponent
       } else {
         multiDirectionAttacks = allEightDirections;
       }
-      game.shootSoundEnemy.start();
+      await SoLoud.instance.play(game.shootSoundEnemy);
       for (final vector in multiDirectionAttacks) {
         _launchProjectile(vector, soundON: false);
       }

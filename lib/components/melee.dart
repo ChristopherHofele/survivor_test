@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 
 import 'package:survivor_test/survivor_test.dart';
 import 'package:survivor_test/actors/player.dart';
@@ -92,7 +93,7 @@ class Melee extends SpriteAnimationComponent
       add(hitboxRegular);
     }
     if (soundON) {
-      game.player.slashSound.start();
+      await SoLoud.instance.play(game.player.slashSound);
     }
     return super.onLoad();
   }
