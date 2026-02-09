@@ -131,7 +131,7 @@ class Player extends SpriteAnimationGroupComponent
       CharacterState.LevelThree: levelThreeAnimation,
     };
 
-    current = CharacterState.LevelTwo;
+    current = CharacterState.LevelThree;
   }
 
   SpriteAnimation _spriteAnimation(String state) {
@@ -588,6 +588,7 @@ class Player extends SpriteAnimationGroupComponent
       if (isVisible) {
         attackCooldown = maxAttackCooldown;
         game.world1.add(LightningBall(position: position, isStationary: false));
+        game.electricitySound.start();
       }
       switch (current) {
         case CharacterState.LevelTwo:
@@ -595,10 +596,6 @@ class Player extends SpriteAnimationGroupComponent
           LightningBall lightningBall = LightningBall(position: position);
           game.world1.add(lightningBall);
           lightningBalls.add(lightningBall);
-          if (lightningBalls.length == 2) {
-            executeLevelTwoZap();
-          }
-
           //spawn stationary orb
           //remember position and connect with lightning
           break;
@@ -607,28 +604,24 @@ class Player extends SpriteAnimationGroupComponent
           LightningBall lightningBall = LightningBall(position: position);
           game.world1.add(lightningBall);
           lightningBalls.add(lightningBall);
-          if (lightningBalls.length == 4) {
-            executeLevelThreeZap();
-          }
 
           break;
         default:
       }
     }
-  }
-
-  void executeZap() {
-    if (!lightningBalls.isEmpty) {
-      int lightningBallPairs = lightningBalls.length - 2;
-      for (int i = 0; i < lightningBallPairs; i++) {
-        game.world1.add(
-          LightningChain(
-            position: lightningBalls[i].position,
-            endPosition: lightningBalls[i + 2].position,
-          ),
-        );
+    if (isVisible) {
+      switch (current) {
+        case CharacterState.LevelTwo:
+          if (lightningBalls.length == 2) {
+            executeLevelTwoZap();
+          }
+          break;
+        case CharacterState.LevelThree:
+          if (lightningBalls.length == 4) {
+            executeLevelThreeZap();
+          }
+        default:
       }
-      lightningBalls = [];
     }
   }
 

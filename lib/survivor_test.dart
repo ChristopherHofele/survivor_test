@@ -65,7 +65,7 @@ class SurvivorTest extends FlameGame
     _initializeLists();
     player = Player(
       position: Vector2(960, 1020),
-      characterChoice: CharacterChoice.DashMan,
+      characterChoice: CharacterChoice.FireGuy,
     );
     await images.loadAllImages();
     await FlameAudio.audioCache.loadAll([
@@ -145,8 +145,8 @@ class SurvivorTest extends FlameGame
     );
     electricitySound = await FlameAudio.createPool(
       'ElectricCrackle1sec.mp3',
-      minPlayers: 1,
-      maxPlayers: 2,
+      minPlayers: 4,
+      maxPlayers: 6,
       audioContext: AudioContext(
         android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
         iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),

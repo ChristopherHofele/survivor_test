@@ -22,7 +22,7 @@ class LightningChain extends SpriteAnimationComponent
 
   @override
   FutureOr<void> onLoad() async {
-    debugMode = true;
+    //debugMode = true;
     priority = 2;
     animation = SpriteAnimation.fromFrameData(
       game.images.fromCache('LightningChain.png'),
@@ -34,7 +34,7 @@ class LightningChain extends SpriteAnimationComponent
     );
     zapDirection = determineZapDirection(position, endPosition);
     hitbox = RectangleHitbox(
-      size: Vector2(size.x, size.y / 2),
+      size: Vector2(size.x, size.y / 2 - 2),
       collisionType: CollisionType.passive,
     );
     hitbox.position.y += 32;

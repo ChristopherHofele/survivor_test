@@ -30,7 +30,6 @@ class LightningBall extends SpriteAnimationComponent
     if (!isStationary) {
       add(CircleHitbox(collisionType: CollisionType.passive));
       game.player.isVisible = false;
-      game.electricitySound.start();
     }
     return super.onLoad();
   }
@@ -59,7 +58,6 @@ class LightningBall extends SpriteAnimationComponent
           game.player.isVisible = true;
           game.player.isDashing = false;
           game.player.canDash = false;
-          //game.player.executeZap();
           removeFromParent();
         }
     }

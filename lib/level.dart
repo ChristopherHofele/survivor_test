@@ -38,6 +38,9 @@ class Level extends World with HasGameReference<SurvivorTest> {
     _addPressurePlates();
     _changeBGM();
     _setInitialCameraPosition();
+    player.isVisible = true;
+    player.isDashing = false;
+    player.lightningBalls = [];
     super.onLoad();
   }
 
