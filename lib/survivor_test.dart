@@ -48,13 +48,9 @@ class SurvivorTest extends FlameGame
   bool keyCanSpawn = true;
 
   Color background = Color.fromARGB(255, 44, 96, 26);
-  late AudioPool shootSoundPlayer;
+
   late AudioPool shootSoundEnemy;
-  late AudioPool explosionSound;
-  late AudioPool fuseSound;
-  late AudioPool slashSound;
-  late AudioPool electricitySound;
-  late AudioPool lightningChainSound;
+
   late AudioPool gotHitSoundPlayer;
   late AudioPool gotHitSoundEnemy;
   late AudioPool eatFruitSound;
@@ -64,7 +60,7 @@ class SurvivorTest extends FlameGame
     _initializeLists();
     player = Player(
       position: Vector2(960, 1020),
-      characterChoice: CharacterChoice.DashMan,
+      characterChoice: CharacterChoice.MeleeLad,
     );
     await images.loadAllImages();
     await FlameAudio.audioCache.loadAll([
@@ -98,15 +94,7 @@ class SurvivorTest extends FlameGame
     addControls();
     addHearts();
     addMoney();
-    shootSoundPlayer = await FlameAudio.createPool(
-      'Fireball 1.wav',
-      minPlayers: 3,
-      maxPlayers: 6,
-      audioContext: AudioContext(
-        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-      ),
-    );
+
     shootSoundEnemy = await FlameAudio.createPool(
       'Sword Unsheath 2.wav',
       minPlayers: 3,
@@ -116,51 +104,7 @@ class SurvivorTest extends FlameGame
         iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
       ),
     );
-    explosionSound = await FlameAudio.createPool(
-      'Explosion.mp3',
-      minPlayers: 1,
-      maxPlayers: 3,
-      audioContext: AudioContext(
-        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-      ),
-    );
-    fuseSound = await FlameAudio.createPool(
-      'Fuse.mp3',
-      minPlayers: 1,
-      maxPlayers: 3,
-      audioContext: AudioContext(
-        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-      ),
-    );
-    slashSound = await FlameAudio.createPool(
-      'Slash.mp3',
-      minPlayers: 1,
-      maxPlayers: 3,
-      audioContext: AudioContext(
-        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-      ),
-    );
-    electricitySound = await FlameAudio.createPool(
-      'ElectricDash.mp3',
-      minPlayers: 1,
-      maxPlayers: 2,
-      audioContext: AudioContext(
-        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-      ),
-    );
-    lightningChainSound = await FlameAudio.createPool(
-      'LightningChain.mp3',
-      minPlayers: 1,
-      maxPlayers: 2,
-      audioContext: AudioContext(
-        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
-      ),
-    );
+
     gotHitSoundPlayer = await FlameAudio.createPool(
       'Bow Blocked 1.wav',
       minPlayers: 1,

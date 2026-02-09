@@ -2,6 +2,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/effects.dart';
+import 'package:flame_audio/flame_audio.dart';
 
 import 'package:survivor_test/actors/basic_enemy.dart';
 import 'package:survivor_test/actors/boss_enemy.dart';
@@ -77,11 +78,19 @@ class Player extends SpriteAnimationGroupComponent
 
   KeyDisplay keyDisplay = KeyDisplay();
 
+  late AudioPool shootSoundPlayer;
+  late AudioPool explosionSound;
+  late AudioPool fuseSound;
+  late AudioPool slashSound;
+  late AudioPool electricitySound;
+  late AudioPool lightningChainSound;
+
   @override
   void onLoad() {
     //debugMode = true;
     isVisible = true;
     priority = 1;
+    _loadSounds();
     _loadAllAnimations();
     _initializeCharacterStats();
     add(CircleHitbox());
@@ -132,7 +141,7 @@ class Player extends SpriteAnimationGroupComponent
       CharacterState.LevelThree: levelThreeAnimation,
     };
 
-    current = CharacterState.LevelThree;
+    current = CharacterState.LevelOne;
   }
 
   SpriteAnimation _spriteAnimation(String state) {
@@ -427,7 +436,7 @@ class Player extends SpriteAnimationGroupComponent
       game.world1.add(
         Projectile(position: position, moveDirection: shootDirection),
       );
-      game.shootSoundPlayer.start();
+      shootSoundPlayer.start();
 
       switch (current) {
         case CharacterState.LevelTwo:
@@ -591,7 +600,7 @@ class Player extends SpriteAnimationGroupComponent
       if (isVisible) {
         attackCooldown = maxAttackCooldown;
         game.world1.add(LightningBall(position: position, isStationary: false));
-        game.electricitySound.start();
+        electricitySound.start();
       }
       switch (current) {
         case CharacterState.LevelTwo:
@@ -655,7 +664,7 @@ class Player extends SpriteAnimationGroupComponent
         endPosition: lightningBalls[3].position,
       ),
     );
-    game.lightningChainSound.start();
+    lightningChainSound.start();
     lightningBalls = [];
   }
 
@@ -666,7 +675,7 @@ class Player extends SpriteAnimationGroupComponent
         endPosition: lightningBalls[1].position,
       ),
     );
-    game.lightningChainSound.start();
+    lightningChainSound.start();
     lightningBalls = [];
   }
 
@@ -678,5 +687,91 @@ class Player extends SpriteAnimationGroupComponent
         break;
       default:
     }
+  }
+
+  void _loadSounds() async {
+    switch (characterChoice) {
+      case CharacterChoice.FireGuy:
+        shootSoundPlayer = await FlameAudio.createPool(
+          'Fireball 1.wav',
+          minPlayers: 3,
+          maxPlayers: 6,
+          audioContext: AudioContext(
+            android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+            iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+          ),
+        );
+        break;
+      case CharacterChoice.MineFellow:
+        explosionSound = await FlameAudio.createPool(
+          'Explosion.mp3',
+          minPlayers: 1,
+          maxPlayers: 3,
+          audioContext: AudioContext(
+            android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+            iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+          ),
+        );
+        fuseSound = await FlameAudio.createPool(
+          'Fuse.mp3',
+          minPlayers: 1,
+          maxPlayers: 3,
+          audioContext: AudioContext(
+            android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+            iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+          ),
+        );
+        break;
+      case CharacterChoice.MeleeLad:
+        slashSound = await FlameAudio.createPool(
+          'Slash.mp3',
+          minPlayers: 1,
+          maxPlayers: 3,
+          audioContext: AudioContext(
+            android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+            iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+          ),
+        );
+        break;
+      case CharacterChoice.DashMan:
+        electricitySound = await FlameAudio.createPool(
+          'ElectricDash.mp3',
+          minPlayers: 1,
+          maxPlayers: 2,
+          audioContext: AudioContext(
+            android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+            iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+          ),
+        );
+        lightningChainSound = await FlameAudio.createPool(
+          'LightningChain.mp3',
+          minPlayers: 1,
+          maxPlayers: 2,
+          audioContext: AudioContext(
+            android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+            iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+          ),
+        );
+        break;
+    }
+
+    electricitySound = await FlameAudio.createPool(
+      'ElectricDash.mp3',
+      minPlayers: 1,
+      maxPlayers: 2,
+      audioContext: AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      ),
+    );
+    lightningChainSound = await FlameAudio.createPool(
+      'LightningChain.mp3',
+      minPlayers: 1,
+      maxPlayers: 2,
+      audioContext: AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      ),
+    );
   }
 }

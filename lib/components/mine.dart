@@ -91,7 +91,7 @@ class Mine extends SpriteAnimationGroupComponent
     add(hitboxSmall);
     hitboxSmall.position += Vector2(80, 40);
     if (soundON) {
-      game.fuseSound.start();
+      game.player.fuseSound.start();
     }
     return super.onLoad();
   }
@@ -102,7 +102,7 @@ class Mine extends SpriteAnimationGroupComponent
     if (current == MineState.Exploding) {
       if (!startedExploding) {
         if (soundON) {
-          game.explosionSound.start();
+          game.player.explosionSound.start();
         }
         startedExploding = true;
       }

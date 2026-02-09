@@ -92,7 +92,7 @@ class Melee extends SpriteAnimationComponent
       add(hitboxRegular);
     }
     if (soundON) {
-      game.slashSound.start();
+      game.player.slashSound.start();
     }
     return super.onLoad();
   }
