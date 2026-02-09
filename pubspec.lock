@@ -141,10 +141,10 @@ packages:
     dependency: "direct main"
     description:
       name: flame_audio
-      sha256: "1b8df0e277cc1aea3a8bf93530e64ab92612344a5580ed737edee0cbde46d78b"
+      sha256: "339b8aa5576e9d4678608c07b8e973ffa17802aaabb701a813364b59b64aedec"
       url: "https://pub.dev"
     source: hosted
-    version: "2.11.13"
+    version: "2.11.12"
   flame_tiled:
     dependency: "direct main"
     description:
@@ -158,6 +158,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_soloud:
+    dependency: "direct main"
+    description:
+      name: flutter_soloud
+      sha256: f4a631ad55185c916ae31e5dcd75b3c2098fb1856567b113da4d0f544310347d
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.4.10"
   flutter_web_plugins:
     dependency: transitive
     description: flutter

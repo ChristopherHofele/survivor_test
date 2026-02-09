@@ -83,6 +83,7 @@ class Player extends SpriteAnimationGroupComponent
     isVisible = true;
     priority = 1;
     _loadAllAnimations();
+    _initializeCharacterStats();
     add(CircleHitbox());
   }
 
@@ -155,7 +156,9 @@ class Player extends SpriteAnimationGroupComponent
       }
     }
     if (isDashing && canDash) {
-      playerSpeed = moveSpeed * dashBoostMultiplier;
+      isVisible
+          ? playerSpeed = moveSpeed * dashBoostMultiplier
+          : playerSpeed = moveSpeed * dashBoostMultiplier * 3;
       stamina -= staminaDrain * dt;
     } else {
       playerSpeed = moveSpeed;
@@ -652,7 +655,7 @@ class Player extends SpriteAnimationGroupComponent
         endPosition: lightningBalls[3].position,
       ),
     );
-
+    game.lightningChainSound.start();
     lightningBalls = [];
   }
 
@@ -663,6 +666,17 @@ class Player extends SpriteAnimationGroupComponent
         endPosition: lightningBalls[1].position,
       ),
     );
+    game.lightningChainSound.start();
     lightningBalls = [];
+  }
+
+  void _initializeCharacterStats() {
+    switch (characterChoice) {
+      case CharacterChoice.DashMan:
+        attackCooldown = 4;
+        maxAttackCooldown = 4;
+        break;
+      default:
+    }
   }
 }

@@ -13,7 +13,7 @@ class LightningBall extends SpriteAnimationComponent
 
   double damage = 20;
   double zapDuration = 1;
-  double duration = 1;
+  double duration = 0.3;
 
   @override
   FutureOr<void> onLoad() async {

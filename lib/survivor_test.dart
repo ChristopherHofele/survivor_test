@@ -56,6 +56,7 @@ class SurvivorTest extends FlameGame
   late AudioPool fuseSound;
   late AudioPool slashSound;
   late AudioPool electricitySound;
+  late AudioPool lightningChainSound;
   late AudioPool gotHitSoundPlayer;
   late AudioPool gotHitSoundEnemy;
   late AudioPool eatFruitSound;
@@ -65,7 +66,7 @@ class SurvivorTest extends FlameGame
     _initializeLists();
     player = Player(
       position: Vector2(960, 1020),
-      characterChoice: CharacterChoice.FireGuy,
+      characterChoice: CharacterChoice.DashMan,
     );
     await images.loadAllImages();
     await FlameAudio.audioCache.loadAll([
@@ -84,7 +85,8 @@ class SurvivorTest extends FlameGame
       'Fuse.mp3',
       'Slash.mp3',
       'UpgradedSlash.mp3',
-      'ElectricCrackle1sec.mp3',
+      'ElectricDash.mp3',
+      'LightningChain.mp3',
     ]);
     FlameAudio.bgm.initialize;
 
@@ -144,9 +146,18 @@ class SurvivorTest extends FlameGame
       ),
     );
     electricitySound = await FlameAudio.createPool(
-      'ElectricCrackle1sec.mp3',
-      minPlayers: 4,
-      maxPlayers: 6,
+      'ElectricDash.mp3',
+      minPlayers: 1,
+      maxPlayers: 2,
+      audioContext: AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      ),
+    );
+    lightningChainSound = await FlameAudio.createPool(
+      'LightningChain.mp3',
+      minPlayers: 1,
+      maxPlayers: 2,
       audioContext: AudioContext(
         android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
         iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
