@@ -103,6 +103,7 @@ class BasicEnemy extends SpriteAnimationComponent
         moveSpeed = 80;
         health = setMediumHealth();
         attackCooldown = 1;
+        getOutOfSpawn = 1;
         break;
       case EnemyType.Big:
         spriteName = 'enemy_big.png';

@@ -1,7 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
-import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 
@@ -61,26 +60,6 @@ class SurvivorTest extends FlameGame
       characterChoice: CharacterChoice.DashMan,
     );
     await images.loadAllImages();
-    await FlameAudio.audioCache.loadAll([
-      'the_return_of_the_8_bit_era.mp3',
-      'Evening Harmony.mp3',
-      'Gentle Breeze.mp3',
-      'Golden Gleam.mp3',
-      'Sunlight Through Leaves.mp3',
-      'Sword Blocked 1.wav',
-      'Bow Blocked 1.wav',
-      'Sword Unsheath 2.wav',
-      'Fireball 1.wav',
-      'Apple Crunch.mp3',
-      'Wave Attack 1.wav',
-      'Explosion.mp3',
-      'Fuse.mp3',
-      'Slash.mp3',
-      'UpgradedSlash.mp3',
-      'ElectricDash.mp3',
-      'LightningChain.mp3',
-    ]);
-    FlameAudio.bgm.initialize;
 
     loadWorld(player, 'Level1.tmx');
     camera = CameraComponent.withFixedResolution(

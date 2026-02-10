@@ -229,6 +229,7 @@ class Player extends SpriteAnimationGroupComponent
               default:
             }
             if (allowedTeleportation) {
+              game.world1.stopBGM();
               game.world1.removeFromParent();
               game.loadWorld(this, block.destinationName);
               position = block.teleportCoordinates;

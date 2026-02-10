@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
-import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 
 import 'package:survivor_test/actors/player.dart';
@@ -84,10 +83,15 @@ class BossEnemy extends SpriteComponent
   bool isAttacking = false;
   bool hasHitWall = false;
 
+  late AudioSource bossBGM;
+  late AudioSource introRoarSound;
+  late AudioSource victorySound;
+
   @override
   FutureOr<void> onLoad() async {
-    debugMode = true;
+    //debugMode = true;
     priority = 1;
+    _loadAudio();
     sprite = await Sprite.load('Boss.png');
     hitboxRadius = 108;
     add(
@@ -105,6 +109,20 @@ class BossEnemy extends SpriteComponent
     spawnPosition = position.clone();
     player = game.player;
     return super.onLoad();
+  }
+
+  void _loadAudio() async {
+    bossBGM = await SoLoud.instance.loadAsset(
+      'assets/audio/the_return_of_the_8_bit_era.mp3',
+    );
+    introRoarSound = await SoLoud.instance.loadAsset(
+      'assets/audio/Wave Attack 1.wav',
+      mode: LoadMode.memory,
+    );
+    victorySound = await SoLoud.instance.loadAsset(
+      'assets/audio/VictorySound.mp3',
+      mode: LoadMode.memory,
+    );
   }
 
   @override
@@ -180,22 +198,6 @@ class BossEnemy extends SpriteComponent
     super.onCollision(intersectionPoints, other);
   }
 
-  void _handleHealth() {
-    print(health);
-    if (health <= 0) {
-      game.enemyCount -= 1;
-      int worth = 10;
-      Item loot = Item(
-        position: position,
-        worldName: 'Bossroom.tmx',
-        worth: worth,
-      );
-      game.world1.add(loot);
-      game.world1.items.add(loot);
-      game.world1.remove(this);
-    }
-  }
-
   void _decideState() async {
     switch (bossState) {
       case BossState.Idle:
@@ -257,8 +259,8 @@ class BossEnemy extends SpriteComponent
   void _executeIntro() async {
     if (introStarted == false) {
       introStarted = true;
-      FlameAudio.play('Wave Attack 1.wav');
-      Future.delayed(Duration(seconds: 3), () {
+
+      Future.delayed(Duration(seconds: 5), () {
         _finishIntro();
       });
     }
@@ -297,7 +299,11 @@ class BossEnemy extends SpriteComponent
   }
 
   void _finishIntro() {
-    FlameAudio.bgm.play('the_return_of_the_8_bit_era.mp3');
+    SoLoud.instance.play(introRoarSound);
+    Future.delayed(Duration(seconds: 5), () {
+      SoLoud.instance.play(bossBGM, looping: true);
+    });
+
     introFinished = true;
   }
 
@@ -390,6 +396,24 @@ class BossEnemy extends SpriteComponent
       position += velocity * dt;
     } else {
       actionCompleted = true;
+    }
+  }
+
+  void _handleHealth() {
+    print(health);
+    if (health <= 0) {
+      SoLoud.instance.play(victorySound);
+      game.enemyCount -= 1;
+      int worth = 10;
+      Item loot = Item(
+        position: position,
+        worldName: 'Bossroom.tmx',
+        worth: worth,
+      );
+      SoLoud.instance.disposeSource(bossBGM);
+      game.world1.add(loot);
+      game.world1.items.add(loot);
+      game.world1.remove(this);
     }
   }
 }
