@@ -2,21 +2,33 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/effects.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 
 import 'package:survivor_test/actors/basic_enemy.dart';
 import 'package:survivor_test/actors/boss_enemy.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/components/items.dart';
+import 'package:survivor_test/components/lightning_ball.dart';
+import 'package:survivor_test/components/lightning_chain.dart';
+import 'package:survivor_test/components/melee.dart';
+import 'package:survivor_test/components/mine.dart';
 import 'package:survivor_test/components/projectile.dart';
 import 'package:survivor_test/overlays/key_display.dart';
 import 'package:survivor_test/survivor_test.dart';
 
-enum PlayerState { LevelOne, LevelTwo, LevelThree }
+enum CharacterChoice { FireGuy, MineFellow, MeleeLad, DashMan }
+
+enum CharacterState { LevelOne, LevelTwo, LevelThree }
 
 class Player extends SpriteAnimationGroupComponent
-    with HasGameReference<SurvivorTest>, TapCallbacks, CollisionCallbacks {
-  Player({position})
+    with
+        HasGameReference<SurvivorTest>,
+        TapCallbacks,
+        CollisionCallbacks,
+        HasVisibility {
+  CharacterChoice characterChoice;
+  Player({position, required this.characterChoice})
     : super(position: position, size: Vector2(64, 64), anchor: Anchor.center);
 
   late final SpriteAnimation levelOneAnimation;
@@ -46,9 +58,11 @@ class Player extends SpriteAnimationGroupComponent
   double buyCooldown = 0;
 
   Vector2 movementDirection = Vector2.zero();
+  Vector2 shootDirection = Vector2(0, 1);
   Vector2 velocity = Vector2.zero();
 
   List<CollisionBlock> collisionBlocks = [];
+  List<LightningBall> lightningBalls = [];
   //List<BasicEnemy> basicEnemies = [];
 
   bool isDashing = false;
@@ -60,14 +74,29 @@ class Player extends SpriteAnimationGroupComponent
   bool hasFruit = false;
   bool hasKey = false;
   bool inside = false;
+  bool zapFinished = false;
 
   KeyDisplay keyDisplay = KeyDisplay();
 
+  late AudioSource gotHitSoundPlayer;
+  late AudioSource explosionSound;
+  late AudioSource fuseSound;
+  late AudioSource slashSound;
+  late AudioSource electricitySound;
+  late AudioSource lightningChainSound;
+  late AudioSource shootSound;
+  late AudioSource eatFruitSound;
+
   @override
-  void onLoad() {
+  void onLoad() async {
     //debugMode = true;
+
+    isVisible = true;
     priority = 1;
+
+    _loadSounds();
     _loadAllAnimations();
+    _initializeCharacterStats();
     add(CircleHitbox());
   }
 
@@ -75,6 +104,7 @@ class Player extends SpriteAnimationGroupComponent
   void update(double dt) {
     if (game.startGame) {
       _updatePlayerMovement(dt);
+      _saveShootDirection();
       _handleBlockCollisions(dt);
       _handleItemCollision(dt);
       _handleHealthRegeneration(dt);
@@ -85,17 +115,37 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _loadAllAnimations() {
-    levelOneAnimation = _spriteAnimation('LevelOne');
-    levelTwoAnimation = _spriteAnimation('LevelTwo');
-    levelThreeAnimation = _spriteAnimation('LevelThree');
+    switch (characterChoice) {
+      case CharacterChoice.FireGuy:
+        levelOneAnimation = _spriteAnimation('LevelOne');
+        levelTwoAnimation = _spriteAnimation('LevelTwo');
+        levelThreeAnimation = _spriteAnimation('LevelThree');
+
+        break;
+      case CharacterChoice.MineFellow:
+        levelOneAnimation = _spriteAnimation('MineFellowOne');
+        levelTwoAnimation = _spriteAnimation('MineFellowTwo');
+        levelThreeAnimation = _spriteAnimation('MineFellowThree');
+        break;
+      case CharacterChoice.MeleeLad:
+        levelOneAnimation = _spriteAnimation('MeleeLadOne');
+        levelTwoAnimation = _spriteAnimation('MeleeLadTwo');
+        levelThreeAnimation = _spriteAnimation('MeleeLadThree');
+        break;
+      case CharacterChoice.DashMan:
+        levelOneAnimation = _spriteAnimation('DashManOne');
+        levelTwoAnimation = _spriteAnimation('DashManTwo');
+        levelThreeAnimation = _spriteAnimation('DashManThree');
+        break;
+    }
 
     animations = {
-      PlayerState.LevelOne: levelOneAnimation,
-      PlayerState.LevelTwo: levelTwoAnimation,
-      PlayerState.LevelThree: levelThreeAnimation,
+      CharacterState.LevelOne: levelOneAnimation,
+      CharacterState.LevelTwo: levelTwoAnimation,
+      CharacterState.LevelThree: levelThreeAnimation,
     };
 
-    current = PlayerState.LevelOne;
+    current = CharacterState.LevelOne;
   }
 
   SpriteAnimation _spriteAnimation(String state) {
@@ -104,26 +154,34 @@ class Player extends SpriteAnimationGroupComponent
       SpriteAnimationData.sequenced(
         amount: 4,
         stepTime: 0.12,
-        textureSize: Vector2(64, 60),
+        textureSize: Vector2(64, 64),
       ),
     );
   }
 
   void _updatePlayerMovement(double dt) {
-    if (stamina <= 0) {
-      canDash = false;
-    }
-    if (stamina >= 50) {
-      canDash = true;
+    if (isVisible) {
+      if (stamina <= 0) {
+        canDash = false;
+      }
+      if (stamina >= 50) {
+        canDash = true;
+      }
     }
     if (isDashing && canDash) {
-      playerSpeed = moveSpeed * dashBoostMultiplier;
+      isVisible
+          ? playerSpeed = moveSpeed * dashBoostMultiplier
+          : playerSpeed = moveSpeed * dashBoostMultiplier * 3;
       stamina -= staminaDrain * dt;
     } else {
       playerSpeed = moveSpeed;
       stamina += staminaRecovery * dt;
     }
-    velocity = movementDirection * playerSpeed;
+    if (isVisible) {
+      velocity = movementDirection * playerSpeed;
+    } else {
+      velocity = shootDirection * playerSpeed;
+    }
     position += velocity * dt;
     if (velocity.x < 0 && scale.x > 0) {
       flipHorizontallyAroundCenter();
@@ -171,6 +229,7 @@ class Player extends SpriteAnimationGroupComponent
               default:
             }
             if (allowedTeleportation) {
+              game.world1.stopBGM();
               game.world1.removeFromParent();
               game.loadWorld(this, block.destinationName);
               position = block.teleportCoordinates;
@@ -229,31 +288,37 @@ class Player extends SpriteAnimationGroupComponent
   void onCollisionStart(
     Set<Vector2> intersectionPoints,
     PositionComponent other,
-  ) {
+  ) async {
     if (other is Projectile && other.shooter == Shooter.Enemy) {
-      health -= 100;
-      gotHit = true;
-      game.shootSoundPlayer.start();
+      if (isVisible) {
+        health -= 100;
+        gotHit = true;
+        await SoLoud.instance.play(gotHitSoundPlayer);
+      }
       other.removeFromParent();
     }
     super.onCollisionStart(intersectionPoints, other);
   }
 
   @override
-  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (other is BasicEnemy && other.attackCooldown <= 0) {
-      health -= 100;
-      gotHit = true;
-      other.attackCooldown = 1;
-      game.gotHitSoundPlayer.start();
+  void onCollision(
+    Set<Vector2> intersectionPoints,
+    PositionComponent other,
+  ) async {
+    if (isVisible) {
+      if (other is BasicEnemy && other.attackCooldown <= 0) {
+        health -= 100;
+        gotHit = true;
+        other.attackCooldown = 1;
+        await SoLoud.instance.play(gotHitSoundPlayer);
+      }
+      if (other is BossEnemy && other.attackCooldown <= 0) {
+        health -= 100;
+        gotHit = true;
+        other.attackCooldown = 1;
+        await SoLoud.instance.play(gotHitSoundPlayer);
+      }
     }
-    if (other is BossEnemy && other.attackCooldown <= 0) {
-      health -= 100;
-      gotHit = true;
-      other.attackCooldown = 1;
-      game.gotHitSoundPlayer.start();
-    }
-
     super.onCollision(intersectionPoints, other);
   }
 
@@ -281,45 +346,22 @@ class Player extends SpriteAnimationGroupComponent
 
   void _handleAttacks(double dt) {
     attackCooldown -= dt;
-    if (isAttacking && attackCooldown <= 0) {
-      attackCooldown = maxAttackCooldown;
-      game.world1.add(
-        Projectile(position: position, moveDirection: movementDirection),
-      );
-      game.shootSoundPlayer.start();
-
-      switch (current) {
-        case PlayerState.LevelTwo:
-          Vector2 leftShot = movementDirection.clone();
-          Vector2 rightShot = movementDirection.clone();
-          leftShot.rotate(0.3);
-          rightShot.rotate(-0.3);
-          game.world1.add(
-            Projectile(position: position, moveDirection: leftShot),
-          );
-          game.world1.add(
-            Projectile(position: position, moveDirection: rightShot),
-          );
-        case PlayerState.LevelThree:
-          Vector2 leftShot = movementDirection.clone();
-          Vector2 rightShot = movementDirection.clone();
-          leftShot.rotate(0.3);
-          rightShot.rotate(-0.3);
-          game.world1.add(
-            Projectile(position: position, moveDirection: leftShot),
-          );
-          game.world1.add(
-            Projectile(position: position, moveDirection: rightShot),
-          );
-          game.world1.add(
-            Projectile(position: position, moveDirection: -movementDirection),
-          );
-        default:
-      }
+    switch (characterChoice) {
+      case CharacterChoice.FireGuy:
+        _fireGuyAttacks();
+        break;
+      case CharacterChoice.MineFellow:
+        _mineFellowAttacks();
+        break;
+      case CharacterChoice.MeleeLad:
+        _meleeLadAttacks();
+        break;
+      case CharacterChoice.DashMan:
+        _dashManAttacks(dt);
     }
   }
 
-  void _handleItemCollision(double dt) {
+  void _handleItemCollision(double dt) async {
     if (game.world1.items.length != 0) {
       List<Item> itemsToRemove = [];
       for (final item in game.world1.items) {
@@ -333,23 +375,23 @@ class Player extends SpriteAnimationGroupComponent
                 maxHealth += 100;
                 isInjured = true;
                 hasFruit = true;
-                game.eatFruitSound.start();
+                await SoLoud.instance.play(eatFruitSound);
                 break;
               case 'Bananas':
                 staminaDrain -= 10;
                 hasFruit = true;
-                game.eatFruitSound.start();
+                await SoLoud.instance.play(eatFruitSound);
                 break;
               case 'Cherries':
                 maxAttackCooldown = maxAttackCooldown * 0.5;
                 projectileMaximumHits += 1;
                 hasFruit = true;
-                game.eatFruitSound.start();
+                await SoLoud.instance.play(eatFruitSound);
                 break;
               case 'Strawberry':
                 _packAPunch();
                 hasFruit = true;
-                game.eatFruitSound.start();
+                await SoLoud.instance.play(eatFruitSound);
               case 'Key':
                 hasKey = true;
                 game.camera.viewport.add(keyDisplay);
@@ -367,12 +409,12 @@ class Player extends SpriteAnimationGroupComponent
 
   void _packAPunch() {
     switch (current) {
-      case PlayerState.LevelOne:
-        current = PlayerState.LevelTwo;
+      case CharacterState.LevelOne:
+        current = CharacterState.LevelTwo;
 
         break;
-      case PlayerState.LevelTwo:
-        current = PlayerState.LevelThree;
+      case CharacterState.LevelTwo:
+        current = CharacterState.LevelThree;
       default:
     }
     resetMaxAttackCooldown();
@@ -394,5 +436,313 @@ class Player extends SpriteAnimationGroupComponent
 
   void resetMaxAttackCooldown() {
     maxAttackCooldown = 1.6;
+  }
+
+  void _fireGuyAttacks() {
+    if (isAttacking && attackCooldown <= 0) {
+      attackCooldown = maxAttackCooldown;
+      game.world1.add(
+        Projectile(position: position, moveDirection: shootDirection),
+      );
+
+      SoLoud.instance.play(shootSound);
+
+      switch (current) {
+        case CharacterState.LevelTwo:
+          Vector2 leftShot = movementDirection.clone();
+          Vector2 rightShot = movementDirection.clone();
+          leftShot.rotate(0.3);
+          rightShot.rotate(-0.3);
+          game.world1.add(
+            Projectile(position: position, moveDirection: leftShot),
+          );
+          game.world1.add(
+            Projectile(position: position, moveDirection: rightShot),
+          );
+        case CharacterState.LevelThree:
+          Vector2 leftShot = movementDirection.clone();
+          Vector2 rightShot = movementDirection.clone();
+          leftShot.rotate(0.3);
+          rightShot.rotate(-0.3);
+          game.world1.add(
+            Projectile(position: position, moveDirection: leftShot),
+          );
+          game.world1.add(
+            Projectile(position: position, moveDirection: rightShot),
+          );
+          game.world1.add(
+            Projectile(position: position, moveDirection: -movementDirection),
+          );
+        default:
+      }
+    }
+  }
+
+  void _mineFellowAttacks() {
+    if (isAttacking && attackCooldown <= 0) {
+      attackCooldown = maxAttackCooldown;
+
+      switch (current) {
+        case CharacterState.LevelOne:
+          game.world1.add(
+            Mine(
+              position: position,
+              moveDirection: Vector2.zero(),
+              soundON: true,
+            ),
+          );
+        case CharacterState.LevelTwo:
+          game.world1.add(
+            Mine(
+              position: position,
+              moveDirection: Vector2.zero(),
+              soundON: true,
+            ),
+          );
+          game.world1.add(
+            Mine(
+              position: position,
+              moveDirection: shootDirection,
+              soundON: false,
+            ),
+          );
+
+          break;
+        case CharacterState.LevelThree:
+          Vector2 leftShot = shootDirection.clone();
+          Vector2 rightShot = shootDirection.clone();
+          leftShot *= -1;
+          rightShot *= -1;
+          leftShot.rotate(0.3);
+          rightShot.rotate(-0.3);
+          game.world1.add(
+            Mine(
+              position: position,
+              moveDirection: shootDirection,
+              soundON: true,
+            ),
+          );
+          game.world1.add(
+            Mine(position: position, moveDirection: leftShot, soundON: false),
+          );
+          game.world1.add(
+            Mine(position: position, moveDirection: rightShot, soundON: false),
+          );
+          break;
+        default:
+      }
+    }
+  }
+
+  void _saveShootDirection() {
+    if (movementDirection != Vector2(0, 0)) {
+      shootDirection = movementDirection;
+    }
+  }
+
+  void _meleeLadAttacks() {
+    if (isAttacking && attackCooldown <= 0) {
+      attackCooldown = maxAttackCooldown;
+
+      switch (current) {
+        case CharacterState.LevelOne:
+          game.world1.add(
+            Melee(
+              position: position + shootDirection * size.x,
+              meleeDirection: shootDirection,
+              strength: 0,
+              soundON: true,
+            ),
+          );
+          break;
+        case CharacterState.LevelTwo:
+          game.world1.add(
+            Melee(
+              position: position + shootDirection * size.x,
+              meleeDirection: shootDirection,
+              strength: 0,
+              soundON: true,
+            ),
+          );
+          game.world1.add(
+            Melee(
+              position: position + shootDirection * size.x,
+              meleeDirection: shootDirection,
+              strength: 1,
+              soundON: false,
+            ),
+          );
+          break;
+        case CharacterState.LevelThree:
+          game.world1.add(
+            Melee(
+              position: position + shootDirection * size.x,
+              meleeDirection: shootDirection,
+              strength: 0,
+              soundON: true,
+            ),
+          );
+          game.world1.add(
+            Melee(
+              position: position + shootDirection * size.x * 1.5,
+              meleeDirection: shootDirection,
+              strength: 1,
+              soundON: false,
+            ),
+          );
+          game.world1.add(
+            Melee(
+              position: position + shootDirection * size.x * 1.5,
+              meleeDirection: shootDirection,
+              strength: 2,
+              soundON: false,
+            ),
+          );
+          break;
+        default:
+      }
+    }
+  }
+
+  void _dashManAttacks(double dt) async {
+    if (isAttacking && attackCooldown <= 0) {
+      if (isVisible) {
+        attackCooldown = maxAttackCooldown;
+        game.world1.add(LightningBall(position: position, isStationary: false));
+        await SoLoud.instance.play(electricitySound);
+      }
+      switch (current) {
+        case CharacterState.LevelTwo:
+          zapFinished = false;
+          LightningBall lightningBall = LightningBall(position: position);
+          game.world1.add(lightningBall);
+          lightningBalls.add(lightningBall);
+          //spawn stationary orb
+          //remember position and connect with lightning
+          break;
+        case CharacterState.LevelThree:
+          zapFinished = false;
+          LightningBall lightningBall = LightningBall(position: position);
+          game.world1.add(lightningBall);
+          lightningBalls.add(lightningBall);
+
+          break;
+        default:
+      }
+    }
+    if (isVisible) {
+      switch (current) {
+        case CharacterState.LevelTwo:
+          if (lightningBalls.length == 2) {
+            executeLevelTwoZap();
+          }
+          break;
+        case CharacterState.LevelThree:
+          if (lightningBalls.length == 4) {
+            executeLevelThreeZap();
+          }
+        default:
+      }
+    }
+  }
+
+  void executeLevelThreeZap() async {
+    for (int i = 0; i < 3; i++) {
+      game.world1.add(
+        LightningChain(
+          position: lightningBalls[i].position,
+          endPosition: lightningBalls[i + 1].position,
+        ),
+      );
+    }
+    game.world1.add(
+      LightningChain(
+        position: lightningBalls[3].position,
+        endPosition: lightningBalls[0].position,
+      ),
+    );
+    game.world1.add(
+      LightningChain(
+        position: lightningBalls[0].position,
+        endPosition: lightningBalls[2].position,
+      ),
+    );
+    game.world1.add(
+      LightningChain(
+        position: lightningBalls[1].position,
+        endPosition: lightningBalls[3].position,
+      ),
+    );
+    await SoLoud.instance.play(lightningChainSound);
+    lightningBalls = [];
+  }
+
+  void executeLevelTwoZap() async {
+    game.world1.add(
+      LightningChain(
+        position: lightningBalls[0].position,
+        endPosition: lightningBalls[1].position,
+      ),
+    );
+    await SoLoud.instance.play(lightningChainSound);
+    lightningBalls = [];
+  }
+
+  void _initializeCharacterStats() {
+    switch (characterChoice) {
+      case CharacterChoice.DashMan:
+        attackCooldown = 4;
+        maxAttackCooldown = 4;
+        break;
+      default:
+    }
+  }
+
+  void _loadSounds() async {
+    switch (characterChoice) {
+      case CharacterChoice.FireGuy:
+        shootSound = await SoLoud.instance.loadAsset(
+          'assets/audio/Fireball 1.wav',
+          mode: LoadMode.memory,
+        );
+        break;
+      case CharacterChoice.MineFellow:
+        explosionSound = await SoLoud.instance.loadAsset(
+          'assets/audio/Explosion.mp3',
+          mode: LoadMode.memory,
+        );
+        fuseSound = await SoLoud.instance.loadAsset(
+          'assets/audio/Fuse.mp3',
+          mode: LoadMode.memory,
+        );
+
+        break;
+      case CharacterChoice.MeleeLad:
+        slashSound = await SoLoud.instance.loadAsset(
+          'assets/audio/Slash.mp3',
+          mode: LoadMode.memory,
+        );
+        break;
+      case CharacterChoice.DashMan:
+        electricitySound = await SoLoud.instance.loadAsset(
+          'assets/audio/ElectricDash.mp3',
+          mode: LoadMode.memory,
+        );
+
+        lightningChainSound = await SoLoud.instance.loadAsset(
+          'assets/audio/LightningChain.mp3',
+          mode: LoadMode.memory,
+        );
+        break;
+    }
+
+    gotHitSoundPlayer = await SoLoud.instance.loadAsset(
+      'assets/audio/Bow Blocked 1.wav',
+      mode: LoadMode.memory,
+    );
+    eatFruitSound = await SoLoud.instance.loadAsset(
+      'assets/audio/Apple Crunch.mp3',
+      mode: LoadMode.memory,
+    );
   }
 }

@@ -31,13 +31,13 @@ class Projectile extends SpriteAnimationComponent
   FutureOr<void> onLoad() async {
     if (shooter == Shooter.Player) {
       switch (game.world1.player.current) {
-        case PlayerState.LevelOne:
+        case CharacterState.LevelOne:
           spriteName = 'Traps/Saw/FB001_red.png';
           break;
-        case PlayerState.LevelTwo:
+        case CharacterState.LevelTwo:
           spriteName = 'Traps/Saw/FB001_green.png';
           break;
-        case PlayerState.LevelThree:
+        case CharacterState.LevelThree:
           spriteName = 'Traps/Saw/FB001_purple.png';
           break;
         default:

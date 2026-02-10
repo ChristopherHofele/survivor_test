@@ -4,11 +4,15 @@ import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
-import 'package:flame_audio/flame_audio.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/items.dart';
+import 'package:survivor_test/components/lightning_ball.dart';
+import 'package:survivor_test/components/lightning_chain.dart';
+import 'package:survivor_test/components/melee.dart';
+import 'package:survivor_test/components/mine.dart';
 import 'package:survivor_test/components/projectile.dart';
 import 'package:survivor_test/level.dart';
 import 'package:survivor_test/survivor_test.dart';
@@ -50,6 +54,7 @@ class BossEnemy extends SpriteComponent
 
   List<Vector2> spinAttacks = [];
   List<Vector2> multiDirectionAttacks = [];
+  List<Mine> alreadyHit = [];
   List<Vector2> allEightDirections = [
     Vector2(0, -1),
     Vector2(1, -1),
@@ -78,11 +83,17 @@ class BossEnemy extends SpriteComponent
   bool isAttacking = false;
   bool hasHitWall = false;
 
+  late AudioSource bossBGM;
+  late AudioSource introRoarSound;
+  late AudioSource victorySound;
+
   @override
   FutureOr<void> onLoad() async {
     //debugMode = true;
+    priority = 1;
+    _loadAudio();
     sprite = await Sprite.load('Boss.png');
-    hitboxRadius = 128;
+    hitboxRadius = 108;
     add(
       CircleHitbox(
         radius: hitboxRadius,
@@ -100,8 +111,24 @@ class BossEnemy extends SpriteComponent
     return super.onLoad();
   }
 
+  void _loadAudio() async {
+    bossBGM = await SoLoud.instance.loadAsset(
+      'assets/audio/the_return_of_the_8_bit_era.mp3',
+    );
+    introRoarSound = await SoLoud.instance.loadAsset(
+      'assets/audio/Wave Attack 1.wav',
+      mode: LoadMode.memory,
+    );
+    victorySound = await SoLoud.instance.loadAsset(
+      'assets/audio/VictorySound.mp3',
+      mode: LoadMode.memory,
+    );
+  }
+
   @override
   void update(double dt) {
+    print(health);
+    angle = -atan2(lookDirection.x, lookDirection.y);
     attackCooldown -= dt;
     _executeIntro();
     if (introFinished) {
@@ -122,7 +149,24 @@ class BossEnemy extends SpriteComponent
     if (other is Projectile && other.shooter == Shooter.Player) {
       health -= other.damage;
       other.removeFromParent();
-      game.gotHitSoundEnemy.start();
+      SoLoud.instance.play(game.gotHitSoundEnemy);
+      add(
+        OpacityEffect.fadeOut(
+          EffectController(alternate: true, duration: 0.1, repeatCount: 5),
+        ),
+      );
+    }
+
+    if (other is Melee) {
+      health -= other.damage;
+      add(
+        OpacityEffect.fadeOut(
+          EffectController(alternate: true, duration: 0.1, repeatCount: 5),
+        ),
+      );
+    }
+    if (other is LightningBall) {
+      health -= other.damage;
       add(
         OpacityEffect.fadeOut(
           EffectController(alternate: true, duration: 0.1, repeatCount: 5),
@@ -132,19 +176,26 @@ class BossEnemy extends SpriteComponent
     super.onCollisionStart(intersectionPoints, other);
   }
 
-  void _handleHealth() {
-    if (health <= 0) {
-      game.enemyCount -= 1;
-      int worth = 10;
-      Item loot = Item(
-        position: position,
-        worldName: 'Bossroom.tmx',
-        worth: worth,
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    if (other is LightningChain) {
+      health -= other.damage;
+      add(
+        OpacityEffect.fadeOut(
+          EffectController(alternate: true, duration: 0.1, repeatCount: 5),
+        ),
       );
-      game.world1.add(loot);
-      game.world1.items.add(loot);
-      game.world1.remove(this);
     }
+    if (other is Mine && other.isExploding && !alreadyHit.contains(other)) {
+      health -= other.damage;
+      alreadyHit.add(other);
+      add(
+        OpacityEffect.fadeOut(
+          EffectController(alternate: true, duration: 0.1, repeatCount: 5),
+        ),
+      );
+    }
+    super.onCollision(intersectionPoints, other);
   }
 
   void _decideState() async {
@@ -207,10 +258,9 @@ class BossEnemy extends SpriteComponent
 
   void _executeIntro() async {
     if (introStarted == false) {
-      print('Intro started');
       introStarted = true;
-      FlameAudio.play('Wave Attack 1.wav');
-      Future.delayed(Duration(seconds: 3), () {
+
+      Future.delayed(Duration(seconds: 5), () {
         _finishIntro();
       });
     }
@@ -249,11 +299,15 @@ class BossEnemy extends SpriteComponent
   }
 
   void _finishIntro() {
-    FlameAudio.bgm.play('the_return_of_the_8_bit_era.mp3');
+    SoLoud.instance.play(introRoarSound);
+    Future.delayed(Duration(seconds: 5), () {
+      SoLoud.instance.play(bossBGM, looping: true);
+    });
+
     introFinished = true;
   }
 
-  void _launchProjectile(Vector2 direction, {bool soundON = true}) {
+  void _launchProjectile(Vector2 direction, {bool soundON = true}) async {
     game.world1.add(
       Projectile(
         position: position,
@@ -262,7 +316,7 @@ class BossEnemy extends SpriteComponent
       ),
     );
     if (soundON) {
-      game.shootSoundEnemy.start();
+      await SoLoud.instance.play(game.shootSoundEnemy);
     }
   }
 
@@ -283,7 +337,7 @@ class BossEnemy extends SpriteComponent
     }
   }
 
-  void _multiDirectionShot() {
+  void _multiDirectionShot() async {
     if (multiPurposeTicker <= 0 && attackCounter < 6) {
       attackCounter += 1;
       multiPurposeTicker = 0.7;
@@ -292,7 +346,7 @@ class BossEnemy extends SpriteComponent
       } else {
         multiDirectionAttacks = allEightDirections;
       }
-      game.shootSoundEnemy.start();
+      await SoLoud.instance.play(game.shootSoundEnemy);
       for (final vector in multiDirectionAttacks) {
         _launchProjectile(vector, soundON: false);
       }
@@ -306,7 +360,7 @@ class BossEnemy extends SpriteComponent
   void _chargeUp(double dt) {
     if (!isAttacking) {
       chargeUpPosition = position - lookDirection * 100;
-      FlameAudio.play('Wave Attack 1.wav');
+      // FlameAudio.play('Wave Attack 1.wav');
       isAttacking = true;
     }
     if ((position - chargeUpPosition).length > 2) {
@@ -342,6 +396,24 @@ class BossEnemy extends SpriteComponent
       position += velocity * dt;
     } else {
       actionCompleted = true;
+    }
+  }
+
+  void _handleHealth() {
+    print(health);
+    if (health <= 0) {
+      SoLoud.instance.play(victorySound);
+      game.enemyCount -= 1;
+      int worth = 10;
+      Item loot = Item(
+        position: position,
+        worldName: 'Bossroom.tmx',
+        worth: worth,
+      );
+      SoLoud.instance.disposeSource(bossBGM);
+      game.world1.add(loot);
+      game.world1.items.add(loot);
+      game.world1.remove(this);
     }
   }
 }

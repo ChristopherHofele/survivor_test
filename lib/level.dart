@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
-import 'package:flame_audio/flame_audio.dart';
+
 import 'package:flame_tiled/flame_tiled.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/components/collision_block.dart';
@@ -26,6 +27,11 @@ class Level extends World with HasGameReference<SurvivorTest> {
   bool dontFollowVertically = false;
   bool dontFollowHorizontally = false;
 
+  late AudioSource Level1BGM;
+  late AudioSource HealthBGM;
+  late AudioSource StaminaBGM;
+  late AudioSource DamageBGM;
+
   @override
   FutureOr<void> onLoad() async {
     //debugMode = true;
@@ -38,6 +44,9 @@ class Level extends World with HasGameReference<SurvivorTest> {
     _addPressurePlates();
     _changeBGM();
     _setInitialCameraPosition();
+    player.isVisible = true;
+    player.isDashing = false;
+    player.lightningBalls = [];
     super.onLoad();
   }
 
@@ -265,19 +274,50 @@ class Level extends World with HasGameReference<SurvivorTest> {
     }
   }
 
-  void _changeBGM() {
+  void _changeBGM() async {
     switch (tileMapName) {
       case 'Level1.tmx':
-        FlameAudio.bgm.play('Sunlight Through Leaves.mp3');
+        Level1BGM = await SoLoud.instance.loadAsset(
+          'assets/audio/Sunlight Through Leaves.mp3',
+        );
+        await SoLoud.instance.play(Level1BGM, looping: true);
         break;
       case 'Health.tmx':
-        FlameAudio.bgm.play('Gentle Breeze.mp3');
+        HealthBGM = await SoLoud.instance.loadAsset(
+          'assets/audio/Gentle Breeze.mp3',
+        );
+        await SoLoud.instance.play(HealthBGM, looping: true);
         break;
       case 'Damage.tmx':
-        FlameAudio.bgm.play('Evening Harmony.mp3');
+        DamageBGM = await SoLoud.instance.loadAsset(
+          'assets/audio/Evening Harmony.mp3',
+        );
+        await SoLoud.instance.play(DamageBGM, looping: true);
         break;
       case 'Stamina.tmx':
-        FlameAudio.bgm.play('Golden Gleam.mp3');
+        StaminaBGM = await SoLoud.instance.loadAsset(
+          'assets/audio/Golden Gleam.mp3',
+        );
+        await SoLoud.instance.play(StaminaBGM, looping: true);
+        break;
+      default:
+    }
+  }
+
+  void stopBGM() {
+    switch (tileMapName) {
+      case 'Level1.tmx':
+        SoLoud.instance.disposeSource(Level1BGM);
+
+        break;
+      case 'Health.tmx':
+        SoLoud.instance.disposeSource(HealthBGM);
+        break;
+      case 'Damage.tmx':
+        SoLoud.instance.disposeSource(DamageBGM);
+        break;
+      case 'Stamina.tmx':
+        SoLoud.instance.disposeSource(StaminaBGM);
         break;
       default:
     }
@@ -317,16 +357,16 @@ class Level extends World with HasGameReference<SurvivorTest> {
         game.camera.follow(player);
         break;
       case 'Health.tmx':
-        game.camera.moveTo(Vector2(128 + game.size.x / 2, 496));
+        game.camera.moveTo(Vector2(game.size.x / 2, 496));
         break;
       case 'Stamina.tmx':
-        game.camera.moveTo(Vector2(690, 96 + game.size.y / 2));
+        game.camera.moveTo(Vector2(690, game.size.y / 2));
         break;
       case 'Damage.tmx':
-        game.camera.moveTo(Vector2(1120 - game.size.x / 2, 432));
+        game.camera.moveTo(Vector2(level.width - game.size.x / 2, 432));
         break;
       case 'Bossroom.tmx':
-        game.camera.moveTo(Vector2(608, 832 - game.size.y / 2));
+        game.camera.moveTo(Vector2(608, level.height - game.size.y / 2));
       default:
     }
   }
