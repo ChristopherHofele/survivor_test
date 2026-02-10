@@ -51,13 +51,16 @@ class SurvivorTest extends FlameGame
 
   late AudioSource shootSoundEnemy;
   late AudioSource gotHitSoundEnemy;
+  late AudioSource bossBGM;
+  late AudioSource introRoarSound;
+  late AudioSource victorySound;
 
   @override
   Future<void> onLoad() async {
     _initializeLists();
     player = Player(
       position: Vector2(960, 1020),
-      characterChoice: CharacterChoice.DashMan,
+      characterChoice: CharacterChoice.MeleeLad,
     );
     await images.loadAllImages();
 

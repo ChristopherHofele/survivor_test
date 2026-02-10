@@ -83,9 +83,7 @@ class BossEnemy extends SpriteComponent
   bool isAttacking = false;
   bool hasHitWall = false;
 
-  late AudioSource bossBGM;
-  late AudioSource introRoarSound;
-  late AudioSource victorySound;
+  late var bgm;
 
   @override
   FutureOr<void> onLoad() async {
@@ -112,14 +110,14 @@ class BossEnemy extends SpriteComponent
   }
 
   void _loadAudio() async {
-    bossBGM = await SoLoud.instance.loadAsset(
+    game.bossBGM = await SoLoud.instance.loadAsset(
       'assets/audio/the_return_of_the_8_bit_era.mp3',
     );
-    introRoarSound = await SoLoud.instance.loadAsset(
+    game.introRoarSound = await SoLoud.instance.loadAsset(
       'assets/audio/Wave Attack 1.wav',
       mode: LoadMode.memory,
     );
-    victorySound = await SoLoud.instance.loadAsset(
+    game.victorySound = await SoLoud.instance.loadAsset(
       'assets/audio/VictorySound.mp3',
       mode: LoadMode.memory,
     );
@@ -128,6 +126,7 @@ class BossEnemy extends SpriteComponent
   @override
   void update(double dt) {
     print(health);
+
     angle = -atan2(lookDirection.x, lookDirection.y);
     attackCooldown -= dt;
     _executeIntro();
@@ -137,6 +136,8 @@ class BossEnemy extends SpriteComponent
       _handleHealth();
       _decideState();
       _executeAction(dt);
+    } else {
+      health = 200;
     }
     super.update(dt);
   }
@@ -261,7 +262,7 @@ class BossEnemy extends SpriteComponent
       introStarted = true;
 
       Future.delayed(Duration(seconds: 5), () {
-        _finishIntro();
+        _playIntro();
       });
     }
   }
@@ -298,13 +299,11 @@ class BossEnemy extends SpriteComponent
     isDeciding = false;
   }
 
-  void _finishIntro() {
-    SoLoud.instance.play(introRoarSound);
-    Future.delayed(Duration(seconds: 5), () {
-      SoLoud.instance.play(bossBGM, looping: true);
+  void _playIntro() async {
+    SoLoud.instance.play(game.introRoarSound);
+    Future.delayed(Duration(seconds: 5), () async {
+      _finishIntro();
     });
-
-    introFinished = true;
   }
 
   void _launchProjectile(Vector2 direction, {bool soundON = true}) async {
@@ -401,8 +400,9 @@ class BossEnemy extends SpriteComponent
 
   void _handleHealth() {
     print(health);
-    if (health <= 0) {
-      SoLoud.instance.play(victorySound);
+    if (health <= 0 && introFinished) {
+      SoLoud.instance.stop(bgm);
+      SoLoud.instance.play(game.victorySound);
       game.enemyCount -= 1;
       int worth = 10;
       Item loot = Item(
@@ -410,10 +410,15 @@ class BossEnemy extends SpriteComponent
         worldName: 'Bossroom.tmx',
         worth: worth,
       );
-      SoLoud.instance.disposeSource(bossBGM);
+
       game.world1.add(loot);
       game.world1.items.add(loot);
       game.world1.remove(this);
     }
+  }
+
+  void _finishIntro() async {
+    bgm = await SoLoud.instance.play(game.bossBGM, looping: true);
+    introFinished = true;
   }
 }

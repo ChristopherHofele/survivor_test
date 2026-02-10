@@ -145,7 +145,7 @@ class Player extends SpriteAnimationGroupComponent
       CharacterState.LevelThree: levelThreeAnimation,
     };
 
-    current = CharacterState.LevelOne;
+    current = CharacterState.LevelThree;
   }
 
   SpriteAnimation _spriteAnimation(String state) {

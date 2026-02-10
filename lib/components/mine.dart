@@ -35,7 +35,7 @@ class Mine extends SpriteAnimationGroupComponent
   late CircleHitbox hitboxSmall;
   @override
   FutureOr<void> onLoad() async {
-    debugMode = true;
+    //debugMode = true;
     switch (game.world1.player.current) {
       case CharacterState.LevelOne:
         spriteName = 'CherryBomb.png';
