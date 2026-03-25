@@ -35,7 +35,7 @@ class Player extends SpriteAnimationGroupComponent
   late final SpriteAnimation levelTwoAnimation;
   late final SpriteAnimation levelThreeAnimation;
 
-  int money = 0;
+  int money = 100;
   //int invincibilityDelay = 1;
   int healthRegenerationDelay = 3;
   int projectileMaximumHits = 2;

@@ -29,10 +29,13 @@ class BasicEnemy extends SpriteAnimationComponent
     required this.initialMoveDirection,
   }) : super(position: position, size: Vector2.all(64), anchor: Anchor.center);
 
+  int amount = 4;
+
   late double moveSpeed;
   late double health;
   late double attackCooldown;
   late double hitboxRadius;
+
   double shootCooldown = 5;
   double selfDestruct = 8;
   double followCornerCooldown = 0.3;
@@ -69,7 +72,7 @@ class BasicEnemy extends SpriteAnimationComponent
     animation = SpriteAnimation.fromFrameData(
       game.images.fromCache(spriteName),
       SpriteAnimationData.sequenced(
-        amount: 4,
+        amount: amount,
         textureSize: textureSize,
         stepTime: 0.12,
       ),
@@ -106,13 +109,14 @@ class BasicEnemy extends SpriteAnimationComponent
         getOutOfSpawn = 1;
         break;
       case EnemyType.Big:
-        spriteName = 'enemy_big.png';
+        spriteName = 'Brokkoli_piskel.png';
         textureSize = Vector2.all(128);
         hitboxRadius = 32;
         moveSpeed = 50;
         health = 30;
         attackCooldown = 1;
         getOutOfSpawn = 3;
+        amount = 5;
         break;
     }
     size = textureSize;
