@@ -90,23 +90,25 @@ class BasicEnemy extends SpriteAnimationComponent
   void _initializeEnemyType() {
     switch (enemyType) {
       case EnemyType.Small:
-        spriteName = 'enemy_small.png';
+        spriteName = 'radish_piskel.png';
         textureSize = Vector2.all(32);
         hitboxRadius = 16;
         moveSpeed = 140;
         health = 1;
         attackCooldown = 1;
         getOutOfSpawn = 0.5;
+        amount = 1;
 
         break;
       case EnemyType.Medium:
-        spriteName = 'enemy.png';
+        spriteName = 'Carrot_piskel.png';
         textureSize = Vector2.all(64);
         hitboxRadius = 16;
         moveSpeed = 80;
         health = setMediumHealth();
         attackCooldown = 1;
         getOutOfSpawn = 1;
+        amount = 1;
         break;
       case EnemyType.Big:
         spriteName = 'Brokkoli_piskel.png';
