@@ -60,7 +60,7 @@ class SurvivorTest extends FlameGame
     _initializeLists();
     player = Player(
       position: Vector2(960, 1020),
-      characterChoice: CharacterChoice.MeleeLad,
+      characterChoice: CharacterChoice.FireGuy,
     );
     await images.loadAllImages();
 

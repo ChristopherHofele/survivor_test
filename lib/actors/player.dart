@@ -117,7 +117,7 @@ class Player extends SpriteAnimationGroupComponent
   void _loadAllAnimations() {
     switch (characterChoice) {
       case CharacterChoice.FireGuy:
-        levelOneAnimation = _spriteAnimation('LevelOne');
+        levelOneAnimation = _spriteAnimation('FireGuy');
         levelTwoAnimation = _spriteAnimation('LevelTwo');
         levelThreeAnimation = _spriteAnimation('LevelThree');
 
@@ -145,7 +145,7 @@ class Player extends SpriteAnimationGroupComponent
       CharacterState.LevelThree: levelThreeAnimation,
     };
 
-    current = CharacterState.LevelThree;
+    current = CharacterState.LevelOne;
   }
 
   SpriteAnimation _spriteAnimation(String state) {
