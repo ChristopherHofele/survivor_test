@@ -123,7 +123,7 @@ class Player extends SpriteAnimationGroupComponent
 
         break;
       case CharacterChoice.MineFellow:
-        levelOneAnimation = _spriteAnimation('MineFellowOne');
+        levelOneAnimation = _spriteAnimation('MineFellow');
         levelTwoAnimation = _spriteAnimation('MineFellowTwo');
         levelThreeAnimation = _spriteAnimation('MineFellowThree');
         break;
@@ -133,7 +133,7 @@ class Player extends SpriteAnimationGroupComponent
         levelThreeAnimation = _spriteAnimation('MeleeLadThree');
         break;
       case CharacterChoice.DashMan:
-        levelOneAnimation = _spriteAnimation('DashManOne');
+        levelOneAnimation = _spriteAnimation('DashMan');
         levelTwoAnimation = _spriteAnimation('DashManTwo');
         levelThreeAnimation = _spriteAnimation('DashManThree');
         break;
