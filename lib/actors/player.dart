@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -17,7 +19,7 @@ import 'package:survivor_test/components/projectile.dart';
 import 'package:survivor_test/overlays/key_display.dart';
 import 'package:survivor_test/survivor_test.dart';
 
-enum CharacterChoice { FireGuy, MineFellow, MeleeLad, DashMan }
+enum CharacterChoice { FireGuy, MineFellow, MeleeLad, DashMan, Undecided }
 
 enum CharacterState { LevelOne, LevelTwo, LevelThree }
 
@@ -27,14 +29,14 @@ class Player extends SpriteAnimationGroupComponent
         TapCallbacks,
         CollisionCallbacks,
         HasVisibility {
-  CharacterChoice characterChoice;
-  Player({position, required this.characterChoice})
+  Player({position, })
     : super(position: position, size: Vector2(64, 64), anchor: Anchor.center);
 
   late final SpriteAnimation levelOneAnimation;
   late final SpriteAnimation levelTwoAnimation;
   late final SpriteAnimation levelThreeAnimation;
 
+  CharacterChoice characterChoice = CharacterChoice.FireGuy;
   int money = 100;
   //int invincibilityDelay = 1;
   int healthRegenerationDelay = 3;
@@ -90,7 +92,7 @@ class Player extends SpriteAnimationGroupComponent
   @override
   void onLoad() async {
     //debugMode = true;
-
+    await getChracterChoice();
     isVisible = true;
     priority = 1;
 
@@ -128,7 +130,7 @@ class Player extends SpriteAnimationGroupComponent
         levelThreeAnimation = _spriteAnimation('MineFellowThree');
         break;
       case CharacterChoice.MeleeLad:
-        levelOneAnimation = _spriteAnimation('MeleeLadOne');
+        levelOneAnimation = _spriteAnimation('MeleeLad');
         levelTwoAnimation = _spriteAnimation('MeleeLadTwo');
         levelThreeAnimation = _spriteAnimation('MeleeLadThree');
         break;
@@ -137,6 +139,7 @@ class Player extends SpriteAnimationGroupComponent
         levelTwoAnimation = _spriteAnimation('DashManTwo');
         levelThreeAnimation = _spriteAnimation('DashManThree');
         break;
+      default:
     }
 
     animations = {
@@ -358,6 +361,8 @@ class Player extends SpriteAnimationGroupComponent
         break;
       case CharacterChoice.DashMan:
         _dashManAttacks(dt);
+        break;
+      default:
     }
   }
 
@@ -734,6 +739,7 @@ class Player extends SpriteAnimationGroupComponent
           mode: LoadMode.memory,
         );
         break;
+      default:
     }
 
     gotHitSoundPlayer = await SoLoud.instance.loadAsset(
@@ -745,4 +751,11 @@ class Player extends SpriteAnimationGroupComponent
       mode: LoadMode.memory,
     );
   }
+  
+  Future<void> getChracterChoice() async {
+    while (game.selectedCharacter == CharacterChoice.Undecided) {
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+    characterChoice = game.selectedCharacter;  
+  } 
 }
