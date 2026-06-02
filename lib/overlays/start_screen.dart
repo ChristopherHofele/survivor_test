@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:survivor_test/actors/player.dart';
 
 import 'package:survivor_test/survivor_test.dart';
 
@@ -18,8 +19,8 @@ class StartScreen extends StatelessWidget {
       child: Center(
         child: Container(
           padding: const EdgeInsets.all(10.0),
-          height: 270,
-          width: 270,
+          height: 540,
+          width: 900,
           decoration: const BoxDecoration(
             color: blackTextColor,
             borderRadius: const BorderRadius.all(Radius.circular(20)),
@@ -29,7 +30,73 @@ class StartScreen extends StatelessWidget {
             children: [
               const Text(
                 'Survivor Test',
+                style: TextStyle(color: whiteTextColor, fontSize: 30),
+              ),
+              const Text(
+                'Character Selection',
                 style: TextStyle(color: whiteTextColor, fontSize: 24),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                height: 75,
+                width: 900,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        game.selectedCharacter = CharacterChoice.FireGuy;
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: whiteTextColor,
+                      ),
+                      child: const Text(
+                        'Fire Guy',
+                        style:
+                            TextStyle(fontSize: 20.0, color: blackTextColor),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        game.selectedCharacter = CharacterChoice.MeleeLad;
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: whiteTextColor,
+                      ),
+                      child: const Text(
+                        'Melee Lad',
+                        style:
+                            TextStyle(fontSize: 20.0, color: blackTextColor),
+                      ),
+                    ),
+                                        ElevatedButton(
+                      onPressed: () {
+                        game.selectedCharacter = CharacterChoice.DashMan;
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: whiteTextColor,
+                      ),
+                      child: const Text(
+                        'Dash Man',
+                        style:
+                            TextStyle(fontSize: 20.0, color: blackTextColor),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        game.selectedCharacter = CharacterChoice.MineFellow;
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: whiteTextColor,
+                      ),
+                      child: const Text(
+                        'Mine Fellow',
+                        style:
+                            TextStyle(fontSize: 20.0, color: blackTextColor),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 10),
               SizedBox(

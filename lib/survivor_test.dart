@@ -36,6 +36,7 @@ class SurvivorTest extends FlameGame
   List<int> threeDoorsEnemyThresholds = [100, 200];
   List<List> enemyThresholds = [];
 
+  CharacterChoice selectedCharacter = CharacterChoice.Undecided;
   late Player player;
   late JoystickComponent joystick;
   late DashButton dashButton;
@@ -60,7 +61,6 @@ class SurvivorTest extends FlameGame
     _initializeLists();
     player = Player(
       position: Vector2(960, 1020),
-      characterChoice: CharacterChoice.MeleeLad,
     );
     await images.loadAllImages();
 
@@ -99,6 +99,22 @@ class SurvivorTest extends FlameGame
     _updateHearts();
     _determineKeyCanSpawn();
     _updateMaxEnemyCount();
+    switch (player.characterChoice) {
+      case CharacterChoice.FireGuy:
+        print('Fire Guy');
+        break;
+      case CharacterChoice.MeleeLad:
+        print('Melee Lad');
+        break;
+      case CharacterChoice.DashMan:
+        print('Dash Man');
+        break;
+      case CharacterChoice.MineFellow:
+        print('Mine Fellow');
+        break;
+      default:
+        print('Unknown Character');
+    }
 
     super.update(dt);
   }

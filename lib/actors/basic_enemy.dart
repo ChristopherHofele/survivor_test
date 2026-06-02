@@ -29,10 +29,13 @@ class BasicEnemy extends SpriteAnimationComponent
     required this.initialMoveDirection,
   }) : super(position: position, size: Vector2.all(64), anchor: Anchor.center);
 
+  int amount = 4;
+
   late double moveSpeed;
   late double health;
   late double attackCooldown;
   late double hitboxRadius;
+
   double shootCooldown = 5;
   double selfDestruct = 8;
   double followCornerCooldown = 0.3;
@@ -69,7 +72,7 @@ class BasicEnemy extends SpriteAnimationComponent
     animation = SpriteAnimation.fromFrameData(
       game.images.fromCache(spriteName),
       SpriteAnimationData.sequenced(
-        amount: 4,
+        amount: amount,
         textureSize: textureSize,
         stepTime: 0.12,
       ),
@@ -87,32 +90,35 @@ class BasicEnemy extends SpriteAnimationComponent
   void _initializeEnemyType() {
     switch (enemyType) {
       case EnemyType.Small:
-        spriteName = 'enemy_small.png';
+        spriteName = 'radish_piskel.png';
         textureSize = Vector2.all(32);
         hitboxRadius = 16;
         moveSpeed = 140;
         health = 1;
         attackCooldown = 1;
         getOutOfSpawn = 0.5;
+        amount = 1;
 
         break;
       case EnemyType.Medium:
-        spriteName = 'enemy.png';
+        spriteName = 'Carrot_piskel.png';
         textureSize = Vector2.all(64);
         hitboxRadius = 16;
         moveSpeed = 80;
         health = setMediumHealth();
         attackCooldown = 1;
         getOutOfSpawn = 1;
+        amount = 1;
         break;
       case EnemyType.Big:
-        spriteName = 'enemy_big.png';
+        spriteName = 'Brokkoli_piskel.png';
         textureSize = Vector2.all(128);
         hitboxRadius = 32;
         moveSpeed = 50;
         health = 30;
         attackCooldown = 1;
         getOutOfSpawn = 3;
+        amount = 5;
         break;
     }
     size = textureSize;
