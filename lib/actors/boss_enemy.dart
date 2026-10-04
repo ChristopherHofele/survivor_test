@@ -299,7 +299,12 @@ class BossEnemy extends SpriteComponent
     isDeciding = false;
   }
 
+  // Future.delayed keeps counting even when the game is paused or thrown away,
+  // so check that the game is still running before playing any sound.
+  bool get _gameStopped => !isMounted || game.isGameOver;
+
   void _playIntro() async {
+    if (_gameStopped) return;
     SoLoud.instance.play(game.introRoarSound);
     Future.delayed(Duration(seconds: 5), () async {
       _finishIntro();
@@ -419,7 +424,8 @@ class BossEnemy extends SpriteComponent
   }
 
   void _finishIntro() async {
-    bgm = await SoLoud.instance.play(game.bossBGM, looping: true);
+    if (_gameStopped) return;
+    bgm =await SoLoud.instance.play(game.bossBGM, looping: true);
     introFinished = true;
   }
 }
