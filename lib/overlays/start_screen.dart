@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:survivor_test/actors/player.dart';
 
 import 'package:survivor_test/survivor_test.dart';
@@ -116,11 +120,47 @@ class StartScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 0),
+              if (_canExit) ...[
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: 200,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _exitGame,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: whiteTextColor,
+                    ),
+                    child: const Text(
+                      'Exit',
+                      style: TextStyle(fontSize: 24.0, color: blackTextColor),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),
       ),
     );
+  }
+
+  // iOS doesn't allow apps to close themselves and a web page can't close
+  // its browser tab, so the Exit button only exists on Android and desktop.
+  bool get _canExit {
+    if (kIsWeb) return false;
+    return const {
+      TargetPlatform.android,
+      TargetPlatform.windows,
+      TargetPlatform.macOS,
+      TargetPlatform.linux,
+    }.contains(defaultTargetPlatform);
+  }
+
+  void _exitGame() {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      SystemNavigator.pop();
+    } else {
+      exit(0);
+    }
   }
 }
