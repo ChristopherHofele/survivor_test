@@ -47,6 +47,7 @@ class SurvivorTest extends FlameGame
   late AttackButton attackButton;
   late Level world1;
   bool startGame = false;
+  bool isGameOver = false;
   bool hasBeenToDamage = false;
   bool hasBeenToStamina = false;
   bool hasBeenToHealth = false;
@@ -94,9 +95,8 @@ class SurvivorTest extends FlameGame
   @override
   void update(double dt) {
     updateJoystick();
-    if (player.health < 100) {
-      startGame = false;
-      overlays.add('GameOver');
+    if (player.health < 100 && !isGameOver) {
+      _triggerGameOver();
     }
     if (startGame) {
       timeSurvived += dt;
@@ -123,6 +123,14 @@ class SurvivorTest extends FlameGame
     }
 
     super.update(dt);
+  }
+
+  void _triggerGameOver() {
+    isGameOver = true;
+    startGame = false;
+    SoLoud.instance.disposeAllSources();
+    pauseEngine();
+    overlays.add('GameOver');
   }
 
   void addControls() {
