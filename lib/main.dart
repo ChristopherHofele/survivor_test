@@ -16,15 +16,36 @@ void main() async {
     channels: Channels.stereo,
   );
 
-  //SurvivorTest game = SurvivorTest();
-  runApp(
-    GameWidget<SurvivorTest>.controlled(
-      gameFactory: SurvivorTest.new,
+  runApp(const GameApp());
+}
+
+class GameApp extends StatefulWidget {
+  const GameApp({super.key});
+
+  @override
+  State<GameApp> createState() => _GameAppState();
+}
+
+class _GameAppState extends State<GameApp> {
+  // Giving the GameWidget a new key makes Flutter build a brand-new game
+  Key _gameKey = UniqueKey();
+
+  void _restart() {
+    setState(() {
+      _gameKey = UniqueKey();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GameWidget<SurvivorTest>.controlled(
+      key: _gameKey,
+      gameFactory: () => SurvivorTest(onReturnToMenu: _restart),
       overlayBuilderMap: {
         'StartScreen': (_, game) => StartScreen(game: game),
         'GameOver': (_, game) => GameOver(game: game),
       },
       initialActiveOverlays: const ['StartScreen'],
-    ),
-  );
+    );
+  }
 }

@@ -35,7 +35,7 @@ class GameOver extends StatelessWidget {
                 height: 75,
                 child: ElevatedButton(
                   onPressed: () {
-                    game.overlays.remove('GameOver');
+                    game.onReturnToMenu();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: whiteTextColor,

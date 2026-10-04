@@ -13,6 +13,10 @@ import 'package:survivor_test/overlays/money_display.dart';
 
 class SurvivorTest extends FlameGame
     with DragCallbacks, HasCollisionDetection, TapCallbacks {
+  // Called to throw this game away and go back to the start screen
+  final void Function() onReturnToMenu;
+  SurvivorTest({required this.onReturnToMenu});
+
   int heartAmount = 0;
   int enemyCount = 0;
   int maxEnemyCount = 12;
