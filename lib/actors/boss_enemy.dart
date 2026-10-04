@@ -404,6 +404,7 @@ class BossEnemy extends SpriteComponent
       SoLoud.instance.stop(bgm);
       SoLoud.instance.play(game.victorySound);
       game.enemyCount -= 1;
+      game.bossesDefeated += 1;
       int worth = 10;
       Item loot = Item(
         position: position,

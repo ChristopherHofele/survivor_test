@@ -21,7 +21,11 @@ class SurvivorTest extends FlameGame
   int doorsOpened = 0;
   int keySpawnrate = 2;
   int enemyThresholdsBroken = 0;
-  double ticker = 0;
+
+  // Stats for the game over scoreboard
+  int enemiesKilled = 0;
+  int bossesDefeated = 0;
+  double timeSurvived = 0;
 
   List<int> doorPrices = [20, 40, 50, 100, 0, 0, 0, 0, 0, 0];
   List<int> zeroDoorsMaxEnemyCounts = [1, 4, 8];
@@ -94,7 +98,9 @@ class SurvivorTest extends FlameGame
       startGame = false;
       overlays.add('GameOver');
     }
-    ticker += dt;
+    if (startGame) {
+      timeSurvived += dt;
+    }
 
     _updateHearts();
     _determineKeyCanSpawn();

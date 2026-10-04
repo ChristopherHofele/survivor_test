@@ -671,6 +671,7 @@ class BasicEnemy extends SpriteAnimationComponent
     if (health <= 0) {
       game.enemyCount -= 1;
       game.world1.enemiesDefeated += 1;
+      game.enemiesKilled += 1;
       int worth = 1;
       if (game.keyCanSpawn && game.world1.tileMapName == 'Level1.tmx') {
         int spawnParlay = random.nextInt(game.keySpawnrate);
