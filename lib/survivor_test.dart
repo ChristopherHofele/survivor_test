@@ -99,7 +99,7 @@ class SurvivorTest extends FlameGame
   @override
   void update(double dt) {
     updateJoystick();
-    if (player.health < 100 && !isGameOver) {
+    if (player.health <= 0 && !isGameOver) {
       _triggerGameOver();
     }
     if (startGame) {
