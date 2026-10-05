@@ -7,15 +7,27 @@ import 'package:survivor_test/actors/player.dart';
 
 import 'package:survivor_test/survivor_test.dart';
 
-class StartScreen extends StatelessWidget {
+const blackTextColor = Color.fromRGBO(0, 0, 0, 1.0);
+const whiteTextColor = Color.fromRGBO(255, 255, 255, 1.0);
+const selectedColor = Colors.amber;
+
+class StartScreen extends StatefulWidget {
   final SurvivorTest game;
 
   const StartScreen({super.key, required this.game});
 
   @override
+  State<StartScreen> createState() => _StartScreenState();
+}
+
+class _StartScreenState extends State<StartScreen> {
+  SurvivorTest get game => widget.game;
+
+  bool get _characterChosen =>
+      game.selectedCharacter != CharacterChoice.Undecided;
+
+  @override
   Widget build(BuildContext context) {
-    const blackTextColor = Color.fromRGBO(0, 0, 0, 1.0);
-    const whiteTextColor = Color.fromRGBO(255, 255, 255, 1.0);
 
     return Material(
       color: Colors.transparent,
@@ -47,58 +59,10 @@ class StartScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        game.selectedCharacter = CharacterChoice.FireGuy;
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: whiteTextColor,
-                      ),
-                      child: const Text(
-                        'Fire Guy',
-                        style:
-                            TextStyle(fontSize: 20.0, color: blackTextColor),
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        game.selectedCharacter = CharacterChoice.MeleeLad;
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: whiteTextColor,
-                      ),
-                      child: const Text(
-                        'Melee Lad',
-                        style:
-                            TextStyle(fontSize: 20.0, color: blackTextColor),
-                      ),
-                    ),
-                                        ElevatedButton(
-                      onPressed: () {
-                        game.selectedCharacter = CharacterChoice.DashMan;
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: whiteTextColor,
-                      ),
-                      child: const Text(
-                        'Dash Man',
-                        style:
-                            TextStyle(fontSize: 20.0, color: blackTextColor),
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        game.selectedCharacter = CharacterChoice.MineFellow;
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: whiteTextColor,
-                      ),
-                      child: const Text(
-                        'Mine Fellow',
-                        style:
-                            TextStyle(fontSize: 20.0, color: blackTextColor),
-                      ),
-                    ),
+                    _characterButton('Fire Guy', CharacterChoice.FireGuy),
+                    _characterButton('Melee Lad', CharacterChoice.MeleeLad),
+                    _characterButton('Dash Man', CharacterChoice.DashMan),
+                    _characterButton('Mine Fellow', CharacterChoice.MineFellow),
                   ],
                 ),
               ),
@@ -107,12 +71,17 @@ class StartScreen extends StatelessWidget {
                 width: 200,
                 height: 75,
                 child: ElevatedButton(
-                  onPressed: () {
-                    game.startGame = true;
-                    game.overlays.remove('StartScreen');
-                  },
+                  // A null onPressed disables the button until a character
+                  // has been chosen
+                  onPressed: _characterChosen
+                      ? () {
+                          game.startGame = true;
+                          game.overlays.remove('StartScreen');
+                        }
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: whiteTextColor,
+                    disabledBackgroundColor: Colors.grey.shade700,
                   ),
                   child: const Text(
                     'Start',
@@ -140,6 +109,25 @@ class StartScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _characterButton(String label, CharacterChoice choice) {
+    final isSelected = game.selectedCharacter == choice;
+    return ElevatedButton(
+      onPressed: () {
+        // setState redraws the screen so the highlight and Start button update
+        setState(() {
+          game.selectedCharacter = choice;
+        });
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isSelected ? selectedColor : whiteTextColor,
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(fontSize: 20.0, color: blackTextColor),
       ),
     );
   }
