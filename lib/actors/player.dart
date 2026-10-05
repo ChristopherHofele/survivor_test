@@ -111,6 +111,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerAnimation>
   bool hasKey = false;
   bool inside = false;
   bool zapFinished = false;
+  bool isCharacterSetUp = false;
 
   KeyDisplay keyDisplay = KeyDisplay();
 
@@ -124,21 +125,22 @@ class Player extends SpriteAnimationGroupComponent<PlayerAnimation>
   late AudioSource eatFruitSound;
 
   @override
-  void onLoad() async {
+  Future<void> onLoad() async {
     //debugMode = true;
-    await getChracterChoice();
     isVisible = true;
     priority = 1;
-
-    _loadSounds();
-    _loadAllAnimations();
-    _initializeCharacterStats();
     add(CircleHitbox());
+    // Flame waits for this before calling update(), so every sound is ready
+    // by the time the game starts
+    await _loadSounds();
   }
 
   @override
   void update(double dt) {
     if (game.startGame) {
+      if (!isCharacterSetUp) {
+        _setUpCharacter();
+      }
       _updatePlayerMovement(dt);
       _saveShootDirection();
       _handleBlockCollisions(dt);
@@ -148,6 +150,15 @@ class Player extends SpriteAnimationGroupComponent<PlayerAnimation>
       _updateInside();
     }
     super.update(dt);
+  }
+
+  // Runs once, in the first frame after Start is pressed, so it uses
+  // whichever character is selected at that moment
+  void _setUpCharacter() {
+    characterChoice = game.selectedCharacter;
+    _loadAllAnimations();
+    _initializeCharacterStats();
+    isCharacterSetUp = true;
   }
 
   void _loadAllAnimations() {
@@ -705,59 +716,23 @@ class Player extends SpriteAnimationGroupComponent<PlayerAnimation>
     maxAttackCooldown = baseAttackCooldown;
   }
 
-  void _loadSounds() async {
-    switch (characterChoice) {
-      case CharacterChoice.FireGuy:
-        shootSound = await SoLoud.instance.loadAsset(
-          'assets/audio/Fireball 1.wav',
-          mode: LoadMode.memory,
-        );
-        break;
-      case CharacterChoice.MineFellow:
-        explosionSound = await SoLoud.instance.loadAsset(
-          'assets/audio/Explosion.mp3',
-          mode: LoadMode.memory,
-        );
-        fuseSound = await SoLoud.instance.loadAsset(
-          'assets/audio/Fuse.mp3',
-          mode: LoadMode.memory,
-        );
+  // Loads the sounds for every character, so they are all ready no matter
+  // which character is picked (or changed) on the start screen
+  Future<void> _loadSounds() async {
+    shootSound = await _loadSound('Fireball 1.wav');
+    explosionSound = await _loadSound('Explosion.mp3');
+    fuseSound = await _loadSound('Fuse.mp3');
+    slashSound = await _loadSound('Slash.mp3');
+    electricitySound = await _loadSound('ElectricDash.mp3');
+    lightningChainSound = await _loadSound('LightningChain.mp3');
+    gotHitSoundPlayer = await _loadSound('Bow Blocked 1.wav');
+    eatFruitSound = await _loadSound('Apple Crunch.mp3');
+  }
 
-        break;
-      case CharacterChoice.MeleeLad:
-        slashSound = await SoLoud.instance.loadAsset(
-          'assets/audio/Slash.mp3',
-          mode: LoadMode.memory,
-        );
-        break;
-      case CharacterChoice.DashMan:
-        electricitySound = await SoLoud.instance.loadAsset(
-          'assets/audio/ElectricDash.mp3',
-          mode: LoadMode.memory,
-        );
-
-        lightningChainSound = await SoLoud.instance.loadAsset(
-          'assets/audio/LightningChain.mp3',
-          mode: LoadMode.memory,
-        );
-        break;
-      default:
-    }
-
-    gotHitSoundPlayer = await SoLoud.instance.loadAsset(
-      'assets/audio/Bow Blocked 1.wav',
-      mode: LoadMode.memory,
-    );
-    eatFruitSound = await SoLoud.instance.loadAsset(
-      'assets/audio/Apple Crunch.mp3',
+  Future<AudioSource> _loadSound(String fileName) {
+    return SoLoud.instance.loadAsset(
+      'assets/audio/$fileName',
       mode: LoadMode.memory,
     );
   }
-  
-  Future<void> getChracterChoice() async {
-    while (game.selectedCharacter == CharacterChoice.Undecided) {
-      await Future.delayed(const Duration(milliseconds: 100));
-    }
-    characterChoice = game.selectedCharacter;  
-  } 
 }
