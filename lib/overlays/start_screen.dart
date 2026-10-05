@@ -156,6 +156,9 @@ class StartScreen extends StatelessWidget {
     }.contains(defaultTargetPlatform);
   }
 
+  // Audio is handled by the lifecycle listener in main.dart: on Android,
+  // closing the app hides it, which pauses all sounds, just like the Back
+  // button. On desktop, exit() ends the whole program, sound included.
   void _exitGame() {
     if (defaultTargetPlatform == TargetPlatform.android) {
       SystemNavigator.pop();
