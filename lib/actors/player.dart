@@ -56,6 +56,7 @@ class Player extends SpriteAnimationGroupComponent
   double maxAttackCooldown = 1.6;
 
   double buyCooldown = 0;
+  double regenerationCooldown = 0;
 
   Vector2 movementDirection = Vector2.zero();
   Vector2 shootDirection = Vector2(0, 1);
@@ -67,8 +68,6 @@ class Player extends SpriteAnimationGroupComponent
 
   bool isDashing = false;
   bool canDash = true;
-  bool gotHit = false;
-  bool isInjured = false;
   bool isAttacking = false;
   bool allowedTeleportation = false;
   bool hasFruit = false;
@@ -289,12 +288,10 @@ class Player extends SpriteAnimationGroupComponent
   void onCollisionStart(
     Set<Vector2> intersectionPoints,
     PositionComponent other,
-  ) async {
+  ) {
     if (other is Projectile && other.shooter == Shooter.Enemy) {
       if (isVisible) {
-        health -= 100;
-        gotHit = true;
-        await SoLoud.instance.play(gotHitSoundPlayer);
+        _takeHit();
       }
       other.removeFromParent();
     }
@@ -305,43 +302,37 @@ class Player extends SpriteAnimationGroupComponent
   void onCollision(
     Set<Vector2> intersectionPoints,
     PositionComponent other,
-  ) async {
+  ) {
     if (isVisible) {
       if (other is BasicEnemy && other.attackCooldown <= 0) {
-        health -= 100;
-        gotHit = true;
         other.attackCooldown = 1;
-        await SoLoud.instance.play(gotHitSoundPlayer);
+        _takeHit();
       }
       if (other is BossEnemy && other.attackCooldown <= 0) {
-        health -= 100;
-        gotHit = true;
         other.attackCooldown = 1;
-        await SoLoud.instance.play(gotHitSoundPlayer);
+        _takeHit();
       }
     }
     super.onCollision(intersectionPoints, other);
   }
 
-  Future<void> _handleHealthRegeneration(double dt) async {
-    if (gotHit) {
-      add(
-        OpacityEffect.fadeOut(
-            EffectController(alternate: true, duration: 0.1, repeatCount: 5),
-          )
-          ..onComplete = () {
-            gotHit = false;
-          },
-      );
-      Future.delayed(
-        Duration(seconds: healthRegenerationDelay),
-        () => isInjured = true,
-      );
-    } else if (isInjured && health < maxHealth) {
-      health += healthRegeneration * dt;
-    } else if (health >= maxHealth) {
-      isInjured = false;
-      health = maxHealth;
+  // Everything that happens once when the player gets hit
+  void _takeHit() {
+    health -= 100;
+    // Every hit restarts the wait before health regenerates
+    regenerationCooldown = healthRegenerationDelay.toDouble();
+    add(
+      OpacityEffect.fadeOut(
+        EffectController(alternate: true, duration: 0.1, repeatCount: 5),
+      ),
+    );
+    SoLoud.instance.play(gotHitSoundPlayer);
+  }
+
+  void _handleHealthRegeneration(double dt) {
+    regenerationCooldown -= dt;
+    if (regenerationCooldown <= 0 && health < maxHealth) {
+      health = (health + healthRegeneration * dt).clamp(0, maxHealth).toDouble();
     }
   }
 
@@ -376,7 +367,6 @@ class Player extends SpriteAnimationGroupComponent
             switch (item.spriteName) {
               case 'Apple':
                 maxHealth += 100;
-                isInjured = true;
                 hasFruit = true;
                 await SoLoud.instance.play(eatFruitSound);
                 break;
