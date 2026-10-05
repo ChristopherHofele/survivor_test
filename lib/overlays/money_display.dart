@@ -26,7 +26,7 @@ class MoneyDisplay extends PositionComponent
         ),
       ),
       anchor: Anchor.center,
-      position: Vector2(game.size.x - 100, 50),
+      position: Vector2(-100, 50),
     );
     add(_scoreTextComponent);
 
@@ -34,11 +34,19 @@ class MoneyDisplay extends PositionComponent
     add(
       SpriteComponent(
         sprite: cookieSprite,
-        position: Vector2(game.size.x - 50, 50),
+        position: Vector2(-50, 50),
         size: Vector2.all(32),
         anchor: Anchor.center,
       ),
     );
+  }
+
+  // The display sits in the top-right corner; the text and cookie are
+  // placed relative to it, so they move along when the screen size changes
+  @override
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    position = Vector2(size.x, 0);
   }
 
   @override

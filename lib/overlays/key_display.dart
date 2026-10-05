@@ -19,11 +19,18 @@ class KeyDisplay extends PositionComponent with HasGameReference<SurvivorTest> {
     add(
       SpriteComponent(
         sprite: keySprite,
-        position: Vector2(game.size.x / 2, 50),
+        position: Vector2(0, 50),
         size: Vector2.all(32),
         anchor: Anchor.center,
       ),
     );
     return super.onLoad();
+  }
+
+  // Keeps the key centred at the top when the screen size changes
+  @override
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    position = Vector2(size.x / 2, 0);
   }
 }

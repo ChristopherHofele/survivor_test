@@ -20,10 +20,6 @@ class DashButton extends SpriteGroupComponent
   @override
   FutureOr<void> onLoad() {
     _loadSprites();
-    position = Vector2(
-      game.size.x - game.size.x + 2 * margin + buttonSize,
-      game.size.y - margin - buttonSize,
-    );
     sprites = {
       'zero': empty,
       'twentyfive': quarter,
@@ -35,6 +31,17 @@ class DashButton extends SpriteGroupComponent
     size *= 1.3;
     current = 'zero';
     return super.onLoad();
+  }
+
+  // Called once when the button is added and again whenever the screen size changes,
+  // so the button always sits at the bottom, next to the attack button
+  @override
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    position = Vector2(
+      (2 * margin + buttonSize).toDouble(),
+      size.y - margin - buttonSize,
+    );
   }
 
   @override

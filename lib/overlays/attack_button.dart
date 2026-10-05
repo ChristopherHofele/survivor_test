@@ -19,10 +19,6 @@ class AttackButton extends SpriteGroupComponent
   @override
   FutureOr<void> onLoad() {
     _loadSprites();
-    position = Vector2(
-      game.size.x - game.size.x + margin,
-      game.size.y - 1.5 * margin - buttonSize,
-    );
     sprites = {
       'zero': empty,
       'twentyfive': quarter,
@@ -34,6 +30,17 @@ class AttackButton extends SpriteGroupComponent
     size *= 1.3;
     current = 'zero';
     return super.onLoad();
+  }
+
+  // Called once when the button is added and again whenever the screen size changes,
+  // so the button always sits in the bottom-left corner
+  @override
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    position = Vector2(
+      margin.toDouble(),
+      size.y - 1.5 * margin - buttonSize,
+    );
   }
 
   @override

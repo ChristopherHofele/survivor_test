@@ -74,11 +74,9 @@ class SurvivorTest extends FlameGame
     await images.loadAllImages();
 
     loadWorld(player, 'Level1.tmx');
-    camera = CameraComponent.withFixedResolution(
-      world: world1,
-      width: size.x,
-      height: size.y,
-    );
+    // No fixed resolution: the camera follows the screen's real size, even if
+    // the game loaded while the phone was still in portrait (lock screen)
+    camera = CameraComponent(world: world1);
     camera.follow(player);
     addControls();
     addHearts();
