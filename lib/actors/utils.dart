@@ -14,7 +14,7 @@ bool checkCollision(player, block) {
 
   return (playerY - playerHeight / 2 < blockY + blockHeight &&
       playerY + playerHeight / 2 > blockY &&
-      playerX - playerHeight / 2 < blockX + blockWidth &&
+      playerX - playerWidth / 2 < blockX + blockWidth &&
       playerX + playerWidth / 2 > blockX);
 }
 
@@ -31,7 +31,7 @@ bool isCollisionVertical(player, block, dt) {
 
   return (playerY - playerHeight / 2 < blockY + blockHeight &&
       playerY + playerHeight / 2 > blockY &&
-      correctedX - playerHeight / 2 < blockX + blockWidth &&
+      correctedX - playerWidth / 2 < blockX + blockWidth &&
       correctedX + playerWidth / 2 > blockX);
 }
 
@@ -52,7 +52,7 @@ bool isCollisionHorizontal(player, block, dt) {
 
   return (correctedY + buffer - playerHeight / 2 < blockY + blockHeight &&
       correctedY + buffer + playerHeight / 2 > blockY &&
-      playerX - playerHeight / 2 < blockX + blockWidth &&
+      playerX - playerWidth / 2 < blockX + blockWidth &&
       playerX + playerWidth / 2 > blockX);
 }
 

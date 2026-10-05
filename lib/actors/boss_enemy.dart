@@ -125,8 +125,6 @@ class BossEnemy extends SpriteComponent
 
   @override
   void update(double dt) {
-    print(health);
-
     angle = -atan2(lookDirection.x, lookDirection.y);
     attackCooldown -= dt;
     _executeIntro();
@@ -295,7 +293,6 @@ class BossEnemy extends SpriteComponent
         break;
       default:
     }
-    print(stateChooser);
     isDeciding = false;
   }
 
@@ -404,7 +401,6 @@ class BossEnemy extends SpriteComponent
   }
 
   void _handleHealth() {
-    print(health);
     if (health <= 0 && introFinished) {
       SoLoud.instance.stop(bgm);
       SoLoud.instance.play(game.victorySound);

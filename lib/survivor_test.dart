@@ -109,22 +109,6 @@ class SurvivorTest extends FlameGame
     _updateHearts();
     _determineKeyCanSpawn();
     _updateMaxEnemyCount();
-    switch (player.characterChoice) {
-      case CharacterChoice.FireGuy:
-        print('Fire Guy');
-        break;
-      case CharacterChoice.MeleeLad:
-        print('Melee Lad');
-        break;
-      case CharacterChoice.DashMan:
-        print('Dash Man');
-        break;
-      case CharacterChoice.MineFellow:
-        print('Mine Fellow');
-        break;
-      default:
-        print('Unknown Character');
-    }
 
     super.update(dt);
   }

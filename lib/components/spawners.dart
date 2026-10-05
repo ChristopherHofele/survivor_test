@@ -29,7 +29,6 @@ class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
   @override
   FutureOr<void> onLoad() {
     spawnLocation = Vector2(position.x + size.x / 2, position.y + size.y / 2);
-    game.world1.add(this);
     return super.onLoad();
   }
 

@@ -319,7 +319,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
       case 'Stamina.tmx':
         SoLoud.instance.disposeSource(StaminaBGM);
         break;
-      case 'Bossroom':
+      case 'Bossroom.tmx':
         SoLoud.instance.disposeSource(game.bossBGM);
         SoLoud.instance.disposeSource(game.victorySound);
         SoLoud.instance.disposeSource(game.introRoarSound);
