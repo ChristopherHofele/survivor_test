@@ -17,6 +17,10 @@ class SurvivorTest extends FlameGame
   final void Function() onReturnToMenu;
   SurvivorTest({required this.onReturnToMenu});
 
+  // How close the camera is: 1.0 shows the map at normal size,
+  // higher numbers zoom in further
+  static const double cameraZoom = 1.25;
+
   int heartAmount = 0;
   int enemyCount = 0;
   int maxEnemyCount = 12;
@@ -73,11 +77,13 @@ class SurvivorTest extends FlameGame
     );
     await images.loadAllImages();
 
-    loadWorld(player, 'Level1.tmx');
     // No fixed resolution: the camera follows the screen's real size, even if
-    // the game loaded while the phone was still in portrait (lock screen)
-    camera = CameraComponent(world: world1);
-    camera.follow(player);
+    // the game loaded while the phone was still in portrait (lock screen).
+    // It's created before the first level, because each level sets up
+    // the camera when it loads.
+    camera = CameraComponent();
+    camera.viewfinder.zoom = cameraZoom;
+    loadWorld(player, 'Level1.tmx');
     addControls();
     addHearts();
     addMoney();

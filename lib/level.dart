@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
+import 'package:flame/experimental.dart';
 
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
@@ -24,9 +25,6 @@ class Level extends World with HasGameReference<SurvivorTest> {
 
   List<Item> items = [];
 
-  bool dontFollowVertically = false;
-  bool dontFollowHorizontally = false;
-
   late AudioSource Level1BGM;
   late AudioSource HealthBGM;
   late AudioSource StaminaBGM;
@@ -43,7 +41,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
     _addSpawners();
     _addPressurePlates();
     _changeBGM();
-    _setInitialCameraPosition();
+    _setUpCamera();
     player.isVisible = true;
     player.isDashing = false;
     player.lightningBalls = [];
@@ -327,51 +325,40 @@ class Level extends World with HasGameReference<SurvivorTest> {
     }
   }
 
+  // The camera follows the player but never shows anything outside the map
+  void _setUpCamera() {
+    game.camera.follow(player);
+    _updateCameraBounds(game.size);
+  }
+
+  // The screen size can change (e.g. phone turning from portrait to
+  // landscape), which changes how much of the map is visible
   @override
-  void update(double dt) {
-    updateCameraPosition();
-    super.update(dt);
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    if (isLoaded) {
+      _updateCameraBounds(size);
+    }
   }
 
-  void updateCameraPosition() {
-    if ((player.position.x > level.width - game.size.x / 2 - 10) ||
-        (player.position.x < game.size.x / 2 + 10)) {
-      dontFollowHorizontally = true;
-    }
-    if ((player.position.y > level.height - game.size.y / 2 - 10) ||
-        (player.position.y < game.size.y / 2 + 10)) {
-      dontFollowVertically = true;
-    }
-    if (dontFollowHorizontally && dontFollowVertically) {
-      game.camera.stop();
-    } else if (dontFollowHorizontally) {
-      game.camera.follow(player, verticalOnly: true);
-    } else if (dontFollowVertically) {
-      game.camera.follow(player, horizontalOnly: true);
-    } else {
-      game.camera.follow(player);
-    }
-    dontFollowHorizontally = false;
-    dontFollowVertically = false;
+  // The camera's position is its centre, so it has to stay half a screen
+  // away from each map edge. Zooming in shows less of the map, so the visible
+  // area is the screen size divided by the zoom.
+  // (Flame's setBounds(considerViewport: true) forgets about the zoom,
+  // which is why we calculate this ourselves.)
+  void _updateCameraBounds(Vector2 screenSize) {
+    final halfVisible = screenSize / game.camera.viewfinder.zoom / 2;
+    final (left, right) = _cameraRange(halfVisible.x, level.width);
+    final (top, bottom) = _cameraRange(halfVisible.y, level.height);
+    game.camera.setBounds(Rectangle.fromLTRB(left, top, right, bottom));
   }
 
-  void _setInitialCameraPosition() {
-    switch (tileMapName) {
-      case 'Level1.tmx':
-        game.camera.follow(player);
-        break;
-      case 'Health.tmx':
-        game.camera.moveTo(Vector2(game.size.x / 2, 496));
-        break;
-      case 'Stamina.tmx':
-        game.camera.moveTo(Vector2(690, game.size.y / 2));
-        break;
-      case 'Damage.tmx':
-        game.camera.moveTo(Vector2(level.width - game.size.x / 2, 432));
-        break;
-      case 'Bossroom.tmx':
-        game.camera.moveTo(Vector2(608, level.height - game.size.y / 2));
-      default:
+  // Where the camera centre may be along one direction. If the map is
+  // smaller than the screen in that direction, the camera stays centred.
+  (double, double) _cameraRange(double halfVisible, double mapLength) {
+    if (halfVisible * 2 >= mapLength) {
+      return (mapLength / 2, mapLength / 2);
     }
+    return (halfVisible, mapLength - halfVisible);
   }
 }
