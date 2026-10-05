@@ -52,6 +52,8 @@ class Player extends SpriteAnimationGroupComponent
   double staminaDrain = 30;
   double staminaRecovery = 20;
 
+  // The character's starting cooldown, before any cherries
+  double baseAttackCooldown = 1.6;
   double attackCooldown = 1.6;
   double maxAttackCooldown = 1.6;
 
@@ -427,8 +429,10 @@ class Player extends SpriteAnimationGroupComponent
     }
   }
 
+  // Levelling up removes any cherry speed bonus and goes back to the
+  // character's own starting cooldown
   void resetMaxAttackCooldown() {
-    maxAttackCooldown = 1.6;
+    maxAttackCooldown = baseAttackCooldown;
   }
 
   void _fireGuyAttacks() {
@@ -684,11 +688,12 @@ class Player extends SpriteAnimationGroupComponent
   void _initializeCharacterStats() {
     switch (characterChoice) {
       case CharacterChoice.DashMan:
-        attackCooldown = 4;
-        maxAttackCooldown = 4;
+        baseAttackCooldown = 4;
         break;
       default:
     }
+    attackCooldown = baseAttackCooldown;
+    maxAttackCooldown = baseAttackCooldown;
   }
 
   void _loadSounds() async {
