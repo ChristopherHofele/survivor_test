@@ -30,7 +30,7 @@ class Projectile extends SpriteAnimationComponent
   @override
   FutureOr<void> onLoad() async {
     if (shooter == Shooter.Player) {
-      switch (game.world1.player.current) {
+      switch (game.world1.player.level) {
         case CharacterState.LevelOne:
           spriteName = 'Traps/Saw/FB001_red.png';
           break;
@@ -40,7 +40,6 @@ class Projectile extends SpriteAnimationComponent
         case CharacterState.LevelThree:
           spriteName = 'Traps/Saw/FB001_purple.png';
           break;
-        default:
       }
     } else {
       spriteName = 'Traps/Saw/FB001_blue.png';

@@ -36,7 +36,7 @@ class Mine extends SpriteAnimationGroupComponent
   @override
   FutureOr<void> onLoad() async {
     //debugMode = true;
-    switch (game.world1.player.current) {
+    switch (game.world1.player.level) {
       case CharacterState.LevelOne:
         spriteName = 'CherryBomb.png';
         break;
@@ -46,7 +46,6 @@ class Mine extends SpriteAnimationGroupComponent
       case CharacterState.LevelThree:
         spriteName = 'CherryBombThree.png';
         break;
-      default:
     }
     plantedAnimation = SpriteAnimation.fromFrameData(
       game.images.fromCache(spriteName),

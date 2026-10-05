@@ -34,7 +34,7 @@ class Melee extends SpriteAnimationComponent
   @override
   FutureOr<void> onLoad() async {
     //debugMode = true;
-    switch (game.world1.player.current) {
+    switch (game.world1.player.level) {
       case CharacterState.LevelOne:
         spriteName = 'MeleeOne.png';
         textureSize = Vector2(114, 64);
@@ -70,7 +70,6 @@ class Melee extends SpriteAnimationComponent
           xPositionOffset = 57;
         }
         break;
-      default:
     }
     animation = SpriteAnimation.fromFrameData(
       game.images.fromCache(spriteName),

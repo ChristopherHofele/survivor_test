@@ -19,9 +19,47 @@ import 'package:survivor_test/survivor_test.dart';
 
 enum CharacterChoice { FireGuy, MineFellow, MeleeLad, DashMan, Undecided }
 
+// The character's upgrade level (raised by eating a strawberry)
 enum CharacterState { LevelOne, LevelTwo, LevelThree }
 
-class Player extends SpriteAnimationGroupComponent
+// Which animation the player is showing
+enum PlayerAnimation { Idle, Walking }
+
+// The sprite sheets for one character. Each sheet has all its frames in a
+// single row; the number of frames is worked out from the image width.
+class CharacterSprites {
+  final String idle;
+  final String walking;
+  final double frameSize;
+  const CharacterSprites({
+    required this.idle,
+    required this.walking,
+    this.frameSize = 64,
+  });
+}
+
+// All levels use the same art for now. To add a new character, add a line here.
+const Map<CharacterChoice, CharacterSprites> characterSprites = {
+  CharacterChoice.FireGuy: CharacterSprites(
+    idle: 'FireGuy.png',
+    walking: 'FireGuy_Walking.png',
+  ),
+  CharacterChoice.DashMan: CharacterSprites(
+    idle: 'DashMan.png',
+    walking: 'DashMan_Walking.png',
+  ),
+  CharacterChoice.MeleeLad: CharacterSprites(
+    idle: 'MeleeLad.png',
+    walking: 'MeleeLad_Walking.png',
+  ),
+  CharacterChoice.MineFellow: CharacterSprites(
+    idle: 'MineFellow.png',
+    // No walking sheet yet, so the idle sheet is used for walking too
+    walking: 'MineFellow.png',
+  ),
+};
+
+class Player extends SpriteAnimationGroupComponent<PlayerAnimation>
     with
         HasGameReference<SurvivorTest>,
         TapCallbacks,
@@ -30,11 +68,8 @@ class Player extends SpriteAnimationGroupComponent
   Player({position, })
     : super(position: position, size: Vector2(64, 64), anchor: Anchor.center);
 
-  late final SpriteAnimation levelOneAnimation;
-  late final SpriteAnimation levelTwoAnimation;
-  late final SpriteAnimation levelThreeAnimation;
-
   CharacterChoice characterChoice = CharacterChoice.FireGuy;
+  CharacterState level = CharacterState.LevelOne;
   int money = 100;
   //int invincibilityDelay = 1;
   int healthRegenerationDelay = 3;
@@ -116,49 +151,21 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _loadAllAnimations() {
-    switch (characterChoice) {
-      case CharacterChoice.FireGuy:
-        levelOneAnimation = _spriteAnimation('FireGuy');
-        levelTwoAnimation = _spriteAnimation('LevelTwo');
-        levelThreeAnimation = _spriteAnimation('LevelThree');
-
-        break;
-      case CharacterChoice.MineFellow:
-        levelOneAnimation = _spriteAnimation('MineFellow');
-        levelTwoAnimation = _spriteAnimation('MineFellowTwo');
-        levelThreeAnimation = _spriteAnimation('MineFellowThree');
-        break;
-      case CharacterChoice.MeleeLad:
-        levelOneAnimation = _spriteAnimation('MeleeLad');
-        levelTwoAnimation = _spriteAnimation('MeleeLadTwo');
-        levelThreeAnimation = _spriteAnimation('MeleeLadThree');
-        break;
-      case CharacterChoice.DashMan:
-        levelOneAnimation = _spriteAnimation('DashMan');
-        levelTwoAnimation = _spriteAnimation('DashManTwo');
-        levelThreeAnimation = _spriteAnimation('DashManThree');
-        break;
-      default:
-    }
-
+    final sprites = characterSprites[characterChoice]!;
+    final frameSize = Vector2.all(sprites.frameSize);
     animations = {
-      CharacterState.LevelOne: levelOneAnimation,
-      CharacterState.LevelTwo: levelTwoAnimation,
-      CharacterState.LevelThree: levelThreeAnimation,
-    };
-
-    current = CharacterState.LevelOne;
-  }
-
-  SpriteAnimation _spriteAnimation(String state) {
-    return SpriteAnimation.fromFrameData(
-      game.images.fromCache('$state.png'),
-      SpriteAnimationData.sequenced(
-        amount: 4,
-        stepTime: 0.12,
-        textureSize: Vector2(64, 64),
+      PlayerAnimation.Idle: spriteSheetAnimation(
+        game.images,
+        sprites.idle,
+        frameSize,
       ),
-    );
+      PlayerAnimation.Walking: spriteSheetAnimation(
+        game.images,
+        sprites.walking,
+        frameSize,
+      ),
+    };
+    current = PlayerAnimation.Idle;
   }
 
   void _updatePlayerMovement(double dt) {
@@ -185,6 +192,9 @@ class Player extends SpriteAnimationGroupComponent
       velocity = shootDirection * playerSpeed;
     }
     position += velocity * dt;
+    current = velocity.isZero()
+        ? PlayerAnimation.Idle
+        : PlayerAnimation.Walking;
     if (velocity.x < 0 && scale.x > 0) {
       flipHorizontallyAroundCenter();
     } else if (velocity.x > 0 && scale.x < 0) {
@@ -404,13 +414,13 @@ class Player extends SpriteAnimationGroupComponent
   }
 
   void _packAPunch() {
-    switch (current) {
+    switch (level) {
       case CharacterState.LevelOne:
-        current = CharacterState.LevelTwo;
+        level = CharacterState.LevelTwo;
 
         break;
       case CharacterState.LevelTwo:
-        current = CharacterState.LevelThree;
+        level = CharacterState.LevelThree;
       default:
     }
     resetMaxAttackCooldown();
@@ -445,7 +455,7 @@ class Player extends SpriteAnimationGroupComponent
 
       SoLoud.instance.play(shootSound);
 
-      switch (current) {
+      switch (level) {
         case CharacterState.LevelTwo:
           Vector2 leftShot = shootDirection.clone();
           Vector2 rightShot = shootDirection.clone();
@@ -480,7 +490,7 @@ class Player extends SpriteAnimationGroupComponent
     if (isAttacking && attackCooldown <= 0) {
       attackCooldown = maxAttackCooldown;
 
-      switch (current) {
+      switch (level) {
         case CharacterState.LevelOne:
           game.world1.add(
             Mine(
@@ -527,7 +537,6 @@ class Player extends SpriteAnimationGroupComponent
             Mine(position: position, moveDirection: rightShot, soundON: false),
           );
           break;
-        default:
       }
     }
   }
@@ -542,7 +551,7 @@ class Player extends SpriteAnimationGroupComponent
     if (isAttacking && attackCooldown <= 0) {
       attackCooldown = maxAttackCooldown;
 
-      switch (current) {
+      switch (level) {
         case CharacterState.LevelOne:
           game.world1.add(
             Melee(
@@ -597,7 +606,6 @@ class Player extends SpriteAnimationGroupComponent
             ),
           );
           break;
-        default:
       }
     }
   }
@@ -609,7 +617,7 @@ class Player extends SpriteAnimationGroupComponent
         game.world1.add(LightningBall(position: position, isStationary: false));
         await SoLoud.instance.play(electricitySound);
       }
-      switch (current) {
+      switch (level) {
         case CharacterState.LevelTwo:
           zapFinished = false;
           LightningBall lightningBall = LightningBall(position: position);
@@ -629,7 +637,7 @@ class Player extends SpriteAnimationGroupComponent
       }
     }
     if (isVisible) {
-      switch (current) {
+      switch (level) {
         case CharacterState.LevelTwo:
           if (lightningBalls.length == 2) {
             executeLevelTwoZap();

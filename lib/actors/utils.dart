@@ -1,5 +1,29 @@
-import 'package:flame/extensions.dart';
+import 'package:flame/cache.dart';
+import 'package:flame/components.dart';
 import 'package:survivor_test/actors/player.dart';
+
+// Seconds each animation frame is shown
+const double animationStepTime = 0.12;
+
+// Builds a looping animation from a sprite sheet with all frames in one row.
+// The number of frames is worked out from the image width, so a sheet can
+// have any number of frames without changing the code.
+SpriteAnimation spriteSheetAnimation(
+  Images images,
+  String fileName,
+  Vector2 frameSize,
+) {
+  final image = images.fromCache(fileName);
+  final frameCount = image.width ~/ frameSize.x;
+  return SpriteAnimation.fromFrameData(
+    image,
+    SpriteAnimationData.sequenced(
+      amount: frameCount,
+      stepTime: animationStepTime,
+      textureSize: frameSize,
+    ),
+  );
+}
 
 bool checkCollision(player, block) {
   final playerX = player.position.x;

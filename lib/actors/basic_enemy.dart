@@ -29,8 +29,6 @@ class BasicEnemy extends SpriteAnimationComponent
     required this.initialMoveDirection,
   }) : super(position: position, size: Vector2.all(64), anchor: Anchor.center);
 
-  int amount = 4;
-
   late double moveSpeed;
   late double health;
   late double attackCooldown;
@@ -69,14 +67,7 @@ class BasicEnemy extends SpriteAnimationComponent
     player = game.player;
     collisionBlocks = player.collisionBlocks;
     priority = 1;
-    animation = SpriteAnimation.fromFrameData(
-      game.images.fromCache(spriteName),
-      SpriteAnimationData.sequenced(
-        amount: amount,
-        textureSize: textureSize,
-        stepTime: 0.12,
-      ),
-    );
+    animation = spriteSheetAnimation(game.images, spriteName, textureSize);
     add(
       CircleHitbox(
         radius: hitboxRadius,
@@ -90,27 +81,25 @@ class BasicEnemy extends SpriteAnimationComponent
   void _initializeEnemyType() {
     switch (enemyType) {
       case EnemyType.Small:
-        spriteName = 'radish_piskel.png';
+        spriteName = 'Radish_Walking.png';
         textureSize = Vector2.all(32);
         hitboxRadius = 16;
         moveSpeed = 140;
         health = 1;
         attackCooldown = 1;
         getOutOfSpawn = 0.5;
-        amount = 1;
-
         break;
       case EnemyType.Medium:
-        spriteName = 'Carrot_piskel.png';
+        spriteName = 'Carrot_walking.png';
         textureSize = Vector2.all(64);
         hitboxRadius = 16;
         moveSpeed = 80;
         health = setMediumHealth();
         attackCooldown = 1;
         getOutOfSpawn = 1;
-        amount = 1;
         break;
       case EnemyType.Big:
+        // No walking sheet yet, so the broccoli keeps its idle animation
         spriteName = 'Brokkoli_piskel.png';
         textureSize = Vector2.all(128);
         hitboxRadius = 32;
@@ -118,7 +107,6 @@ class BasicEnemy extends SpriteAnimationComponent
         health = 30;
         attackCooldown = 1;
         getOutOfSpawn = 3;
-        amount = 5;
         break;
     }
     size = textureSize;
