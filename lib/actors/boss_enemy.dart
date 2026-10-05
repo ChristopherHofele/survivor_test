@@ -32,11 +32,17 @@ class BossEnemy extends SpriteComponent
   BossEnemy({required position})
     : super(position: position, size: Vector2.all(256), anchor: Anchor.center);
 
+  // ---- Hitbox sizes (radius in pixels, the boss image is 256 x 256) ----
+  // Hurtbox: the area the player's attacks can hit. Reaches the arm tips.
+  static const double hurtboxRadius = 108;
+  // Contact zone: the area that damages the player on touch.
+  // Covers the pumpkin's body (about 65 pixels), but not the arms.
+  static const double contactRadius = 55;
+
   int stateChooser = 0;
   int attackCounter = 0;
   late double health;
   double attackCooldown = 1;
-  late double hitboxRadius;
   double moveSpeed = 100;
   double multiPurposeTicker = 0;
   BossState bossState = BossState.Idle;
@@ -91,15 +97,15 @@ class BossEnemy extends SpriteComponent
     priority = 1;
     _loadAudio();
     sprite = await Sprite.load('Boss.png');
-    hitboxRadius = 108;
     add(
       CircleHitbox(
-        radius: hitboxRadius,
+        radius: hurtboxRadius,
         position: size / 2,
         anchor: Anchor.center,
         collisionType: CollisionType.active,
       ),
     );
+    add(BossContactZone(radius: contactRadius, position: size / 2));
     health = 200;
     for (Vector2 vector in eightDirectionsRotated) {
       vector.rotate(0.4124);
@@ -421,7 +427,25 @@ class BossEnemy extends SpriteComponent
 
   void _finishIntro() async {
     if (_gameStopped) return;
-    bgm =await SoLoud.instance.play(game.bossBGM, looping: true);
+    bgm = await SoLoud.instance.play(game.bossBGM, looping: true);
     introFinished = true;
+  }
+}
+
+// The area around the pumpkin's body that damages the player on touch.
+// It's its own component (instead of a second hitbox on the boss) so the
+// player can tell it apart from the boss's bigger hurtbox.
+// As a child of the boss, it moves and turns with the boss automatically.
+class BossContactZone extends PositionComponent with ParentIsA<BossEnemy> {
+  BossContactZone({required double radius, required super.position})
+    : super(size: Vector2.all(radius * 2), anchor: Anchor.center);
+
+  BossEnemy get boss => parent;
+
+  @override
+  FutureOr<void> onLoad() {
+    // Without a radius, the circle fills the whole component
+    add(CircleHitbox(collisionType: CollisionType.passive));
+    return super.onLoad();
   }
 }

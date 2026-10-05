@@ -310,8 +310,9 @@ class Player extends SpriteAnimationGroupComponent
         other.attackCooldown = 1;
         _takeHit();
       }
-      if (other is BossEnemy && other.attackCooldown <= 0) {
-        other.attackCooldown = 1;
+      // Only the boss's contact zone hurts, not its bigger hurtbox
+      if (other is BossContactZone && other.boss.attackCooldown <= 0) {
+        other.boss.attackCooldown = 1;
         _takeHit();
       }
     }
