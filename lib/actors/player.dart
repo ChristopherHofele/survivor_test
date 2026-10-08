@@ -394,6 +394,9 @@ class Player extends SpriteAnimationGroupComponent<PlayerAnimation>
           itemsToRemove.add(item);
           item.removeFromParent();
           money += item.worth;
+          if (item.isGift) {
+            game.world1.statue?.giftTaken(item);
+          }
           switch (item.type) {
             case ItemType.Cookie:
               break;

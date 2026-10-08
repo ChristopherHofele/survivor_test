@@ -33,7 +33,9 @@ String itemImagePath(ItemType type) => switch (type) {
 class Item extends SpriteAnimationComponent
     with HasGameReference<SurvivorTest> {
   final ItemType type;
-  Item({required position, required this.type})
+  // True for fruits offered by the lake statue
+  final bool isGift;
+  Item({required position, required this.type, this.isGift = false})
     : super(position: position - Vector2.all(25), size: Vector2.all(50));
 
   // Money the player gets for picking this item up

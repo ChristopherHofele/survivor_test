@@ -9,6 +9,7 @@ import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/components/fruit_tree.dart';
+import 'package:survivor_test/components/lake_statue.dart';
 import 'package:survivor_test/components/pressure_plate.dart';
 import 'package:survivor_test/components/spawners.dart';
 import 'package:survivor_test/survivor_test.dart';
@@ -28,6 +29,8 @@ class Level extends World with HasGameReference<SurvivorTest> {
 
   // The special tree in upgrade rooms (null in rooms without one)
   FruitTree? tree;
+  // The statue in the lake (only in Level 1)
+  LakeStatue? statue;
 
   late AudioSource Level1BGM;
   late AudioSource HealthBGM;
@@ -44,6 +47,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
     _addCollisions();
     _addSpawners();
     _addPressurePlates();
+    _addStatue();
     _changeBGM();
     _setUpCamera();
     player.isVisible = true;
@@ -253,6 +257,31 @@ class Level extends World with HasGameReference<SurvivorTest> {
         return;
       }
     }
+  }
+
+  // Reads the "Statue" layer: "DropOff" areas around the lake and the
+  // "Gift" point where the statue's fruits appear
+  void _addStatue() {
+    final statueLayer = level.tileMap.getLayer<ObjectGroup>('Statue');
+    if (statueLayer == null) return;
+    final dropOffZones = <PositionComponent>[];
+    Vector2? giftSpot;
+    for (final object in statueLayer.objects) {
+      switch (object.class_) {
+        case 'DropOff':
+          dropOffZones.add(
+            PositionComponent(
+              position: Vector2(object.x, object.y),
+              size: Vector2(object.width, object.height),
+            ),
+          );
+        case 'Gift':
+          giftSpot = Vector2(object.x, object.y);
+      }
+    }
+    if (dropOffZones.isEmpty || giftSpot == null) return;
+    statue = LakeStatue(dropOffZones: dropOffZones, giftSpot: giftSpot);
+    add(statue!);
   }
 
   void _addSpawners() {
