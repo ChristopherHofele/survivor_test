@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
-import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/overlays/door_price_display.dart';
 import 'package:survivor_test/survivor_test.dart';
 
@@ -121,21 +120,8 @@ class CollisionBlock extends PositionComponent
       }
       game.world1.add(doorPriceDisplay);
     }
-    switch (interactionType) {
-      case InteractionType.HealthShop:
-        _spawnFruit(ItemType.Apple);
-      case InteractionType.StaminaShop:
-        _spawnFruit(ItemType.Bananas);
-      case InteractionType.DamageShop:
-        _spawnFruit(ItemType.Cherries);
-      default:
-    }
+    // Shop objects no longer spawn fruit: they only mark where the room's
+    // tree drops its seed (see FruitTree)
     return super.onLoad();
-  }
-
-  void _spawnFruit(ItemType fruitType) {
-    Item fruit = Item(position: position, type: fruitType);
-    game.world1.add(fruit);
-    game.world1.items.add(fruit);
   }
 }
