@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="220">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="233">
  <tileset firstgid="1" source="survivor_test.tsx"/>
  <tileset firstgid="243" source="forrest.tsx"/>
  <tileset firstgid="507" source="enemy.tsx"/>
@@ -322,6 +322,19 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1243,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1814,1814,1814,1814,1814,1814,1814,0,0,1814,1814,0,0,0,0,0,0,0,0,0,0,1247,0,0,0,0,0,0,0,0
 </data>
  </layer>
+ <objectgroup id="6" name="Statue">
+  <object id="220" type="DropOff" x="656" y="896" width="336" height="16"/>
+  <object id="221" type="DropOff" x="992" y="880" width="16" height="16"/>
+  <object id="222" type="DropOff" x="1008" y="672" width="16" height="208"/>
+  <object id="223" type="DropOff" x="992" y="656" width="16" height="16"/>
+  <object id="224" x="976" y="640" width="16" height="16"/>
+  <object id="225" x="656" y="624" width="320" height="16"/>
+  <object id="226" type="DropOff" x="624" y="640" width="32" height="16"/>
+  <object id="227" type="DropOff" x="608" y="656" width="16" height="208"/>
+  <object id="228" type="DropOff" x="624" y="864" width="16" height="16"/>
+  <object id="229" type="DropOff" x="640" y="880" width="16" height="16"/>
+  <object id="232" type="Gift" x="944" y="1008"/>
+ </objectgroup>
  <objectgroup id="2" name="Collisions">
   <object id="65" type="Right" x="624" y="672" width="16" height="176"/>
   <object id="68" type="Down_Right" x="976" y="864" width="16" height="16"/>
