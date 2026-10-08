@@ -17,6 +17,19 @@ enum ItemType {
   CherrySeed,
 }
 
+// The image for each item type (also used by the HUD and door signs)
+String itemImagePath(ItemType type) => switch (type) {
+  ItemType.Cookie => 'Items/Fruits/cookie.png',
+  ItemType.Key => 'Items/Fruits/Key.png',
+  ItemType.Apple => 'Items/Fruits/Apple.png',
+  ItemType.Bananas => 'Items/Fruits/Bananas.png',
+  ItemType.Cherries => 'Items/Fruits/Cherries.png',
+  ItemType.Strawberry => 'Items/Fruits/Strawberry.png',
+  ItemType.AppleSeed => 'Apple_Seed.png',
+  ItemType.BananaSeed => 'Banana_Seed.png',
+  ItemType.CherrySeed => 'Cherry_Seed.png',
+};
+
 class Item extends SpriteAnimationComponent
     with HasGameReference<SurvivorTest> {
   final ItemType type;
@@ -30,18 +43,6 @@ class Item extends SpriteAnimationComponent
     ItemType.Apple || ItemType.Bananas || ItemType.Cherries => 5,
     ItemType.Strawberry => 10,
     ItemType.AppleSeed || ItemType.BananaSeed || ItemType.CherrySeed => 0,
-  };
-
-  String get _imagePath => switch (type) {
-    ItemType.Cookie => 'Items/Fruits/cookie.png',
-    ItemType.Key => 'Items/Fruits/Key.png',
-    ItemType.Apple => 'Items/Fruits/Apple.png',
-    ItemType.Bananas => 'Items/Fruits/Bananas.png',
-    ItemType.Cherries => 'Items/Fruits/Cherries.png',
-    ItemType.Strawberry => 'Items/Fruits/Strawberry.png',
-    ItemType.AppleSeed => 'Apple_Seed.png',
-    ItemType.BananaSeed => 'Banana_Seed.png',
-    ItemType.CherrySeed => 'Cherry_Seed.png',
   };
 
   @override
@@ -66,7 +67,7 @@ class Item extends SpriteAnimationComponent
         frameSize = Vector2.all(64);
         position += Vector2.all(9);
     }
-    animation = spriteSheetAnimation(game.images, _imagePath, frameSize);
+    animation = spriteSheetAnimation(game.images, itemImagePath(type), frameSize);
     return super.onLoad();
   }
 }

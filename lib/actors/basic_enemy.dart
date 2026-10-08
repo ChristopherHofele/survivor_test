@@ -662,9 +662,9 @@ class BasicEnemy extends SpriteAnimationComponent
       game.enemiesKilled += 1;
       final tree = game.world1.tree;
       if (tree != null && tree.canAbsorbAt(position)) {
-        // Killed next to a charging tree: the tree gets the kill
+        // Killed next to a charging tree: a soul flies to the tree
         // instead of a cookie dropping
-        tree.addCharge();
+        tree.sendSoulFrom(position);
       } else {
         _dropLoot();
       }

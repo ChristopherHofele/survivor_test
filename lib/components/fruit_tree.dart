@@ -4,7 +4,15 @@ import 'package:flame/components.dart';
 import 'package:flutter/painting.dart';
 
 import 'package:survivor_test/components/items.dart';
+import 'package:survivor_test/components/soul.dart';
 import 'package:survivor_test/survivor_test.dart';
+
+// Which seed each upgrade room's tree drops
+const Map<String, ItemType> roomSeeds = {
+  'Health.tmx': ItemType.AppleSeed,
+  'Stamina.tmx': ItemType.BananaSeed,
+  'Damage.tmx': ItemType.CherrySeed,
+};
 
 // The special tree in each upgrade room. Enemies killed near it charge it up;
 // once fully charged it drops the room's seed.
@@ -26,6 +34,9 @@ class FruitTree extends PositionComponent with HasGameReference<SurvivorTest> {
   });
 
   int charge = 0;
+  // Souls that are still flying here. They are counted so the tree doesn't
+  // take more kills than it needs while souls are on their way.
+  int _soulsOnTheWay = 0;
   late TextComponent _progressText;
 
   bool get isFullyCharged => charge >= killsToCharge;
@@ -45,14 +56,22 @@ class FruitTree extends PositionComponent with HasGameReference<SurvivorTest> {
     return super.onLoad();
   }
 
-  // Whether a kill at this point should charge the tree
+  // Whether a kill at this point should send a soul to the tree
   bool canAbsorbAt(Vector2 point) {
-    if (isFullyCharged) return false;
+    if (charge + _soulsOnTheWay >= killsToCharge) return false;
     final range = game.world1.level.width * chargeRangeOfRoomWidth;
     return absoluteCenter.distanceTo(point) <= range;
   }
 
-  void addCharge() {
+  // Called by an enemy that died nearby
+  void sendSoulFrom(Vector2 point) {
+    _soulsOnTheWay += 1;
+    game.world1.add(Soul(position: point.clone(), tree: this));
+  }
+
+  // Called by a soul when it reaches the tree
+  void receiveSoul() {
+    _soulsOnTheWay -= 1;
     if (isFullyCharged) return;
     charge += 1;
     _progressText.text = _progressLabel;

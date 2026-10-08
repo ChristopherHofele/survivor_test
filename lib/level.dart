@@ -233,14 +233,16 @@ class Level extends World with HasGameReference<SurvivorTest> {
   }
 
   void _addTree(TiledObject treeObject) {
+    final seedType = roomSeeds[tileMapName];
+    if (seedType == null) return;
+    const shopTypes = {
+      InteractionType.HealthShop,
+      InteractionType.StaminaShop,
+      InteractionType.DamageShop,
+    };
+    // The seed drops at the room's shop object (where the fruit used to be)
     for (final block in collisionBlocks) {
-      final seedType = switch (block.interactionType) {
-        InteractionType.HealthShop => ItemType.AppleSeed,
-        InteractionType.StaminaShop => ItemType.BananaSeed,
-        InteractionType.DamageShop => ItemType.CherrySeed,
-        _ => null,
-      };
-      if (seedType != null) {
+      if (shopTypes.contains(block.interactionType)) {
         tree = FruitTree(
           position: Vector2(treeObject.x, treeObject.y),
           size: Vector2(treeObject.width, treeObject.height),

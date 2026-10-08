@@ -8,6 +8,7 @@ import 'package:survivor_test/actors/basic_enemy.dart';
 import 'package:survivor_test/actors/boss_enemy.dart';
 import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/collision_block.dart';
+import 'package:survivor_test/components/fruit_tree.dart';
 import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/components/lightning_ball.dart';
 import 'package:survivor_test/components/lightning_chain.dart';
@@ -107,13 +108,17 @@ class Player extends SpriteAnimationGroupComponent<PlayerAnimation>
   bool canDash = true;
   bool isAttacking = false;
   bool allowedTeleportation = false;
-  bool hasFruit = false;
+  // Set by eating the boss's strawberry; needed to leave the boss room
+  bool ateStrawberry = false;
   bool hasKey = false;
   bool inside = false;
   bool zapFinished = false;
   bool isCharacterSetUp = false;
 
   KeyDisplay keyDisplay = KeyDisplay();
+
+  // The seeds the player is carrying (at most one of each kind)
+  final Set<ItemType> seeds = {};
 
   late AudioSource gotHitSoundPlayer;
   late AudioSource explosionSound;
@@ -227,15 +232,17 @@ class Player extends SpriteAnimationGroupComponent<PlayerAnimation>
           case InteractionType.Portal:
             switch (block.destinationName) {
               case 'Level1.tmx':
-                if (hasFruit) {
+                if (_canLeaveRoom()) {
                   allowedTeleportation = true;
-                  hasFruit = false;
                 }
                 break;
               case 'Health.tmx':
               case 'Stamina.tmx':
               case 'Damage.tmx':
-                if (money >= block.entryCost) {
+                // The door stays closed while carrying this room's seed:
+                // it has to be planted first
+                final roomSeed = roomSeeds[block.destinationName];
+                if (money >= block.entryCost && !seeds.contains(roomSeed)) {
                   allowedTeleportation = true;
                   money -= block.entryCost;
                   if (game.doorsOpened < 3) {
@@ -392,20 +399,17 @@ class Player extends SpriteAnimationGroupComponent<PlayerAnimation>
               break;
             case ItemType.Apple:
               maxHealth += 100;
-              hasFruit = true;
               await SoLoud.instance.play(eatFruitSound);
             case ItemType.Bananas:
               staminaDrain -= 10;
-              hasFruit = true;
               await SoLoud.instance.play(eatFruitSound);
             case ItemType.Cherries:
               maxAttackCooldown = maxAttackCooldown * 0.5;
               projectileMaximumHits += 1;
-              hasFruit = true;
               await SoLoud.instance.play(eatFruitSound);
             case ItemType.Strawberry:
               _packAPunch();
-              hasFruit = true;
+              ateStrawberry = true;
               await SoLoud.instance.play(eatFruitSound);
             case ItemType.Key:
               hasKey = true;
@@ -413,8 +417,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerAnimation>
             case ItemType.AppleSeed:
             case ItemType.BananaSeed:
             case ItemType.CherrySeed:
-              // TODO (seed step 4): carry the seed and show it on the HUD
-              break;
+              seeds.add(item.type);
           }
         }
       }
@@ -422,6 +425,20 @@ class Player extends SpriteAnimationGroupComponent<PlayerAnimation>
         game.world1.items.remove(item);
       }
     }
+  }
+
+  // Upgrade rooms can only be left with the room's seed,
+  // the boss room only after eating the strawberry
+  bool _canLeaveRoom() {
+    final tree = game.world1.tree;
+    if (tree != null) {
+      return seeds.contains(tree.seedType);
+    }
+    if (ateStrawberry) {
+      ateStrawberry = false;
+      return true;
+    }
+    return false;
   }
 
   void _packAPunch() {

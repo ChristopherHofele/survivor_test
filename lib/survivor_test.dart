@@ -10,6 +10,7 @@ import 'package:survivor_test/overlays/dash_button.dart';
 import 'package:survivor_test/overlays/health_display.dart';
 import 'package:survivor_test/level.dart';
 import 'package:survivor_test/overlays/money_display.dart';
+import 'package:survivor_test/overlays/seed_display.dart';
 
 class SurvivorTest extends FlameGame
     with DragCallbacks, HasCollisionDetection, TapCallbacks {
@@ -87,6 +88,7 @@ class SurvivorTest extends FlameGame
     addControls();
     addHearts();
     addMoney();
+    camera.viewport.add(SeedDisplay());
     gotHitSoundEnemy = await SoLoud.instance.loadAsset(
       'assets/audio/Sword Blocked 1.wav',
       mode: LoadMode.memory,

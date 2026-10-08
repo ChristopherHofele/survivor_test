@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flame/components.dart';
 
+import 'package:survivor_test/components/fruit_tree.dart';
+import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/survivor_test.dart';
 
 class DoorPriceDisplay extends PositionComponent
@@ -45,20 +47,28 @@ class DoorPriceDisplay extends PositionComponent
           priceLoaded = true;
         }
         break;
+      // Upgrade rooms: the exit needs the room's seed
       case 'Health.tmx':
-        _addRequiredFruitComponent('Apple');
-        break;
       case 'Stamina.tmx':
-        _addRequiredFruitComponent('Bananas');
-        break;
       case 'Damage.tmx':
-        _addRequiredFruitComponent('Cherries');
+        _addRequiredSeedComponent(roomSeeds[worldName]!);
         break;
       case 'Bossroom.tmx':
         _addRequiredFruitComponent('Strawberry');
         break;
       default:
     }
+  }
+
+  void _addRequiredSeedComponent(ItemType seed) {
+    _requiredFruitComponent = SpriteComponent.fromImage(
+      game.images.fromCache(itemImagePath(seed)),
+      position: position,
+      // Seed images are 64 x 64; shown at the same size as the fruit icons
+      size: Vector2.all(32),
+      anchor: Anchor.center,
+    );
+    game.world1.add(_requiredFruitComponent);
   }
 
   @override
