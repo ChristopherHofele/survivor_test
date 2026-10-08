@@ -123,18 +123,19 @@ class CollisionBlock extends PositionComponent
     }
     switch (interactionType) {
       case InteractionType.HealthShop:
+        _spawnFruit(ItemType.Apple);
       case InteractionType.StaminaShop:
+        _spawnFruit(ItemType.Bananas);
       case InteractionType.DamageShop:
-        Item fruit = Item(
-          position: position,
-          worldName: game.world1.tileMapName,
-          worth: 5,
-        );
-        game.world1.add(fruit);
-        game.world1.items.add(fruit);
-        break;
+        _spawnFruit(ItemType.Cherries);
       default:
     }
     return super.onLoad();
+  }
+
+  void _spawnFruit(ItemType fruitType) {
+    Item fruit = Item(position: position, type: fruitType);
+    game.world1.add(fruit);
+    game.world1.items.add(fruit);
   }
 }

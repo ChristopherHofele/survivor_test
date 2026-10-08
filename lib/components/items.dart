@@ -2,66 +2,71 @@ import 'dart:async';
 
 import 'package:flame/components.dart';
 
+import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/survivor_test.dart';
+
+enum ItemType {
+  Cookie,
+  Key,
+  Apple,
+  Bananas,
+  Cherries,
+  Strawberry,
+  AppleSeed,
+  BananaSeed,
+  CherrySeed,
+}
 
 class Item extends SpriteAnimationComponent
     with HasGameReference<SurvivorTest> {
-  final int worth;
-  late String worldName;
-  Item({required position, this.worldName = '', this.worth = 1})
+  final ItemType type;
+  Item({required position, required this.type})
     : super(position: position - Vector2.all(25), size: Vector2.all(50));
 
-  String spriteName = '';
-  late int amount;
-  late Vector2 textureSize;
-  late double stepTime;
+  // Money the player gets for picking this item up
+  int get worth => switch (type) {
+    ItemType.Cookie => 1,
+    ItemType.Key => 0,
+    ItemType.Apple || ItemType.Bananas || ItemType.Cherries => 5,
+    ItemType.Strawberry => 10,
+    ItemType.AppleSeed || ItemType.BananaSeed || ItemType.CherrySeed => 0,
+  };
+
+  String get _imagePath => switch (type) {
+    ItemType.Cookie => 'Items/Fruits/cookie.png',
+    ItemType.Key => 'Items/Fruits/Key.png',
+    ItemType.Apple => 'Items/Fruits/Apple.png',
+    ItemType.Bananas => 'Items/Fruits/Bananas.png',
+    ItemType.Cherries => 'Items/Fruits/Cherries.png',
+    ItemType.Strawberry => 'Items/Fruits/Strawberry.png',
+    ItemType.AppleSeed => 'Apple_Seed.png',
+    ItemType.BananaSeed => 'Banana_Seed.png',
+    ItemType.CherrySeed => 'Cherry_Seed.png',
+  };
 
   @override
   FutureOr<void> onLoad() {
-    _determineSprite();
-    animation = SpriteAnimation.fromFrameData(
-      game.images.fromCache('Items/Fruits/${this.spriteName}.png'),
-      SpriteAnimationData.sequenced(
-        amount: amount,
-        textureSize: textureSize,
-        stepTime: stepTime,
-      ),
-    );
-    return super.onLoad();
-  }
-
-  void _determineSprite() {
-    if (worth == 1) {
-      spriteName = 'cookie';
-      amount = 8;
-      textureSize = Vector2.all(32);
-      stepTime = 0.12;
-    } else if (worth == 0) {
-      spriteName = 'Key';
-      amount = 25;
-      textureSize = Vector2(10, 27);
-      size = textureSize;
-      stepTime = 0.12;
-    } else {
-      switch (worldName) {
-        case 'Health.tmx':
-          spriteName = 'Apple';
-          break;
-        case 'Stamina.tmx':
-          spriteName = 'Bananas';
-          break;
-        case 'Damage.tmx':
-          spriteName = 'Cherries';
-          break;
-        case 'Bossroom.tmx':
-          spriteName = 'Strawberry';
-          break;
-        default:
-      }
-      amount = 17;
-      textureSize = Vector2.all(32);
-      stepTime = 0.12;
-      position += Vector2.all(9);
+    final Vector2 frameSize;
+    switch (type) {
+      case ItemType.Cookie:
+        frameSize = Vector2.all(32);
+      case ItemType.Key:
+        frameSize = Vector2(10, 27);
+        size = frameSize.clone();
+      case ItemType.Apple:
+      case ItemType.Bananas:
+      case ItemType.Cherries:
+      case ItemType.Strawberry:
+        frameSize = Vector2.all(32);
+        position += Vector2.all(9);
+      case ItemType.AppleSeed:
+      case ItemType.BananaSeed:
+      case ItemType.CherrySeed:
+        // Seeds are single 64 x 64 images, drawn at the item's size
+        frameSize = Vector2.all(64);
+        position += Vector2.all(9);
     }
+    animation = spriteSheetAnimation(game.images, _imagePath, frameSize);
+    return super.onLoad();
   }
 }

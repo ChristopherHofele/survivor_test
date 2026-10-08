@@ -660,16 +660,14 @@ class BasicEnemy extends SpriteAnimationComponent
       game.enemyCount -= 1;
       game.world1.enemiesDefeated += 1;
       game.enemiesKilled += 1;
-      int worth = 1;
-      if (game.keyCanSpawn && game.world1.tileMapName == 'Level1.tmx') {
-        int spawnParlay = random.nextInt(game.keySpawnrate);
-        if (spawnParlay == 1) {
-          worth = 0;
-        }
+      final tree = game.world1.tree;
+      if (tree != null && tree.canAbsorbAt(position)) {
+        // Killed next to a charging tree: the tree gets the kill
+        // instead of a cookie dropping
+        tree.addCharge();
+      } else {
+        _dropLoot();
       }
-      Item loot = Item(position: position, worth: worth);
-      game.world1.add(loot);
-      game.world1.items.add(loot);
       game.world1.remove(this);
     } else if (game.world1.tileMapName == 'Stamina.tmx' &&
         enemyType == EnemyType.Small &&
@@ -677,6 +675,19 @@ class BasicEnemy extends SpriteAnimationComponent
       game.enemyCount -= 1;
       game.world1.remove(this);
     }
+  }
+
+  void _dropLoot() {
+    ItemType lootType = ItemType.Cookie;
+    if (game.keyCanSpawn && game.world1.tileMapName == 'Level1.tmx') {
+      int spawnParlay = random.nextInt(game.keySpawnrate);
+      if (spawnParlay == 1) {
+        lootType = ItemType.Key;
+      }
+    }
+    Item loot = Item(position: position, type: lootType);
+    game.world1.add(loot);
+    game.world1.items.add(loot);
   }
 
   double setMediumHealth() {

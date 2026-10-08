@@ -412,12 +412,7 @@ class BossEnemy extends SpriteComponent
       SoLoud.instance.play(game.victorySound);
       game.enemyCount -= 1;
       game.bossesDefeated += 1;
-      int worth = 10;
-      Item loot = Item(
-        position: position,
-        worldName: 'Bossroom.tmx',
-        worth: worth,
-      );
+      Item loot = Item(position: position, type: ItemType.Strawberry);
 
       game.world1.add(loot);
       game.world1.items.add(loot);

@@ -5,9 +5,9 @@
     },
     "activeFile": "Level1.tmx",
     "expandedProjectPaths": [
-        "Spring",
         ".",
-        "Summer"
+        "Summer",
+        "Spring"
     ],
     "fileStates": {
         "Bossroom.tmx": {
@@ -15,7 +15,7 @@
             "selectedLayer": 5,
             "viewCenter": {
                 "x": 640.3333333333333,
-                "y": 480.33333333333337
+                "y": 480
             }
         },
         "Damage.tmx": {
@@ -24,10 +24,10 @@
                 4
             ],
             "scale": 0.75,
-            "selectedLayer": 2,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 640.6666666666666,
-                "y": 480
+                "x": 385.99999999999994,
+                "y": 478.6666666666667
             }
         },
         "Fall_Tiles.tsx": {
@@ -48,13 +48,14 @@
         },
         "Health.tmx": {
             "expandedObjectLayers": [
+                2,
                 3
             ],
             "scale": 1,
-            "selectedLayer": 1,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 640.5,
-                "y": 480
+                "x": 1212.5,
+                "y": 481
             }
         },
         "Level1.tmx": {
@@ -65,8 +66,8 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 797,
-                "y": 726.3333333333333
+                "x": 964.3333333333333,
+                "y": 1146.6666666666665
             }
         },
         "Spring/Spring_Cliff.tsx": {
@@ -83,10 +84,10 @@
                 6
             ],
             "scale": 1.5,
-            "selectedLayer": 5,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 640.3333333333333,
-                "y": 480
+                "x": 649,
+                "y": 344.66666666666663
             }
         },
         "Statue.tsx": {

@@ -387,34 +387,34 @@ class Player extends SpriteAnimationGroupComponent<PlayerAnimation>
           itemsToRemove.add(item);
           item.removeFromParent();
           money += item.worth;
-          if (item.worth != 1) {
-            switch (item.spriteName) {
-              case 'Apple':
-                maxHealth += 100;
-                hasFruit = true;
-                await SoLoud.instance.play(eatFruitSound);
-                break;
-              case 'Bananas':
-                staminaDrain -= 10;
-                hasFruit = true;
-                await SoLoud.instance.play(eatFruitSound);
-                break;
-              case 'Cherries':
-                maxAttackCooldown = maxAttackCooldown * 0.5;
-                projectileMaximumHits += 1;
-                hasFruit = true;
-                await SoLoud.instance.play(eatFruitSound);
-                break;
-              case 'Strawberry':
-                _packAPunch();
-                hasFruit = true;
-                await SoLoud.instance.play(eatFruitSound);
-              case 'Key':
-                hasKey = true;
-                game.camera.viewport.add(keyDisplay);
-
-              default:
-            }
+          switch (item.type) {
+            case ItemType.Cookie:
+              break;
+            case ItemType.Apple:
+              maxHealth += 100;
+              hasFruit = true;
+              await SoLoud.instance.play(eatFruitSound);
+            case ItemType.Bananas:
+              staminaDrain -= 10;
+              hasFruit = true;
+              await SoLoud.instance.play(eatFruitSound);
+            case ItemType.Cherries:
+              maxAttackCooldown = maxAttackCooldown * 0.5;
+              projectileMaximumHits += 1;
+              hasFruit = true;
+              await SoLoud.instance.play(eatFruitSound);
+            case ItemType.Strawberry:
+              _packAPunch();
+              hasFruit = true;
+              await SoLoud.instance.play(eatFruitSound);
+            case ItemType.Key:
+              hasKey = true;
+              game.camera.viewport.add(keyDisplay);
+            case ItemType.AppleSeed:
+            case ItemType.BananaSeed:
+            case ItemType.CherrySeed:
+              // TODO (seed step 4): carry the seed and show it on the HUD
+              break;
           }
         }
       }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="80" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="179">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="80" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="182">
  <tileset firstgid="1" source="forrest.tsx"/>
  <tileset firstgid="265" source="survivor_test.tsx"/>
  <tileset firstgid="507" source="Fall_Tiles.tsx"/>
@@ -419,6 +419,7 @@
   <object id="173" x="512" y="0" width="224" height="16"/>
   <object id="174" x="496" y="16" width="16" height="16"/>
   <object id="175" type="Stamina_Shop" x="672" y="288" width="16" height="16"/>
+  <object id="181" type="Tree" x="672" y="256" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="6" name="Spawners">
   <object id="169" type="Up_Left" x="528" y="208" width="32" height="32"/>

@@ -8,6 +8,7 @@ import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/components/collision_block.dart';
+import 'package:survivor_test/components/fruit_tree.dart';
 import 'package:survivor_test/components/pressure_plate.dart';
 import 'package:survivor_test/components/spawners.dart';
 import 'package:survivor_test/survivor_test.dart';
@@ -24,6 +25,9 @@ class Level extends World with HasGameReference<SurvivorTest> {
   List<PressurePlate> pressurePlates = [];
 
   List<Item> items = [];
+
+  // The special tree in upgrade rooms (null in rooms without one)
+  FruitTree? tree;
 
   late AudioSource Level1BGM;
   late AudioSource HealthBGM;
@@ -68,6 +72,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
   }
 
   void _addCollisions() {
+    TiledObject? treeObject;
     final collisionsLayer = level.tileMap.getLayer<ObjectGroup>('Collisions');
     if (collisionsLayer != null) {
       for (final collision in collisionsLayer.objects) {
@@ -207,6 +212,10 @@ class Level extends World with HasGameReference<SurvivorTest> {
             collisionBlocks.add(block);
             add(block);
             break;
+          case 'Tree':
+            // Only a marker, not a wall: the tree is set up after the loop,
+            // once the room's shop object (where the seed drops) is known
+            treeObject = collision;
           default:
             final block = CollisionBlock(
               position: Vector2(collision.x, collision.y),
@@ -218,6 +227,30 @@ class Level extends World with HasGameReference<SurvivorTest> {
       }
     }
     player.collisionBlocks = collisionBlocks;
+    if (treeObject != null) {
+      _addTree(treeObject);
+    }
+  }
+
+  void _addTree(TiledObject treeObject) {
+    for (final block in collisionBlocks) {
+      final seedType = switch (block.interactionType) {
+        InteractionType.HealthShop => ItemType.AppleSeed,
+        InteractionType.StaminaShop => ItemType.BananaSeed,
+        InteractionType.DamageShop => ItemType.CherrySeed,
+        _ => null,
+      };
+      if (seedType != null) {
+        tree = FruitTree(
+          position: Vector2(treeObject.x, treeObject.y),
+          size: Vector2(treeObject.width, treeObject.height),
+          seedType: seedType,
+          seedSpot: block.position,
+        );
+        add(tree!);
+        return;
+      }
+    }
   }
 
   void _addSpawners() {
