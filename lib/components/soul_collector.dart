@@ -7,13 +7,14 @@ import 'package:survivor_test/components/soul.dart';
 import 'package:survivor_test/survivor_test.dart';
 
 // Something that is charged up by the souls of nearby kills and does
-// something once it's full (the fruit trees, later the lake statue).
+// something once it's full (the fruit trees and the lake statue).
 // It shows its progress (e.g. "3/10") above itself.
 //
 // A class that extends this decides:
 //  - soulsNeeded: how many souls it takes
 //  - isInRange: which kills count
 //  - onFullyCharged: what happens when it's full
+//  - isCollecting (optional): whether it accepts souls right now
 abstract class SoulCollector extends PositionComponent
     with HasGameReference<SurvivorTest> {
   SoulCollector({required super.position, required super.size});
@@ -21,6 +22,9 @@ abstract class SoulCollector extends PositionComponent
   int get soulsNeeded;
   bool isInRange(Vector2 point);
   void onFullyCharged();
+  // Collectors that are only sometimes active (like the statue) override this.
+  // While it's false, no souls come and the progress text is hidden.
+  bool get isCollecting => true;
 
   int charge = 0;
   // Souls that are still flying here. They are counted so the collector
@@ -34,7 +38,7 @@ abstract class SoulCollector extends PositionComponent
   @override
   FutureOr<void> onLoad() {
     _progressText = TextComponent(
-      text: _progressLabel,
+      text: isCollecting ? _progressLabel : '',
       anchor: Anchor.bottomCenter,
       position: Vector2(size.x / 2, -4),
       textRenderer: TextPaint(
@@ -47,6 +51,7 @@ abstract class SoulCollector extends PositionComponent
 
   // Whether a kill at this point should send a soul here
   bool canAbsorbAt(Vector2 point) {
+    if (!isCollecting) return false;
     if (charge + _soulsOnTheWay >= soulsNeeded) return false;
     return isInRange(point);
   }
@@ -62,9 +67,20 @@ abstract class SoulCollector extends PositionComponent
     _soulsOnTheWay -= 1;
     if (isFullyCharged) return;
     charge += 1;
-    _progressText.text = _progressLabel;
+    refreshProgress();
     if (isFullyCharged) {
       onFullyCharged();
     }
+  }
+
+  // Starts counting from 0 again
+  void resetCharge() {
+    charge = 0;
+    refreshProgress();
+  }
+
+  // Updates the progress text, e.g. after isCollecting changed
+  void refreshProgress() {
+    _progressText.text = isCollecting ? _progressLabel : '';
   }
 }

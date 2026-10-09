@@ -5,7 +5,6 @@ import 'package:flutter/painting.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 
 import 'package:survivor_test/actors/player.dart';
-import 'package:survivor_test/components/fruit_tree.dart';
 import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/overlays/attack_button.dart';
 import 'package:survivor_test/overlays/dash_button.dart';
@@ -30,7 +29,6 @@ class SurvivorTest extends FlameGame
   int enemyBaseHealth = 10;
   int frames = 0;
   int doorsOpened = 0;
-  int keySpawnrate = 2;
   int enemyThresholdsBroken = 0;
 
   // Stats for the game over scoreboard
@@ -62,9 +60,7 @@ class SurvivorTest extends FlameGame
   bool hasBeenToDamage = false;
   bool hasBeenToStamina = false;
   bool hasBeenToHealth = false;
-  bool keyCanSpawn = false;
-
-  // Seed kinds planted at the lake statue so far (for the boss key)
+  // Seed kinds planted at the lake statue towards its next activation
   final Set<ItemType> plantedSeeds = {};
   // Fruits the statue has offered that haven't been picked up yet.
   // Kept here so they're still there after leaving Level 1 and coming back.
@@ -121,7 +117,6 @@ class SurvivorTest extends FlameGame
     }
 
     _updateHearts();
-    _determineKeyCanSpawn();
     _updateMaxEnemyCount();
 
     super.update(dt);
@@ -200,13 +195,6 @@ class SurvivorTest extends FlameGame
 
   void resetMaxEnemyCount() {
     maxEnemyCount = 12;
-  }
-
-  // The key drops once every kind of seed has been planted,
-  // and only while the player isn't already carrying it
-  void _determineKeyCanSpawn() {
-    final allSeedsPlanted = plantedSeeds.containsAll(roomSeeds.values);
-    keyCanSpawn = allSeedsPlanted && !player.hasKey;
   }
 
   void _updateMaxEnemyCount() {

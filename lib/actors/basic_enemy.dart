@@ -660,13 +660,13 @@ class BasicEnemy extends SpriteAnimationComponent
       game.enemyCount -= 1;
       game.world1.enemiesDefeated += 1;
       game.enemiesKilled += 1;
-      final tree = game.world1.tree;
-      if (tree != null && tree.canAbsorbAt(position)) {
-        // Killed next to a charging tree: a soul flies to the tree
-        // instead of a cookie dropping
-        tree.sendSoulFrom(position);
+      final collector = game.world1.soulCollector;
+      if (collector != null && collector.canAbsorbAt(position)) {
+        // Killed in range of a charging tree or the active statue:
+        // a soul flies there instead of a cookie dropping
+        collector.sendSoulFrom(position);
       } else {
-        _dropLoot();
+        _dropCookie();
       }
       game.world1.remove(this);
     } else if (game.world1.tileMapName == 'Stamina.tmx' &&
@@ -677,17 +677,10 @@ class BasicEnemy extends SpriteAnimationComponent
     }
   }
 
-  void _dropLoot() {
-    ItemType lootType = ItemType.Cookie;
-    if (game.keyCanSpawn && game.world1.tileMapName == 'Level1.tmx') {
-      int spawnParlay = random.nextInt(game.keySpawnrate);
-      if (spawnParlay == 1) {
-        lootType = ItemType.Key;
-      }
-    }
-    Item loot = Item(position: position, type: lootType);
-    game.world1.add(loot);
-    game.world1.items.add(loot);
+  void _dropCookie() {
+    Item cookie = Item(position: position, type: ItemType.Cookie);
+    game.world1.add(cookie);
+    game.world1.items.add(cookie);
   }
 
   double setMediumHealth() {

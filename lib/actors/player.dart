@@ -230,6 +230,10 @@ class Player extends SpriteAnimationGroupComponent<PlayerAnimation>
           case InteractionType.StaminaShop:
             break;
           case InteractionType.Portal:
+            // While the statue event runs, no door in Level 1 opens
+            if (game.world1.statue?.isLockingLevel ?? false) {
+              break;
+            }
             switch (block.destinationName) {
               case 'Level1.tmx':
                 if (_canLeaveRoom()) {
@@ -417,6 +421,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerAnimation>
             case ItemType.Key:
               hasKey = true;
               game.camera.viewport.add(keyDisplay);
+              game.world1.statue?.keyCollected();
             case ItemType.AppleSeed:
             case ItemType.BananaSeed:
             case ItemType.CherrySeed:

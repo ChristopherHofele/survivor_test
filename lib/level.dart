@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' show max, min;
 
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
@@ -10,6 +11,7 @@ import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/components/fruit_tree.dart';
 import 'package:survivor_test/components/lake_statue.dart';
+import 'package:survivor_test/components/soul_collector.dart';
 import 'package:survivor_test/components/pressure_plate.dart';
 import 'package:survivor_test/components/spawners.dart';
 import 'package:survivor_test/survivor_test.dart';
@@ -31,6 +33,9 @@ class Level extends World with HasGameReference<SurvivorTest> {
   FruitTree? tree;
   // The statue in the lake (only in Level 1)
   LakeStatue? statue;
+  // Whatever souls fly to in this level: the tree in an upgrade room,
+  // the statue in Level 1, nothing in the boss room
+  SoulCollector? get soulCollector => tree ?? statue;
 
   late AudioSource Level1BGM;
   late AudioSource HealthBGM;
@@ -280,7 +285,18 @@ class Level extends World with HasGameReference<SurvivorTest> {
       }
     }
     if (dropOffZones.isEmpty || giftSpot == null) return;
-    statue = LakeStatue(dropOffZones: dropOffZones, giftSpot: giftSpot);
+    // The statue covers the area around the lake: from the left/top-most
+    // DropOff edge to the right/bottom-most one
+    final left = dropOffZones.map((zone) => zone.x).reduce(min);
+    final top = dropOffZones.map((zone) => zone.y).reduce(min);
+    final right = dropOffZones.map((zone) => zone.x + zone.width).reduce(max);
+    final bottom = dropOffZones.map((zone) => zone.y + zone.height).reduce(max);
+    statue = LakeStatue(
+      position: Vector2(left, top),
+      size: Vector2(right - left, bottom - top),
+      dropOffZones: dropOffZones,
+      giftSpot: giftSpot,
+    );
     add(statue!);
   }
 
