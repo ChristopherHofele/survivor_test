@@ -25,10 +25,10 @@ class SurvivorTest extends FlameGame
 
   // ---- Testing shortcuts: set back to false before committing ----
   // Start the game carrying all three seeds (touch the lake to plant them)
-  static const bool debugStartWithAllSeeds = false;
+  static const bool debugStartWithAllSeeds = true;
   // Level 1 spawns all three enemy types, each with the same chance,
   // without having visited the Stamina and Damage rooms first
-  static const bool debugAllEnemyTypesInLevel1 = false;
+  static const bool debugAllEnemyTypesInLevel1 = true;
 
   int heartAmount = 0;
   int enemyCount = 0;
@@ -84,9 +84,7 @@ class SurvivorTest extends FlameGame
   @override
   Future<void> onLoad() async {
     _initializeLists();
-    player = Player(
-      position: Vector2(960, 1020),
-    );
+    player = Player(position: Vector2(960, 1020));
     await images.loadAllImages();
 
     // No fixed resolution: the camera follows the screen's real size, even if

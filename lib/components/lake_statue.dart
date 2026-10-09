@@ -9,6 +9,7 @@ import 'package:survivor_test/actors/utils.dart';
 import 'package:survivor_test/components/charge_zone.dart';
 import 'package:survivor_test/components/fruit_tree.dart';
 import 'package:survivor_test/components/items.dart';
+import 'package:survivor_test/components/lob.dart';
 import 'package:survivor_test/components/soul_collector.dart';
 import 'package:survivor_test/components/statue_orb.dart';
 
@@ -21,7 +22,7 @@ const Map<ItemType, ItemType> seedFruits = {
 
 // The statue in the lake in Level 1.
 //  - Touching the lake ("DropOff" areas in the map) plants every seed the
-//    player carries; for each seed the statue offers the matching fruit at
+//    player carries; for each seed the statue throws the matching fruit to
 //    the "Gift" spot.
 //  - Once one seed of each kind has been planted, the statue activates:
 //    every kill in Level 1 sends it a soul, and Level 1 is locked until the
@@ -89,8 +90,8 @@ class LakeStatue extends SoulCollector {
         : zoneSpots[_random.nextInt(zoneSpots.length)];
     game.world1.add(
       StatueOrb(
-        start: absoluteCenter,
-        target: landingSpot,
+        from: absoluteCenter,
+        landingSpot: landingSpot,
         onLanded: () => _createZone(landingSpot),
       ),
     );
@@ -135,7 +136,7 @@ class LakeStatue extends SoulCollector {
       game.plantedSeeds.add(seed);
       final fruit = seedFruits[seed]!;
       game.waitingGifts.add(fruit);
-      _placeGift(fruit);
+      _placeGift(fruit, thrown: true);
     }
     player.seeds.clear();
     _playPlantingEffect();
@@ -157,7 +158,9 @@ class LakeStatue extends SoulCollector {
     isLockingLevel = false;
   }
 
-  void _placeGift(ItemType fruit) {
+  // thrown: the fruit flies from the statue to its spot (when planting).
+  // Otherwise it's simply placed there (fruits waiting from earlier).
+  void _placeGift(ItemType fruit, {bool thrown = false}) {
     int slot = _giftSlots.indexOf(null);
     if (slot == -1) {
       slot = _giftSlots.length;
@@ -170,7 +173,14 @@ class LakeStatue extends SoulCollector {
     );
     _giftSlots[slot] = gift;
     game.world1.add(gift);
-    game.world1.items.add(gift);
+    if (thrown) {
+      // It can only be picked up once it has landed
+      gift.add(
+        Lob(from: absoluteCenter, onLanded: () => game.world1.items.add(gift)),
+      );
+    } else {
+      game.world1.items.add(gift);
+    }
   }
 
   // Called by the player when picking up one of the statue's fruits
