@@ -23,6 +23,10 @@ class SurvivorTest extends FlameGame
   // higher numbers zoom in further
   static const double cameraZoom = 1.25;
 
+  // ---- Testing shortcuts: set back to false before committing ----
+  // Start the game carrying all three seeds (touch the lake to plant them)
+  static const bool debugStartWithAllSeeds = true;
+
   int heartAmount = 0;
   int enemyCount = 0;
   int maxEnemyCount = 12;

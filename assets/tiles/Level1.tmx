@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="234">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="238">
  <tileset firstgid="1" source="survivor_test.tsx"/>
  <tileset firstgid="243" source="forrest.tsx"/>
  <tileset firstgid="507" source="enemy.tsx"/>
@@ -334,6 +334,18 @@
   <object id="228" type="DropOff" x="624" y="864" width="16" height="16"/>
   <object id="229" type="DropOff" x="640" y="880" width="16" height="16"/>
   <object id="232" type="Gift" x="944" y="1008"/>
+  <object id="234" type="ZoneSpot" x="1184" y="736">
+   <point/>
+  </object>
+  <object id="235" type="ZoneSpot" x="816" y="448">
+   <point/>
+  </object>
+  <object id="236" type="ZoneSpot" x="416" y="752">
+   <point/>
+  </object>
+  <object id="237" type="ZoneSpot" x="848" y="1104">
+   <point/>
+  </object>
  </objectgroup>
  <objectgroup id="2" name="Collisions">
   <object id="65" type="Right" x="624" y="672" width="16" height="176"/>

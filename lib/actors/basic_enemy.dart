@@ -660,8 +660,12 @@ class BasicEnemy extends SpriteAnimationComponent
       game.enemyCount -= 1;
       game.world1.enemiesDefeated += 1;
       game.enemiesKilled += 1;
+      final statue = game.world1.statue;
       final collector = game.world1.soulCollector;
-      if (collector != null && collector.canAbsorbAt(position)) {
+      if (statue != null && statue.isInChargeZone(position)) {
+        // Killed inside the statue's zone
+        statue.enemyKilledInZone(position);
+      } else if (collector != null && collector.canAbsorbAt(position)) {
         // Killed in range of a charging tree or the active statue:
         // a soul flies there instead of a cookie dropping
         collector.sendSoulFrom(position);

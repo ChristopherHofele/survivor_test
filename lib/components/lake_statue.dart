@@ -1,13 +1,16 @@
 import 'dart:async';
+import 'dart:math' show Random;
 import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 
 import 'package:survivor_test/actors/utils.dart';
+import 'package:survivor_test/components/charge_zone.dart';
 import 'package:survivor_test/components/fruit_tree.dart';
 import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/components/soul_collector.dart';
+import 'package:survivor_test/components/statue_orb.dart';
 
 // Which fruit the statue gives for each planted seed
 const Map<ItemType, ItemType> seedFruits = {
@@ -23,6 +26,8 @@ const Map<ItemType, ItemType> seedFruits = {
 //  - Once one seed of each kind has been planted, the statue activates:
 //    every kill in Level 1 sends it a soul, and Level 1 is locked until the
 //    key has been collected.
+//  - Fully charged, it throws an orb to one of the "ZoneSpot" points, which
+//    creates a zone. An enemy killed inside the zone is charged.
 // Its position and size are the area around the lake (all DropOff areas).
 class LakeStatue extends SoulCollector {
   // ---- Tuning ----
@@ -30,15 +35,23 @@ class LakeStatue extends SoulCollector {
   static const int soulsToCharge = 20;
   // Distance between fruits when several are waiting at the gift spot
   static const double giftSpacing = 40;
+  // Size of the zone the orb creates: about 3 times the character (64)
+  static const double zoneDiameter = 192;
 
   final List<PositionComponent> dropOffZones;
   final Vector2 giftSpot;
+  final List<Vector2> zoneSpots;
   LakeStatue({
     required super.position,
     required super.size,
     required this.dropOffZones,
     required this.giftSpot,
+    required this.zoneSpots,
   });
+
+  final _random = Random();
+  // The zone on the ground, while there is one
+  ChargeZone? chargeZone;
 
   // True while the statue collects souls
   bool isActive = false;
@@ -64,12 +77,38 @@ class LakeStatue extends SoulCollector {
   void onFullyCharged() {
     isActive = false;
     refreshProgress();
-    // TODO (key event step 3): lob the projectile that creates the zone.
-    // Until then, the key simply appears next to the gift spot.
-    final key = Item(
-      position: giftSpot - Vector2(giftSpacing, 0),
-      type: ItemType.Key,
+    _throwOrb();
+  }
+
+  // Throws the orb to a random zone spot (or the gift spot if the map has
+  // no zone spots); the zone appears where it lands
+  void _throwOrb() {
+    final landingSpot = zoneSpots.isEmpty
+        ? giftSpot
+        : zoneSpots[_random.nextInt(zoneSpots.length)];
+    game.world1.add(
+      StatueOrb(
+        start: absoluteCenter,
+        target: landingSpot,
+        onLanded: () => _createZone(landingSpot),
+      ),
     );
+  }
+
+  void _createZone(Vector2 spot) {
+    chargeZone = ChargeZone(center: spot.clone(), diameter: zoneDiameter);
+    game.world1.add(chargeZone!);
+  }
+
+  bool isInChargeZone(Vector2 point) => chargeZone?.isInside(point) ?? false;
+
+  // Called by an enemy that was killed inside the zone
+  void enemyKilledInZone(Vector2 point) {
+    chargeZone?.removeFromParent();
+    chargeZone = null;
+    // TODO (key event step 4): the enemy revives as its charged version
+    // instead. Until then, the key simply drops where it died.
+    final key = Item(position: point, type: ItemType.Key);
     game.world1.add(key);
     game.world1.items.add(key);
   }

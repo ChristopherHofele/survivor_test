@@ -163,6 +163,9 @@ class Player extends SpriteAnimationGroupComponent<PlayerAnimation>
     characterChoice = game.selectedCharacter;
     _loadAllAnimations();
     _initializeCharacterStats();
+    if (SurvivorTest.debugStartWithAllSeeds) {
+      seeds.addAll(roomSeeds.values);
+    }
     isCharacterSetUp = true;
   }
 

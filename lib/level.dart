@@ -264,12 +264,14 @@ class Level extends World with HasGameReference<SurvivorTest> {
     }
   }
 
-  // Reads the "Statue" layer: "DropOff" areas around the lake and the
-  // "Gift" point where the statue's fruits appear
+  // Reads the "Statue" layer: "DropOff" areas around the lake, the "Gift"
+  // point where the statue's fruits appear and the "ZoneSpot" points where
+  // its orb can land
   void _addStatue() {
     final statueLayer = level.tileMap.getLayer<ObjectGroup>('Statue');
     if (statueLayer == null) return;
     final dropOffZones = <PositionComponent>[];
+    final zoneSpots = <Vector2>[];
     Vector2? giftSpot;
     for (final object in statueLayer.objects) {
       switch (object.class_) {
@@ -282,6 +284,8 @@ class Level extends World with HasGameReference<SurvivorTest> {
           );
         case 'Gift':
           giftSpot = Vector2(object.x, object.y);
+        case 'ZoneSpot':
+          zoneSpots.add(Vector2(object.x, object.y));
       }
     }
     if (dropOffZones.isEmpty || giftSpot == null) return;
@@ -296,6 +300,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
       size: Vector2(right - left, bottom - top),
       dropOffZones: dropOffZones,
       giftSpot: giftSpot,
+      zoneSpots: zoneSpots,
     );
     add(statue!);
   }
