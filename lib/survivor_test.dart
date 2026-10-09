@@ -25,10 +25,12 @@ class SurvivorTest extends FlameGame
 
   // ---- Testing shortcuts: set back to false before committing ----
   // Start the game carrying all three seeds (touch the lake to plant them)
-  static const bool debugStartWithAllSeeds = true;
+  static const bool debugStartWithAllSeeds = false;
   // Level 1 spawns all three enemy types, each with the same chance,
   // without having visited the Stamina and Damage rooms first
-  static const bool debugAllEnemyTypesInLevel1 = true;
+  static const bool debugAllEnemyTypesInLevel1 = false;
+  // Fight the boss at this level (1-4) every time; 0 = normal (off)
+  static const int debugBossLevel = 0;
 
   int heartAmount = 0;
   int enemyCount = 0;

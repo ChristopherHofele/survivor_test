@@ -24,10 +24,13 @@ class BasicEnemy extends SpriteAnimationComponent
     with HasGameReference<SurvivorTest>, CollisionCallbacks {
   EnemyType enemyType;
   Vector2 initialMoveDirection;
+  // Starts as its charged version (carrots grown from the boss's seeds)
+  final bool startsCharged;
   BasicEnemy({
     required position,
     required this.enemyType,
     required this.initialMoveDirection,
+    this.startsCharged = false,
   }) : super(position: position, size: Vector2.all(64), anchor: Anchor.center);
 
   late double moveSpeed;
@@ -84,6 +87,9 @@ class BasicEnemy extends SpriteAnimationComponent
       collisionType: CollisionType.active,
     );
     add(_hitbox);
+    if (startsCharged) {
+      _becomeCharged();
+    }
   }
 
   void _initializeEnemyType() {
@@ -677,9 +683,12 @@ class BasicEnemy extends SpriteAnimationComponent
       game.world1.enemiesDefeated += 1;
       game.enemiesKilled += 1;
       final collector = game.world1.soulCollector;
-      if (isCharged) {
-        // A charged enemy always drops the key to the boss room
+      if (isCharged && game.world1.statue != null) {
+        // A charged enemy in Level 1 always drops the key to the boss room
         _dropKey();
+      } else if (isCharged) {
+        // Charged carrots in the boss room drop a cookie instead
+        _dropCookie();
       } else if (collector != null && collector.canAbsorbAt(position)) {
         // Killed in range of a charging tree or the active statue:
         // a soul flies there instead of a cookie dropping

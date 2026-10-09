@@ -34,7 +34,7 @@ const Map<ItemType, ItemType> seedFruits = {
 class LakeStatue extends SoulCollector {
   // ---- Tuning ----
   // How many souls it takes to fully charge the active statue
-  static const int soulsToCharge = 20;
+  static const int soulsToCharge = 2;
   // Distance between fruits when several are waiting at the gift spot
   static const double giftSpacing = 40;
   // Size of the zone the orb creates: about 3 times the character (64)
