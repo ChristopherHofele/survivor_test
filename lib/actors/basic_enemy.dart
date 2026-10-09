@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui' show Color;
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
@@ -35,6 +36,14 @@ class BasicEnemy extends SpriteAnimationComponent
   late double hitboxRadius;
 
   double shootCooldown = 5;
+  // Seconds between shots (only the big enemy shoots)
+  double shootInterval = 5;
+
+  // ---- Charged version (killed inside the statue's zone, then revived) ----
+  // PLACEHOLDER look: a purple tint until there's art for it
+  static const Color chargedTint = Color(0x99B57BFF);
+  bool isCharged = false;
+  late CircleHitbox _hitbox;
   double selfDestruct = 8;
   double followCornerCooldown = 0.3;
   double getOutOfSpawn = 1.5;
@@ -68,14 +77,13 @@ class BasicEnemy extends SpriteAnimationComponent
     collisionBlocks = player.collisionBlocks;
     priority = 1;
     animation = spriteSheetAnimation(game.images, spriteName, textureSize);
-    add(
-      CircleHitbox(
-        radius: hitboxRadius,
-        position: size / 2,
-        anchor: Anchor.center,
-        collisionType: CollisionType.active,
-      ),
+    _hitbox = CircleHitbox(
+      radius: hitboxRadius,
+      position: size / 2,
+      anchor: Anchor.center,
+      collisionType: CollisionType.active,
     );
+    add(_hitbox);
   }
 
   void _initializeEnemyType() {
@@ -657,14 +665,21 @@ class BasicEnemy extends SpriteAnimationComponent
 
   void _handleHealth() {
     if (health <= 0) {
+      final statue = game.world1.statue;
+      if (!isCharged && statue != null && statue.isInChargeZone(position)) {
+        // Killed inside the statue's zone: comes back as its charged version
+        // instead of dying (so it doesn't count as a kill yet)
+        statue.chargeZoneUsed();
+        _becomeCharged();
+        return;
+      }
       game.enemyCount -= 1;
       game.world1.enemiesDefeated += 1;
       game.enemiesKilled += 1;
-      final statue = game.world1.statue;
       final collector = game.world1.soulCollector;
-      if (statue != null && statue.isInChargeZone(position)) {
-        // Killed inside the statue's zone
-        statue.enemyKilledInZone(position);
+      if (isCharged) {
+        // A charged enemy always drops the key to the boss room
+        _dropKey();
       } else if (collector != null && collector.canAbsorbAt(position)) {
         // Killed in range of a charging tree or the active statue:
         // a soul flies there instead of a cookie dropping
@@ -679,6 +694,40 @@ class BasicEnemy extends SpriteAnimationComponent
       game.enemyCount -= 1;
       game.world1.remove(this);
     }
+  }
+
+  void _becomeCharged() {
+    isCharged = true;
+    switch (enemyType) {
+      case EnemyType.Small:
+        // The sprinter: very fast, but little health
+        moveSpeed = 200;
+        health = 30;
+      case EnemyType.Medium:
+        // The brute: bigger, sturdier and a bit faster
+        moveSpeed = 100;
+        health = 120;
+        _grow(1.5);
+      case EnemyType.Big:
+        // The turret: lots of health, shoots a fan of 3 more often
+        health = 180;
+        shootInterval = 3;
+    }
+    tint(chargedTint);
+  }
+
+  // Makes the enemy bigger, including its hitbox
+  void _grow(double factor) {
+    size *= factor;
+    hitboxRadius *= factor;
+    _hitbox.radius = hitboxRadius;
+    _hitbox.position = size / 2;
+  }
+
+  void _dropKey() {
+    Item key = Item(position: position, type: ItemType.Key);
+    game.world1.add(key);
+    game.world1.items.add(key);
   }
 
   void _dropCookie() {
@@ -705,15 +754,24 @@ class BasicEnemy extends SpriteAnimationComponent
     return initialHealth;
   }
 
-  void _shoot() async {
+  void _shoot() {
+    shootCooldown = shootInterval;
+    _launchProjectile(directionOfPlayer);
+    if (isCharged) {
+      // The charged turret also shoots slightly to the left and right
+      _launchProjectile(directionOfPlayer.clone()..rotate(0.3));
+      _launchProjectile(directionOfPlayer.clone()..rotate(-0.3));
+    }
+    SoLoud.instance.play(game.shootSoundEnemy);
+  }
+
+  void _launchProjectile(Vector2 direction) {
     game.world1.add(
       Projectile(
         position: position,
-        moveDirection: directionOfPlayer,
+        moveDirection: direction,
         shooter: Shooter.Enemy,
       ),
     );
-    await SoLoud.instance.play(game.shootSoundEnemy);
-    shootCooldown = 5;
   }
 }

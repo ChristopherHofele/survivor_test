@@ -73,6 +73,10 @@ class Spawner extends PositionComponent with HasGameReference<SurvivorTest> {
   void _determineEnemyType() {
     switch (worldName) {
       case 'Level1.tmx':
+        if (SurvivorTest.debugAllEnemyTypesInLevel1) {
+          enemyType = EnemyType.values[random.nextInt(EnemyType.values.length)];
+          break;
+        }
         enemyType = EnemyType.Medium;
         int enemyTypeChooser = random.nextInt(specialEnemySpawnrate);
         if (game.hasBeenToDamage && enemyTypeChooser == 2) {

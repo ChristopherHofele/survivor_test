@@ -27,7 +27,8 @@ const Map<ItemType, ItemType> seedFruits = {
 //    every kill in Level 1 sends it a soul, and Level 1 is locked until the
 //    key has been collected.
 //  - Fully charged, it throws an orb to one of the "ZoneSpot" points, which
-//    creates a zone. An enemy killed inside the zone is charged.
+//    creates a zone. An enemy killed inside the zone revives as a stronger
+//    charged version, which drops the key when killed.
 // Its position and size are the area around the lake (all DropOff areas).
 class LakeStatue extends SoulCollector {
   // ---- Tuning ----
@@ -102,15 +103,11 @@ class LakeStatue extends SoulCollector {
 
   bool isInChargeZone(Vector2 point) => chargeZone?.isInside(point) ?? false;
 
-  // Called by an enemy that was killed inside the zone
-  void enemyKilledInZone(Vector2 point) {
+  // Called by an enemy that was killed inside the zone (it then revives as
+  // its charged version): the zone has done its job and disappears
+  void chargeZoneUsed() {
     chargeZone?.removeFromParent();
     chargeZone = null;
-    // TODO (key event step 4): the enemy revives as its charged version
-    // instead. Until then, the key simply drops where it died.
-    final key = Item(position: point, type: ItemType.Key);
-    game.world1.add(key);
-    game.world1.items.add(key);
   }
 
   @override
