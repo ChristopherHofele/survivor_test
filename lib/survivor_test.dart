@@ -6,6 +6,7 @@ import 'package:flutter_soloud/flutter_soloud.dart';
 
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/components/items.dart';
+import 'package:survivor_test/components/screen_shake.dart';
 import 'package:survivor_test/overlays/attack_button.dart';
 import 'package:survivor_test/overlays/dash_button.dart';
 import 'package:survivor_test/overlays/health_display.dart';
@@ -156,6 +157,14 @@ class SurvivorTest extends FlameGame
     SoLoud.instance.disposeAllSources();
     pauseEngine();
     overlays.add('GameOver');
+  }
+
+  // Shakes the screen briefly. A new shake replaces one that's still running.
+  void shakeScreen() {
+    for (final shake in children.whereType<ScreenShake>()) {
+      shake.removeFromParent();
+    }
+    add(ScreenShake());
   }
 
   void addControls() {

@@ -528,14 +528,26 @@ class BossEnemy extends SpriteComponent
       // close to a wall doesn't stop immediately
       if (_chargeTime > 0.2) {
         for (final block in player.collisionBlocks) {
-          if (checkCollision(this, block)) {
+          if (_bodyTouches(block)) {
             hasHitWall = true;
+            game.shakeScreen();
+            break;
           }
         }
       }
     } else {
       actionCompleted = true;
     }
+  }
+
+  // Whether the pumpkin's body (the contact zone, not the whole 256 x 256
+  // image) touches the block. Used so the charge only stops when the body
+  // actually reaches the wall.
+  bool _bodyTouches(PositionComponent block) {
+    return position.x - contactRadius < block.x + block.width &&
+        position.x + contactRadius > block.x &&
+        position.y - contactRadius < block.y + block.height &&
+        position.y + contactRadius > block.y;
   }
 
   void _returnToSpawn(double dt) {
