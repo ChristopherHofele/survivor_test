@@ -20,6 +20,15 @@ import 'package:survivor_test/survivor_test.dart';
 
 enum CharacterChoice { FireGuy, MineFellow, MeleeLad, DashMan, Undecided }
 
+// How each character's name is written on screen
+const Map<CharacterChoice, String> characterNames = {
+  CharacterChoice.FireGuy: 'Fire Guy',
+  CharacterChoice.MineFellow: 'Mine Fellow',
+  CharacterChoice.MeleeLad: 'Melee Lad',
+  CharacterChoice.DashMan: 'Dash Man',
+  CharacterChoice.Undecided: '?',
+};
+
 // The character's upgrade level (raised by eating a strawberry)
 enum CharacterState { LevelOne, LevelTwo, LevelThree }
 

@@ -6,6 +6,7 @@ import 'package:flutter_soloud/flutter_soloud.dart';
 
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/components/items.dart';
+import 'package:survivor_test/data/personal_bests.dart';
 import 'package:survivor_test/components/screen_shake.dart';
 import 'package:survivor_test/overlays/attack_button.dart';
 import 'package:survivor_test/overlays/dash_button.dart';
@@ -32,6 +33,8 @@ class SurvivorTest extends FlameGame
   static const bool debugAllEnemyTypesInLevel1 = false;
   // Fight the boss at this level (1-4) every time; 0 = normal (off)
   static const int debugBossLevel = 0;
+  // Empties the personal best list every time the game starts
+  static const bool debugClearPersonalBests = false;
 
   int heartAmount = 0;
   int enemyCount = 0;
@@ -107,6 +110,9 @@ class SurvivorTest extends FlameGame
 
   @override
   Future<void> onLoad() async {
+    if (debugClearPersonalBests) {
+      await PersonalBests.clear();
+    }
     _initializeLists();
     player = Player(position: Vector2(960, 1020));
     await images.loadAllImages();
@@ -156,7 +162,22 @@ class SurvivorTest extends FlameGame
     startGame = false;
     SoLoud.instance.disposeAllSources();
     pauseEngine();
+    _recordPersonalBest();
     overlays.add('GameOver');
+  }
+
+  // Saving happens in the background; the personal best screen waits for
+  // the result when it's shown
+  Future<PersonalBestsResult>? personalBestsResult;
+
+  void _recordPersonalBest() {
+    personalBestsResult = PersonalBests.add(
+      ScoreEntry(
+        score: finalScore,
+        date: DateTime.now(),
+        character: player.characterChoice,
+      ),
+    );
   }
 
   // Shakes the screen briefly. A new shake replaces one that's still running.

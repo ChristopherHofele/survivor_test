@@ -120,7 +120,7 @@ class _GameOverState extends State<GameOver> {
                   child: ElevatedButton(
                     onPressed: () {
                       game.overlays.remove('GameOver');
-                      game.overlays.add('Leaderboard');
+                      game.overlays.add('PersonalBests');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: whiteTextColor,

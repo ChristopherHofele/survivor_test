@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:survivor_test/overlays/menu_colors.dart';
 import 'package:survivor_test/survivor_test.dart';
 
-// Shown after the game over screen.
-// PLACEHOLDER: the real leaderboard comes later; for now it shows the score
-// and the button back to the main menu.
-class Leaderboard extends StatelessWidget {
+// Shown after the personal bests screen.
+// PLACEHOLDER: the real global leaderboard comes later; for now it shows the
+// score and the button back to the main menu.
+class GlobalLeaderboard extends StatelessWidget {
   final SurvivorTest game;
-  const Leaderboard({super.key, required this.game});
+  const GlobalLeaderboard({super.key, required this.game});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class Leaderboard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                'Leaderboard',
+                'Global Leaderboard',
                 style: TextStyle(color: whiteTextColor, fontSize: 30),
               ),
               const SizedBox(height: 16),
@@ -36,7 +36,7 @@ class Leaderboard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               const Text(
-                'Leaderboard coming soon',
+                'Coming soon',
                 style: TextStyle(color: Colors.grey, fontSize: 16),
               ),
               const SizedBox(height: 20),
