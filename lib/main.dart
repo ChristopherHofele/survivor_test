@@ -3,6 +3,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:survivor_test/overlays/game_over.dart';
+import 'package:survivor_test/overlays/leaderboard.dart';
 import 'package:survivor_test/overlays/start_screen.dart';
 import 'package:survivor_test/survivor_test.dart';
 
@@ -89,6 +90,7 @@ class _GameAppState extends State<GameApp> {
       overlayBuilderMap: {
         'StartScreen': (_, game) => StartScreen(game: game),
         'GameOver': (_, game) => GameOver(game: game),
+        'Leaderboard': (_, game) => Leaderboard(game: game),
       },
       initialActiveOverlays: const ['StartScreen'],
     );

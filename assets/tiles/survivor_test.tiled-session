@@ -5,8 +5,8 @@
     },
     "activeFile": "Level1.tmx",
     "expandedProjectPaths": [
-        ".",
         "Summer",
+        ".",
         "Spring"
     ],
     "fileStates": {
@@ -66,8 +66,8 @@
             "scale": 1.5,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 800.3333333333333,
-                "y": 800
+                "x": 867.6666666666666,
+                "y": 1006.3333333333333
             }
         },
         "Spring/Spring_Cliff.tsx": {

@@ -42,8 +42,29 @@ class SurvivorTest extends FlameGame
 
   // Stats for the game over scoreboard
   int enemiesKilled = 0;
-  int bossesDefeated = 0;
   double timeSurvived = 0;
+  int timesHit = 0;
+  // The level of every boss defeated in this run, e.g. [1, 2]
+  final List<int> defeatedBossLevels = [];
+  int get bossesDefeated => defeatedBossLevels.length;
+
+  // ---- Score: points per stat (shown on the game over screen) ----
+  static const int pointsPerKill = 10;
+  static const int pointsPerBossLevel = 1000; // a level 2 boss gives 2000
+  static const int pointsPerSecond = 1;
+  static const int pointsLostPerHit = 25;
+
+  int get killPoints => enemiesKilled * pointsPerKill;
+  int get bossPoints =>
+      defeatedBossLevels.fold(0, (sum, level) => sum + level) *
+      pointsPerBossLevel;
+  int get timePoints => timeSurvived.floor() * pointsPerSecond;
+  int get hitPoints => timesHit * pointsLostPerHit;
+  // Never below 0
+  int get finalScore {
+    final total = killPoints + bossPoints + timePoints - hitPoints;
+    return total < 0 ? 0 : total;
+  }
 
   List<int> doorPrices = [20, 40, 50, 100, 0, 0, 0, 0, 0, 0];
   List<int> zeroDoorsMaxEnemyCounts = [1, 4, 8];

@@ -4,11 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:survivor_test/actors/player.dart';
+import 'package:survivor_test/overlays/menu_colors.dart';
 
 import 'package:survivor_test/survivor_test.dart';
 
-const blackTextColor = Color.fromRGBO(0, 0, 0, 1.0);
-const whiteTextColor = Color.fromRGBO(255, 255, 255, 1.0);
 const selectedColor = Colors.amber;
 
 class StartScreen extends StatefulWidget {

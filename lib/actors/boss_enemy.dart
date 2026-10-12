@@ -552,7 +552,7 @@ class BossEnemy extends SpriteComponent
       SoLoud.instance.stop(bgm);
       SoLoud.instance.play(game.victorySound);
       game.enemyCount -= 1;
-      game.bossesDefeated += 1;
+      game.defeatedBossLevels.add(bossLevel);
       _removeSeedCarrots();
       Item loot = Item(position: position, type: ItemType.Strawberry);
 

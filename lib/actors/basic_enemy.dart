@@ -41,6 +41,11 @@ class BasicEnemy extends SpriteAnimationComponent
   double shootCooldown = 5;
   // Seconds between shots (only the big enemy shoots)
   double shootInterval = 5;
+  // The charged big enemy fires a quick burst instead of a single shot
+  static const int burstShots = 3;
+  static const double timeBetweenBurstShots = 0.2;
+  int _burstShotsLeft = 0;
+  double _burstTimer = 0;
 
   // ---- Charged version (killed inside the statue's zone, then revived) ----
   // PLACEHOLDER look: a purple tint until there's art for it
@@ -142,6 +147,7 @@ class BasicEnemy extends SpriteAnimationComponent
       if (enemyType == EnemyType.Big && shootCooldown <= 0) {
         _shoot();
       }
+      _updateBurst(dt);
       _handleHealth();
       attackCooldown -= dt;
       shootCooldown -= dt;
@@ -718,7 +724,7 @@ class BasicEnemy extends SpriteAnimationComponent
         health = 120;
         _grow(1.5);
       case EnemyType.Big:
-        // The turret: lots of health, shoots a fan of 3 more often
+        // The turret: lots of health, shoots a burst of 3 more often
         health = 180;
         shootInterval = 3;
     }
@@ -765,12 +771,29 @@ class BasicEnemy extends SpriteAnimationComponent
 
   void _shoot() {
     shootCooldown = shootInterval;
-    _launchProjectile(directionOfPlayer);
     if (isCharged) {
-      // The charged turret also shoots slightly to the left and right
-      _launchProjectile(directionOfPlayer.clone()..rotate(0.3));
-      _launchProjectile(directionOfPlayer.clone()..rotate(-0.3));
+      // Start a burst; the shots are fired by _updateBurst
+      _burstShotsLeft = burstShots;
+      _burstTimer = 0;
+    } else {
+      _fireShot();
     }
+  }
+
+  // Fires the burst's shots one after another. Each one aims at where the
+  // player is at that moment, so moving sideways dodges them.
+  void _updateBurst(double dt) {
+    if (_burstShotsLeft <= 0) return;
+    _burstTimer -= dt;
+    if (_burstTimer <= 0) {
+      _fireShot();
+      _burstShotsLeft -= 1;
+      _burstTimer = timeBetweenBurstShots;
+    }
+  }
+
+  void _fireShot() {
+    _launchProjectile(directionOfPlayer);
     SoLoud.instance.play(game.shootSoundEnemy);
   }
 

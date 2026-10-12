@@ -357,6 +357,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerAnimation>
   // Everything that happens once when the player gets hit
   void _takeHit() {
     health -= 100;
+    game.timesHit += 1;
     // Every hit restarts the wait before health regenerates
     regenerationCooldown = healthRegenerationDelay.toDouble();
     add(
