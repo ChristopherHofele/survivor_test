@@ -22,6 +22,7 @@ A top-down survivor game built with Flutter + Flame (`flame`, `flame_tiled`, `fl
 - `lib/main.dart`: `GameApp` (restarting a run gives the `GameWidget` a new key), overlays, and an `AppLifecycleListener` that pauses all sounds when the app is hidden.
 - `lib/survivor_test.dart`: the game (`SurvivorTest`): world loading, run stats, score, game over, testing switches.
 - `lib/level.dart`: a room (`World`) built from a Tiled map: collisions, spawners, tree, statue, camera bounds.
+- `lib/components/camera_follower.dart`: moves the camera itself (sets `viewfinder.position`; Flame's `follow`/`setBounds` are no longer used). Each `Level` adds its own and passes it the map limits.
 - `lib/actors/`: player, basic enemies, boss, collision helpers and `spriteSheetAnimation` in `utils.dart`.
 - `lib/components/`: items, trees, souls, statue, orb, zone, `Lob` (arc throw), `ScreenShake`, projectiles and attacks.
 - `lib/overlays/`: HUD pieces and the Flutter menu screens.
@@ -55,6 +56,8 @@ A top-down survivor game built with Flutter + Flame (`flame`, `flame_tiled`, `fl
 - Level 4: double charge.
 - The volley never gets upgraded (16 directions was undodgeable). The charge stops when the body (`contactRadius`) hits a wall, and the screen shakes.
 - The boss has a big hurtbox and a smaller `BossContactZone` that hurts the player.
+
+**Sprint camera lag.** When a sprint starts, the camera is held back for `lagDuration` (0.4 s) and then catches up; walking is unchanged. The lag is computed from the camera target already clamped to the map limits, so nothing builds up at map edges. It's capped at a quarter of the screen height, and the camera snaps to the player on room changes and teleports. The user tested it on the phone and is happy with it. A zoom-out while sprinting was discussed but deliberately left out for now.
 
 **Score and screens.**
 - Score: +10 per kill, +1000 × boss level, +1 per second, −25 per hit, never below 0. The constants are on `SurvivorTest`.

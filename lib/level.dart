@@ -7,6 +7,7 @@ import 'package:flame/experimental.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:survivor_test/actors/player.dart';
+import 'package:survivor_test/components/camera_follower.dart';
 import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/components/collision_block.dart';
 import 'package:survivor_test/components/fruit_tree.dart';
@@ -36,6 +37,8 @@ class Level extends World with HasGameReference<SurvivorTest> {
   // Whatever souls fly to in this level: the tree in an upgrade room,
   // the statue in Level 1, nothing in the boss room
   SoulCollector? get soulCollector => tree ?? statue;
+
+  late final CameraFollower cameraFollower = CameraFollower(player: player);
 
   late AudioSource Level1BGM;
   late AudioSource HealthBGM;
@@ -411,8 +414,9 @@ class Level extends World with HasGameReference<SurvivorTest> {
   }
 
   // The camera follows the player but never shows anything outside the map
+  // (see CameraFollower for the sprint lag)
   void _setUpCamera() {
-    game.camera.follow(player);
+    add(cameraFollower);
     _updateCameraBounds(game.size);
   }
 
@@ -435,7 +439,7 @@ class Level extends World with HasGameReference<SurvivorTest> {
     final halfVisible = screenSize / game.camera.viewfinder.zoom / 2;
     final (left, right) = _cameraRange(halfVisible.x, level.width);
     final (top, bottom) = _cameraRange(halfVisible.y, level.height);
-    game.camera.setBounds(Rectangle.fromLTRB(left, top, right, bottom));
+    cameraFollower.bounds = Rectangle.fromLTRB(left, top, right, bottom);
   }
 
   // Where the camera centre may be along one direction. If the map is
