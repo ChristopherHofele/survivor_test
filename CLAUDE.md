@@ -76,7 +76,7 @@ A top-down survivor game built with Flutter + Flame (`flame`, `flame_tiled`, `fl
 - The boss's carrot seed, which uses the Apple seed image.
 - Mine Fellow's walking sheet (it uses his idle image) and the Broccoli's walking sheet.
 
-## Next step: global leaderboard (planned, not started)
+## Next step: global leaderboard (setup done, building not started)
 
 - The plan is Firebase: Firestore plus anonymous auth, on the free Spark plan.
 - Ruled out:
@@ -84,19 +84,14 @@ A top-down survivor game built with Flutter + Flame (`flame`, `flame_tiled`, `fl
   - Supabase: free projects pause after a week.
   - LootLocker: no Flutter SDK.
 
-**Questions to ask the user first:**
-- Which platforms are they releasing on?
-- One entry per player (suggested: their best score) or one per run?
-- Should players enter a name once (suggested, max ~12 characters)?
+**Decided with the user:**
+- Platforms: Android and iOS only, so configure just those in `flutterfire configure`. Building for iOS needs a Mac with Xcode; the user tests Android from Windows.
+- One entry per player, holding their best score.
+- The name is entered once (max ~12 characters) and saved on the device.
 
-**The user's part** (needs their Google account and a browser login):
-1. Create a Firebase project.
-2. Create a Firestore database in production mode (for example in `europe-west3`).
-3. Enable Anonymous sign-in.
-4. Install the Firebase CLI and `flutterfire_cli`.
-5. Run `firebase login`.
+**The user's part is done** (on the Windows machine): Firebase project created, Firestore database created in production mode, Anonymous sign-in enabled, Node.js + Firebase CLI + `flutterfire_cli` installed (Pub cache `bin` added to the user PATH), and `firebase login` done. On another machine, the tools and the login would need to be set up again.
 
-**Then build:**
+**Then build** (start with step 1 when the user says go):
 1. `flutterfire configure`, plus the packages `firebase_core`, `firebase_auth` and `cloud_firestore`, and initialise Firebase in `main()` (needs a full rebuild).
 2. Anonymous sign-in in the background.
 3. One-time name entry, saved on the device.
