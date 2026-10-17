@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
+import 'package:survivor_test/data/online_player.dart';
 import 'package:survivor_test/firebase_options.dart';
 import 'package:survivor_test/overlays/game_over.dart';
 import 'package:survivor_test/overlays/global_leaderboard.dart';
@@ -15,6 +18,9 @@ void main() async {
   // Connects the app to our Firebase project (used by the global leaderboard).
   // The settings for each platform are in firebase_options.dart.
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Signs the player in silently. `unawaited` means the game starts right
+  // away instead of waiting for it (important without internet).
+  unawaited(OnlinePlayer.signIn());
   await Flame.device.fullScreen();
   await Flame.device.setLandscape();
   await SoLoud.instance.init(
@@ -47,8 +53,17 @@ class _GameAppState extends State<GameApp> {
     super.initState();
     _lifecycleListener = AppLifecycleListener(
       onHide: _pauseAllSounds,
-      onShow: _resumePausedSounds,
+      onShow: _onAppShown,
     );
+  }
+
+  void _onAppShown() {
+    _resumePausedSounds();
+    // If the sign-in at the start failed (e.g. the screen locked while the
+    // game was loading), try again now that the game is back on screen
+    if (OnlinePlayer.id == null) {
+      unawaited(OnlinePlayer.signIn());
+    }
   }
 
   @override

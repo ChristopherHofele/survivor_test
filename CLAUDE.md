@@ -93,7 +93,7 @@ A top-down survivor game built with Flutter + Flame (`flame`, `flame_tiled`, `fl
 
 **Then build:**
 1. Done: app ID changed to `com.hofele.monstersurvivors` (Android `applicationId` and iOS bundle ID; the Android `namespace` stays `com.example.survivor_test`). `flutterfire configure` was run for Firebase project `survivor-test-cd43b` (Android + iOS), giving `lib/firebase_options.dart` and `android/app/google-services.json`. Added `firebase_core`, `firebase_auth` and `cloud_firestore`, and `Firebase.initializeApp` in `main()`. Kotlin was raised to 2.4.10 (firebase_auth needs it), with `jvmTarget` moved to the `kotlin { compilerOptions }` block; the iOS deployment target is now 15.0. The Android debug build works. iOS hasn't been built yet (needs the Mac; the Podfile is created on the first build there and may need `platform :ios, '15.0'`).
-2. Anonymous sign-in in the background.
+2. Done and tested: anonymous sign-in in the background via `OnlinePlayer` in `lib/data/online_player.dart` (`signIn()` is started unawaited in `main()`, and retried in `_onAppShown` when the app returns to the foreground while still signed out; use `ensureSignedIn()` before anything that needs `OnlinePlayer.id`). An account remembered on the device counts as signed in even offline; sign-in only needs the internet on the very first launch. The player's name (step 3) goes in this class too.
 3. One-time name entry, saved on the device.
 4. Submit the score at game over: one document per player, keyed by user ID, only updated when higher.
 5. Security rules for the user to paste: only your own entry, plausible scores, limited name length.
