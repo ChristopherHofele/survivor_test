@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:survivor_test/data/blocked_names.dart';
 import 'package:survivor_test/data/personal_bests.dart';
 
 // The player's online identity for the global leaderboard: their player ID,
@@ -70,6 +71,9 @@ class OnlinePlayer {
     }
     if (!_allowedNameCharacters.hasMatch(trimmed)) {
       return 'Only letters, numbers, spaces, - and _';
+    }
+    if (BlockedNames.contains(trimmed)) {
+      return "This name isn't allowed";
     }
     return null;
   }

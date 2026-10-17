@@ -30,9 +30,12 @@ class _StartScreenState extends State<StartScreen> {
   @override
   void initState() {
     super.initState();
-    // The very first time, ask for a name. A window can only open once the
-    // screen has been drawn, so wait for the end of the first frame.
-    if (OnlinePlayer.name == null) {
+    // The very first time, ask for a name. Also ask again if the saved name
+    // isn't allowed any more (e.g. after a word was added to the blocked
+    // names). A window can only open once the screen has been drawn, so
+    // wait for the end of the first frame.
+    final savedName = OnlinePlayer.name;
+    if (savedName == null || OnlinePlayer.nameProblem(savedName) != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _changeName(canCancel: false);
       });

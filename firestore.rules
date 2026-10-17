@@ -4,15 +4,95 @@ rules_version = '2';
 // servers and check every read and write. Copy this whole file into
 // Firebase console -> Firestore Database -> Rules, then press Publish.
 //
-// First version (step 4): every signed-in player may read the board and
-// may only write their own entry. Stricter checks follow in step 5.
+// They make sure every leaderboard entry looks exactly like one the game
+// writes, even if someone talks to Firebase without the game.
 service cloud.firestore {
   match /databases/{database}/documents {
 
     // The global leaderboard: one entry per player, named after their ID
     match /leaderboard/{playerId} {
+      // Every signed-in player may see the board
       allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid == playerId;
+
+      // A player's first entry
+      allow create: if isOwner(playerId)
+        && isValidEntry(request.resource.data);
+
+      // Changing an existing entry: only a higher score or a new name,
+      // and at most once every 10 seconds
+      allow update: if isOwner(playerId)
+        && isValidEntry(request.resource.data)
+        && request.time > resource.data.updatedAt + duration.value(10, 's')
+        && (isHigherScore() || isNameChangeOnly());
+
+      // No "allow delete": players can't delete entries.
+      // (The Firebase console can, because it ignores these rules.)
+    }
+
+    // Signed in, and the entry is named after the player's own ID
+    function isOwner(playerId) {
+      return request.auth != null && request.auth.uid == playerId;
+    }
+
+    // An entry exactly as the game writes it
+    function isValidEntry(entry) {
+      return entry.keys().hasOnly(['name', 'score', 'character', 'date', 'updatedAt'])
+        && entry.keys().hasAll(['name', 'score', 'character', 'date', 'updatedAt'])
+        && isValidName(entry.name)
+        // A whole number from 0 to 1,000,000
+        && entry.score is int
+        && entry.score >= 0
+        && entry.score <= 1000000
+        && entry.character in ['FireGuy', 'MeleeLad', 'DashMan', 'MineFellow']
+        // The run's date, not in the future (a day of leeway for phones
+        // whose clock is a bit off)
+        && entry.date is timestamp
+        && entry.date < request.time + duration.value(1, 'd')
+        // Must be the server's own time, so it can't be faked
+        && entry.updatedAt == request.time;
+    }
+
+    // Same rules as OnlinePlayer.nameProblem in the game: 3-12 letters,
+    // digits, spaces, - or _, no space at the start or end, and no rude words
+    function isValidName(name) {
+      return name is string
+        && name.matches('[\\p{L}\\p{N}_-][\\p{L}\\p{N} _-]{1,10}[\\p{L}\\p{N}_-]')
+        && !isBlockedName(name);
+    }
+
+    // BEGIN BLOCKED NAMES: written by tool/update_blocked_names_rules.dart from
+    // lib/data/blocked_names.dart. Don't change it here by hand.
+    function isBlockedName(name) {
+      let cleaned = name.lower()
+        .replace('[äàáâãå]', 'a')
+        .replace('[öòóôõø]', 'o')
+        .replace('[üùúû]', 'u')
+        .replace('[éèêë]', 'e')
+        .replace('[íìîï]', 'i')
+        .replace('ß', 'ss')
+        .replace('ñ', 'n')
+        .replace('ç', 'c')
+        .replace('0', 'o')
+        .replace('1', 'i')
+        .replace('3', 'e')
+        .replace('4', 'a')
+        .replace('5', 's')
+        .replace('7', 't');
+      let compact = cleaned.replace('[ _-]', '');
+      return compact.matches('.*(f+u+c+k+|p+h+u+c+k+|s+h+i+t+|c+u+n+t+|b+i+t+c+h+|b+a+s+t+a+r+d+|w+h+o+r+e+|s+l+u+t+|w+a+n+k+e+r+|w+a+n+k+i+n+g+|t+w+a+t+|p+u+s+s+y+|a+s+s+h+o+l+e+|c+o+c+k+s+u+c+k+e+r+|d+i+c+k+h+e+a+d+|p+e+n+i+s+|v+a+g+i+n+a+|d+i+l+d+o+|p+o+r+n+|j+i+z+z+|b+l+o+w+j+o+b+|h+a+n+d+j+o+b+|p+i+s+s+|r+e+t+a+r+d+|n+i+g+g+e+r+|n+i+g+g+a+|f+a+g+g+o+t+|t+r+a+n+n+y+|p+e+d+o+p+h+i+l+e+|p+a+e+d+o+p+h+i+l+e+|m+o+l+e+s+t+|i+n+c+e+s+t+|h+i+t+l+e+r+|f+o+t+z+e+|v+o+t+z+e+|a+r+s+c+h+l+o+c+h+|w+i+c+h+s+e+r+|w+i+x+e+r+|w+i+c+h+s+|f+i+c+k+e+n+|f+i+c+k+e+r+|f+i+c+k+t+|h+u+r+e+n+s+o+h+n+|s+c+h+l+a+m+p+e+|s+c+h+w+u+c+h+t+e+l+|m+i+s+s+g+e+b+u+r+t+|b+e+h+i+n+d+e+r+t+|s+p+a+s+t+|n+e+g+e+r+|k+a+n+a+k+e+|p+i+m+m+e+l+|t+i+t+t+e+n+|b+u+m+s+e+n+|m+u+s+c+h+i+|s+c+h+e+i+s+|s+i+e+g+h+e+i+l+).*')
+        || cleaned.matches('(.*[ _-])?(a+s+s+|a+r+s+e+|d+i+c+k+|c+o+c+k+|c+u+m+|s+e+x+|t+i+t+s+|b+o+o+b+s+|a+n+a+l+|a+n+u+s+|f+a+g+|r+a+p+e+|r+a+p+i+s+t+|p+e+d+o+|p+a+e+d+o+|w+a+n+k+|f+u+k+|f+c+k+|c+o+o+n+|s+p+i+c+|c+h+i+n+k+|k+i+k+e+|n+a+z+i+|n+a+z+i+s+|k+k+k+|a+r+s+c+h+|f+i+c+k+|h+u+r+e+|h+u+r+e+n+|n+u+t+t+e+|n+u+t+t+e+n+|s+c+h+w+a+n+z+|m+o+n+g+o+)([ _-].*)?')
+        || compact.matches('(a+s+s+|a+r+s+e+|d+i+c+k+|c+o+c+k+|c+u+m+|s+e+x+|t+i+t+s+|b+o+o+b+s+|a+n+a+l+|a+n+u+s+|f+a+g+|r+a+p+e+|r+a+p+i+s+t+|p+e+d+o+|p+a+e+d+o+|w+a+n+k+|f+u+k+|f+c+k+|c+o+o+n+|s+p+i+c+|c+h+i+n+k+|k+i+k+e+|n+a+z+i+|n+a+z+i+s+|k+k+k+|a+r+s+c+h+|f+i+c+k+|h+u+r+e+|h+u+r+e+n+|n+u+t+t+e+|n+u+t+t+e+n+|s+c+h+w+a+n+z+|m+o+n+g+o+)');
+    }
+    // END BLOCKED NAMES
+
+    function isHigherScore() {
+      return request.resource.data.score > resource.data.score;
+    }
+
+    // Nothing changed except the name (and the time of the change)
+    function isNameChangeOnly() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['name', 'updatedAt']);
     }
   }
 }
