@@ -20,6 +20,8 @@ dependencies:
   cloud_firestore: ^7.0.0
 
 flutter:
+  # Packs Flutter's built-in icons (like the edit pencil) into the app
+  uses-material-design: true
   assets:
     - assets/images/
     - assets/images/HUD/

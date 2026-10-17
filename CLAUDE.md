@@ -19,7 +19,7 @@ A top-down survivor game built with Flutter + Flame (`flame`, `flame_tiled`, `fl
 
 ## Structure
 
-- `lib/main.dart`: `GameApp` (restarting a run gives the `GameWidget` a new key), overlays, and an `AppLifecycleListener` that pauses all sounds when the app is hidden.
+- `lib/main.dart`: `GameApp` (a `MaterialApp` around the `GameWidget`, which dialogs need; restarting a run gives the `GameWidget` a new key), overlays, and an `AppLifecycleListener` that pauses all sounds when the app is hidden.
 - `lib/survivor_test.dart`: the game (`SurvivorTest`): world loading, run stats, score, game over, testing switches.
 - `lib/level.dart`: a room (`World`) built from a Tiled map: collisions, spawners, tree, statue, camera bounds.
 - `lib/components/camera_follower.dart`: moves the camera itself (sets `viewfinder.position`; Flame's `follow`/`setBounds` are no longer used). Each `Level` adds its own and passes it the map limits.
@@ -67,7 +67,7 @@ A top-down survivor game built with Flutter + Flame (`flame`, `flame_tiled`, `fl
 
 ## Testing switches (in `SurvivorTest`, keep `false`/`0` when committing)
 
-`debugStartWithAllSeeds`, `debugAllEnemyTypesInLevel1`, `debugBossLevel` (1–4, 0 = off), `debugClearPersonalBests`. For faster statue tests, temporarily lower `soulsToCharge` in `lake_statue.dart`.
+`debugStartWithAllSeeds`, `debugAllEnemyTypesInLevel1`, `debugBossLevel` (1–4, 0 = off), `debugClearPersonalBests`, `debugClearPlayerName` (handled in `main()`). For faster statue tests, temporarily lower `soulsToCharge` in `lake_statue.dart`.
 
 ## Placeholders waiting for the user's art
 
@@ -94,7 +94,7 @@ A top-down survivor game built with Flutter + Flame (`flame`, `flame_tiled`, `fl
 **Then build:**
 1. Done: app ID changed to `com.hofele.monstersurvivors` (Android `applicationId` and iOS bundle ID; the Android `namespace` stays `com.example.survivor_test`). `flutterfire configure` was run for Firebase project `survivor-test-cd43b` (Android + iOS), giving `lib/firebase_options.dart` and `android/app/google-services.json`. Added `firebase_core`, `firebase_auth` and `cloud_firestore`, and `Firebase.initializeApp` in `main()`. Kotlin was raised to 2.4.10 (firebase_auth needs it), with `jvmTarget` moved to the `kotlin { compilerOptions }` block; the iOS deployment target is now 15.0. The Android debug build works. iOS hasn't been built yet (needs the Mac; the Podfile is created on the first build there and may need `platform :ios, '15.0'`).
 2. Done and tested: anonymous sign-in in the background via `OnlinePlayer` in `lib/data/online_player.dart` (`signIn()` is started unawaited in `main()`, and retried in `_onAppShown` when the app returns to the foreground while still signed out; use `ensureSignedIn()` before anything that needs `OnlinePlayer.id`). An account remembered on the device counts as signed in even offline; sign-in only needs the internet on the very first launch. The player's name (step 3) goes in this class too.
-3. One-time name entry, saved on the device.
+3. Done and tested: one-time name entry. `OnlinePlayer` has `name`, `loadName()` (awaited in `main()`), `saveName()`, `clearName()` and `nameProblem()` (3–12 characters, letters/digits/spaces/`-`/`_`). The window is in `lib/overlays/name_dialog.dart`; the start screen opens it on first launch (it can't be cancelled then) and via "Player: name ✎" (it can be cancelled there). Names don't have to be unique.
 4. Submit the score at game over: one document per player, keyed by user ID, only updated when higher.
 5. Security rules for the user to paste: only your own entry, plausible scores, limited name length.
 6. The screen: top 10 plus your own rank, with your entry highlighted.

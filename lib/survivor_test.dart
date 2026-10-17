@@ -35,6 +35,9 @@ class SurvivorTest extends FlameGame
   static const int debugBossLevel = 0;
   // Empties the personal best list every time the game starts
   static const bool debugClearPersonalBests = false;
+  // Forgets the leaderboard name every time the app starts, so the
+  // "choose your name" window shows again
+  static const bool debugClearPlayerName = false;
 
   int heartAmount = 0;
   int enemyCount = 0;

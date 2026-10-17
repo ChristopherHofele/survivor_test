@@ -4,7 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:survivor_test/actors/player.dart';
+import 'package:survivor_test/data/online_player.dart';
 import 'package:survivor_test/overlays/menu_colors.dart';
+import 'package:survivor_test/overlays/name_dialog.dart';
 
 import 'package:survivor_test/survivor_test.dart';
 
@@ -24,6 +26,26 @@ class _StartScreenState extends State<StartScreen> {
 
   bool get _characterChosen =>
       game.selectedCharacter != CharacterChoice.Undecided;
+
+  @override
+  void initState() {
+    super.initState();
+    // The very first time, ask for a name. A window can only open once the
+    // screen has been drawn, so wait for the end of the first frame.
+    if (OnlinePlayer.name == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _changeName(canCancel: false);
+      });
+    }
+  }
+
+  Future<void> _changeName({required bool canCancel}) async {
+    await showNameDialog(context, canCancel: canCancel);
+    // Redraw so the new name shows on the screen
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +68,16 @@ class _StartScreenState extends State<StartScreen> {
               const Text(
                 'Survivor Test',
                 style: TextStyle(color: whiteTextColor, fontSize: 30),
+              ),
+              // Tap to change the leaderboard name
+              TextButton.icon(
+                onPressed: () => _changeName(canCancel: true),
+                icon: const Icon(Icons.edit, color: whiteTextColor, size: 18),
+                iconAlignment: IconAlignment.end,
+                label: Text(
+                  'Player: ${OnlinePlayer.name ?? '-'}',
+                  style: const TextStyle(color: whiteTextColor, fontSize: 18),
+                ),
               ),
               const Text(
                 'Character Selection',

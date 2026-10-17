@@ -21,6 +21,12 @@ void main() async {
   // Signs the player in silently. `unawaited` means the game starts right
   // away instead of waiting for it (important without internet).
   unawaited(OnlinePlayer.signIn());
+  // The saved leaderboard name is needed by the start screen, so load it
+  // before the app starts (it's on the device, so this is quick)
+  if (SurvivorTest.debugClearPlayerName) {
+    await OnlinePlayer.clearName();
+  }
+  await OnlinePlayer.loadName();
   await Flame.device.fullScreen();
   await Flame.device.setLandscape();
   await SoLoud.instance.init(
@@ -105,16 +111,23 @@ class _GameAppState extends State<GameApp> {
 
   @override
   Widget build(BuildContext context) {
-    return GameWidget<SurvivorTest>.controlled(
-      key: _gameKey,
-      gameFactory: () => SurvivorTest(onReturnToMenu: _restart),
-      overlayBuilderMap: {
-        'StartScreen': (_, game) => StartScreen(game: game),
-        'GameOver': (_, game) => GameOver(game: game),
-        'PersonalBests': (_, game) => PersonalBestsScreen(game: game),
-        'GlobalLeaderboard': (_, game) => GlobalLeaderboard(game: game),
-      },
-      initialActiveOverlays: const ['StartScreen'],
+    // MaterialApp provides what Flutter's pop-up windows (like the name
+    // window) need: a place to open them on top of the game, and the
+    // built-in texts and labels in the phone's language
+    return MaterialApp(
+      // Hides the red "DEBUG" ribbon in the corner
+      debugShowCheckedModeBanner: false,
+      home: GameWidget<SurvivorTest>.controlled(
+        key: _gameKey,
+        gameFactory: () => SurvivorTest(onReturnToMenu: _restart),
+        overlayBuilderMap: {
+          'StartScreen': (_, game) => StartScreen(game: game),
+          'GameOver': (_, game) => GameOver(game: game),
+          'PersonalBests': (_, game) => PersonalBestsScreen(game: game),
+          'GlobalLeaderboard': (_, game) => GlobalLeaderboard(game: game),
+        },
+        initialActiveOverlays: const ['StartScreen'],
+      ),
     );
   }
 }
