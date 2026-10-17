@@ -1,0 +1,18 @@
+rules_version = '2';
+
+// Security rules for the Firestore database. These run on Firebase's
+// servers and check every read and write. Copy this whole file into
+// Firebase console -> Firestore Database -> Rules, then press Publish.
+//
+// First version (step 4): every signed-in player may read the board and
+// may only write their own entry. Stricter checks follow in step 5.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // The global leaderboard: one entry per player, named after their ID
+    match /leaderboard/{playerId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == playerId;
+    }
+  }
+}

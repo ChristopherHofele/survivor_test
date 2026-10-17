@@ -1,9 +1,14 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// The player's online identity for the global leaderboard: their player ID
-// and the name they chose.
+import 'package:survivor_test/data/personal_bests.dart';
+
+// The player's online identity for the global leaderboard: their player ID,
+// the name they chose, and sending their best score.
 // Players never log in themselves: the first time the game runs, Firebase
 // creates an anonymous account and remembers it on the device. Every later
 // start uses that same account again, so each phone keeps one player ID
@@ -34,11 +39,15 @@ class OnlinePlayer {
     _name = await _storage.getString(_nameStorageKey);
   }
 
-  // Saves a new name (removing spaces at the start and end). Only call this
-  // with a name that nameProblem() accepts.
+  // Saves a new name (removing spaces at the start and end) and also changes
+  // it on the global leaderboard. Only call this with a name that
+  // nameProblem() accepts. An unchanged name sends nothing.
   static Future<void> saveName(String newName) async {
-    _name = newName.trim();
-    await _storage.setString(_nameStorageKey, _name!);
+    final trimmed = newName.trim();
+    if (trimmed == _name) return;
+    _name = trimmed;
+    await _storage.setString(_nameStorageKey, trimmed);
+    unawaited(_renameLeaderboardEntry(trimmed));
   }
 
   // Forgets the saved name (used by a testing switch)
@@ -99,6 +108,77 @@ class OnlinePlayer {
     } catch (error) {
       debugPrint('Firebase sign-in failed: $error');
       return false;
+    }
+  }
+
+  // ---- Global leaderboard ----
+  // The Firestore list with one entry per player, named after their ID
+  static const String leaderboardCollection = 'leaderboard';
+  static CollectionReference<Map<String, dynamic>> get _leaderboard =>
+      FirebaseFirestore.instance.collection(leaderboardCollection);
+
+  // Sends the player's best score to the global leaderboard if it beats
+  // what's there (or if they have no entry yet). Pass the best entry of
+  // the personal bests, not just this run: that way a record from a time
+  // when sending wasn't possible still gets sent later.
+  // Never throws, so it can safely run in the background.
+  static Future<void> submitBest(ScoreEntry best) async {
+    try {
+      final playerName = _name;
+      if (playerName == null || !await ensureSignedIn()) return;
+      final entry = _leaderboard.doc(id);
+
+      // Look at the current entry first. Without internet, Firestore uses
+      // the last known copy on the device, or fails if it has none (then
+      // we send anyway).
+      int? onlineScore;
+      try {
+        final snapshot = await entry.get();
+        onlineScore = snapshot.data()?['score'] as int?;
+      } catch (_) {
+        onlineScore = null;
+      }
+      if (onlineScore != null && best.score <= onlineScore) return;
+
+      // Not awaited on purpose: without internet, Firestore keeps the write
+      // on the device and sends it as soon as there's a connection again,
+      // even after the game was closed in between
+      unawaited(
+        entry
+            .set({
+              'name': playerName,
+              'score': best.score,
+              'character': best.character.name,
+              'date': Timestamp.fromDate(best.date),
+              // The server fills in its own time (the rules use it later)
+              'updatedAt': FieldValue.serverTimestamp(),
+            })
+            .then((_) => debugPrint('Score ${best.score} sent to leaderboard'))
+            .catchError((Object error) {
+              debugPrint('Sending score failed: $error');
+            }),
+      );
+    } catch (error) {
+      debugPrint('Sending score failed: $error');
+    }
+  }
+
+  // Changes the name on the player's leaderboard entry, if they have one
+  static Future<void> _renameLeaderboardEntry(String newName) async {
+    try {
+      if (!await ensureSignedIn()) return;
+      // update() only changes an entry that already exists. Without an
+      // entry it fails, which is fine: the next score sent has the new name.
+      await _leaderboard.doc(id).update({
+        'name': newName,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      debugPrint('Leaderboard name changed to $newName');
+    } on FirebaseException catch (error) {
+      if (error.code == 'not-found') return;
+      debugPrint('Changing leaderboard name failed: $error');
+    } catch (error) {
+      debugPrint('Changing leaderboard name failed: $error');
     }
   }
 }

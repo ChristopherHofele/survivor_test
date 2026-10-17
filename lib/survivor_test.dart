@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
@@ -6,6 +8,7 @@ import 'package:flutter_soloud/flutter_soloud.dart';
 
 import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/components/items.dart';
+import 'package:survivor_test/data/online_player.dart';
 import 'package:survivor_test/data/personal_bests.dart';
 import 'package:survivor_test/components/screen_shake.dart';
 import 'package:survivor_test/overlays/attack_button.dart';
@@ -174,12 +177,18 @@ class SurvivorTest extends FlameGame
   Future<PersonalBestsResult>? personalBestsResult;
 
   void _recordPersonalBest() {
-    personalBestsResult = PersonalBests.add(
+    final result = PersonalBests.add(
       ScoreEntry(
         score: finalScore,
         date: DateTime.now(),
         character: player.characterChoice,
       ),
+    );
+    personalBestsResult = result;
+    // Then send the best score on this device to the global leaderboard
+    // (in the background; it only sends something if it's a new record)
+    unawaited(
+      result.then((saved) => OnlinePlayer.submitBest(saved.entries.first)),
     );
   }
 
