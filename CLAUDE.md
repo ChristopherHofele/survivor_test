@@ -91,8 +91,8 @@ A top-down survivor game built with Flutter + Flame (`flame`, `flame_tiled`, `fl
 
 **The user's part is done** (on the Windows machine): Firebase project created, Firestore database created in production mode, Anonymous sign-in enabled, Node.js + Firebase CLI + `flutterfire_cli` installed (Pub cache `bin` added to the user PATH), and `firebase login` done. On another machine, the tools and the login would need to be set up again.
 
-**Then build** (start with step 1 when the user says go):
-1. `flutterfire configure`, plus the packages `firebase_core`, `firebase_auth` and `cloud_firestore`, and initialise Firebase in `main()` (needs a full rebuild).
+**Then build:**
+1. Done: app ID changed to `com.hofele.monstersurvivors` (Android `applicationId` and iOS bundle ID; the Android `namespace` stays `com.example.survivor_test`). `flutterfire configure` was run for Firebase project `survivor-test-cd43b` (Android + iOS), giving `lib/firebase_options.dart` and `android/app/google-services.json`. Added `firebase_core`, `firebase_auth` and `cloud_firestore`, and `Firebase.initializeApp` in `main()`. Kotlin was raised to 2.4.10 (firebase_auth needs it), with `jvmTarget` moved to the `kotlin { compilerOptions }` block; the iOS deployment target is now 15.0. The Android debug build works. iOS hasn't been built yet (needs the Mac; the Podfile is created on the first build there and may need `platform :ios, '15.0'`).
 2. Anonymous sign-in in the background.
 3. One-time name entry, saved on the device.
 4. Submit the score at game over: one document per player, keyed by user ID, only updated when higher.

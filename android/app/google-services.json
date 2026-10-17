@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "50774943706",
+    "project_id": "survivor-test-cd43b",
+    "storage_bucket": "survivor-test-cd43b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:50774943706:android:ffb726b5d277d0f962c2e3",
+        "android_client_info": {
+          "package_name": "com.hofele.monstersurvivors"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKxqeK1Qho356KRpXCvBd_lUOvB4lXfN4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

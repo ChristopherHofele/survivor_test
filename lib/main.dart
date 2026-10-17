@@ -1,7 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
+import 'package:survivor_test/firebase_options.dart';
 import 'package:survivor_test/overlays/game_over.dart';
 import 'package:survivor_test/overlays/global_leaderboard.dart';
 import 'package:survivor_test/overlays/personal_bests_screen.dart';
@@ -10,6 +12,9 @@ import 'package:survivor_test/survivor_test.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Connects the app to our Firebase project (used by the global leaderboard).
+  // The settings for each platform are in firebase_options.dart.
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await Flame.device.fullScreen();
   await Flame.device.setLandscape();
   await SoLoud.instance.init(
