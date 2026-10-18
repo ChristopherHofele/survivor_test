@@ -62,16 +62,22 @@ class PersonalBests {
     return entries;
   }
 
-  // Adds a score, keeps only the best ones and saves the list
-  static Future<PersonalBestsResult> add(ScoreEntry newEntry) async {
+  // Adds a score, keeps only the best ones and saves the list.
+  // With save: false the list is only worked out, not saved (test runs).
+  static Future<PersonalBestsResult> add(
+    ScoreEntry newEntry, {
+    bool save = true,
+  }) async {
     final entries = await load();
     entries.add(newEntry);
     _sortBestFirst(entries);
     final kept = entries.take(maxEntries).toList();
-    await _storage.setStringList(
-      _storageKey,
-      kept.map((entry) => jsonEncode(entry.toJson())).toList(),
-    );
+    if (save) {
+      await _storage.setStringList(
+        _storageKey,
+        kept.map((entry) => jsonEncode(entry.toJson())).toList(),
+      );
+    }
     final place = kept.indexOf(newEntry);
     return PersonalBestsResult(
       entries: kept,

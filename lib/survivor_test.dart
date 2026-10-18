@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 
@@ -41,6 +42,14 @@ class SurvivorTest extends FlameGame
   // Forgets the leaderboard name every time the app starts, so the
   // "choose your name" window shows again
   static const bool debugClearPlayerName = false;
+
+  // True while a switch is on that makes runs easier or different from a
+  // normal game. Such runs are neither saved as a personal best nor sent to
+  // the global leaderboard, so no test score ever ends up online.
+  static bool get isTestRun =>
+      debugStartWithAllSeeds ||
+      debugAllEnemyTypesInLevel1 ||
+      debugBossLevel != 0;
 
   int heartAmount = 0;
   int enemyCount = 0;
@@ -183,8 +192,14 @@ class SurvivorTest extends FlameGame
         date: DateTime.now(),
         character: player.characterChoice,
       ),
+      // A test run still shows where it would have placed, but isn't saved
+      save: !isTestRun,
     );
     personalBestsResult = result;
+    if (isTestRun) {
+      debugPrint('Test run: score not saved and not sent to the leaderboard');
+      return;
+    }
     // Then send the best score on this device to the global leaderboard
     // (in the background; it only sends something if it's a new record)
     leaderboardSubmission = result.then(
@@ -194,7 +209,7 @@ class SurvivorTest extends FlameGame
 
   // Sending the score to the global leaderboard. The leaderboard screen
   // waits for it, so a new record already shows up there.
-  Future<void>? leaderboardSubmission;
+  Future<SubmitResult>? leaderboardSubmission;
 
   // Shakes the screen briefly. A new shake replaces one that's still running.
   void shakeScreen() {

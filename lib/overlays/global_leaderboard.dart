@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:survivor_test/data/leaderboard.dart';
+import 'package:survivor_test/data/online_player.dart';
 import 'package:survivor_test/overlays/menu_colors.dart';
 import 'package:survivor_test/survivor_test.dart';
 
@@ -33,13 +34,36 @@ class GlobalLeaderboard extends StatefulWidget {
 class _GlobalLeaderboardState extends State<GlobalLeaderboard> {
   SurvivorTest get game => widget.game;
 
-  // Started once when the screen opens (not on every redraw)
-  late final Future<LeaderboardResult> _result = _load();
+  // How long to wait for this run's score to be handed to Firestore
+  // before loading the board anyway
+  static const Duration submissionWaitLimit = Duration(seconds: 5);
 
-  Future<LeaderboardResult> _load() async {
-    // After a run: wait until this run's score has been handed to Firestore
-    await game.leaderboardSubmission;
+  // Started once when the screen opens (not on every redraw), and again
+  // with "Try again"
+  late Future<LeaderboardResult> _result = _loadAfterSubmission();
+
+  // What happened to this run's score (null from the start screen, or if
+  // sending took too long)
+  SubmitResult? _submitResult;
+
+  Future<LeaderboardResult> _loadAfterSubmission() async {
+    // After a run: wait until this run's score has been handed to
+    // Firestore, so a new record already shows
+    final submission = game.leaderboardSubmission;
+    if (submission != null) {
+      _submitResult = await submission.timeout(
+        submissionWaitLimit,
+        onTimeout: () => SubmitResult.couldNotSend,
+      );
+    }
     return Leaderboard.load();
+  }
+
+  void _tryAgain() {
+    // setState redraws the screen, which shows "Loading..." again
+    setState(() {
+      _result = Leaderboard.load();
+    });
   }
 
   @override
@@ -62,7 +86,13 @@ class _GlobalLeaderboardState extends State<GlobalLeaderboard> {
           child: FutureBuilder<LeaderboardResult>(
             future: _result,
             builder: (context, snapshot) {
-              final result = snapshot.data;
+              final isLoading =
+                  snapshot.connectionState == ConnectionState.waiting;
+              final result = isLoading ? null : snapshot.data;
+              final failed = !isLoading && snapshot.hasError;
+              final message = widget.fromStartScreen || isLoading
+                  ? null
+                  : _message(result, snapshot.error);
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -70,14 +100,41 @@ class _GlobalLeaderboardState extends State<GlobalLeaderboard> {
                     'Global Leaderboard',
                     style: TextStyle(color: whiteTextColor, fontSize: 28),
                   ),
-                  if (result != null && !widget.fromStartScreen) ...[
+                  if (message != null) ...[
                     const SizedBox(height: 4),
-                    _resultMessage(result),
+                    Text(
+                      message,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: GlobalLeaderboard.highlightColor,
+                        fontSize: 16,
+                      ),
+                    ),
                   ],
                   const SizedBox(height: 8),
-                  Flexible(child: _body(snapshot)),
+                  Flexible(
+                    child: isLoading
+                        ? const Text(
+                            'Loading...',
+                            style: TextStyle(color: whiteTextColor),
+                          )
+                        : failed
+                        ? _errorText(snapshot.error)
+                        : _board(result!),
+                  ),
                   const SizedBox(height: 10),
-                  _button(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (failed) ...[
+                        _button('Try again', _tryAgain),
+                        const SizedBox(width: 16),
+                      ],
+                      widget.fromStartScreen
+                          ? _button('Back', _backToStartScreen)
+                          : _button('Main Menu', game.onReturnToMenu),
+                    ],
+                  ),
                 ],
               );
             },
@@ -87,19 +144,23 @@ class _GlobalLeaderboardState extends State<GlobalLeaderboard> {
     );
   }
 
-  Widget _body(AsyncSnapshot<LeaderboardResult> snapshot) {
-    if (snapshot.hasError) {
-      // TODO: a clearer offline message comes in step 7
-      debugPrint('Loading the leaderboard failed: ${snapshot.error}');
-      return const Text(
-        "Couldn't load the leaderboard",
-        style: TextStyle(color: whiteTextColor),
-      );
+  // Why the board couldn't be shown
+  Widget _errorText(Object? error) {
+    final String text;
+    if (error is NoConnection) {
+      text = 'No connection – leaderboard unavailable';
+    } else {
+      debugPrint('Loading the leaderboard failed: $error');
+      text = "Couldn't load the leaderboard. Please try again later.";
     }
-    final result = snapshot.data;
-    if (result == null) {
-      return const Text('Loading...', style: TextStyle(color: whiteTextColor));
-    }
+    return Text(
+      text,
+      textAlign: TextAlign.center,
+      style: const TextStyle(color: whiteTextColor, fontSize: 18),
+    );
+  }
+
+  Widget _board(LeaderboardResult result) {
     if (result.top.isEmpty) {
       return const Text(
         'No scores yet',
@@ -121,19 +182,27 @@ class _GlobalLeaderboardState extends State<GlobalLeaderboard> {
     );
   }
 
-  // The line under the title: the player's place
-  Widget _resultMessage(LeaderboardResult result) {
-    final me = result.me;
-    final message = me == null
-        ? 'Not on the board yet'
-        : "You're #${me.rank} of ${result.playerCount} players!";
-    return Text(
-      message,
-      style: const TextStyle(
-        color: GlobalLeaderboard.highlightColor,
-        fontSize: 16,
-      ),
-    );
+  // The line under the title after a run: the player's place, or what
+  // happens to their score while offline (null = no line)
+  String? _message(LeaderboardResult? result, Object? error) {
+    if (result != null) {
+      final me = result.me;
+      return me == null
+          ? 'Not on the board yet'
+          : "You're #${me.rank} of ${result.playerCount} players!";
+    }
+    if (error is NoConnection) {
+      switch (_submitResult) {
+        case SubmitResult.sent:
+          return "Your new best will be sent once you're online";
+        case SubmitResult.couldNotSend:
+          return 'Your best will be sent after your next run with internet';
+        case SubmitResult.notNeeded:
+        case null:
+          return null;
+      }
+    }
+    return null;
   }
 
   // One line: place, name, character, score
@@ -162,21 +231,20 @@ class _GlobalLeaderboardState extends State<GlobalLeaderboard> {
     );
   }
 
-  // "Main Menu" after a run, "Back" from the start screen
-  Widget _button() {
+  void _backToStartScreen() {
+    game.overlays.remove(GlobalLeaderboard.overlayFromStartScreen);
+    game.overlays.add('StartScreen');
+  }
+
+  Widget _button(String label, VoidCallback onPressed) {
     return SizedBox(
       width: 200,
       height: 50,
       child: ElevatedButton(
-        onPressed: widget.fromStartScreen
-            ? () {
-                game.overlays.remove(GlobalLeaderboard.overlayFromStartScreen);
-                game.overlays.add('StartScreen');
-              }
-            : game.onReturnToMenu,
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(backgroundColor: whiteTextColor),
         child: Text(
-          widget.fromStartScreen ? 'Back' : 'Main Menu',
+          label,
           style: const TextStyle(fontSize: 22.0, color: blackTextColor),
         ),
       ),

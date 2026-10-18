@@ -125,11 +125,14 @@ class OnlinePlayer {
   // what's there (or if they have no entry yet). Pass the best entry of
   // the personal bests, not just this run: that way a record from a time
   // when sending wasn't possible still gets sent later.
-  // Never throws, so it can safely run in the background.
-  static Future<void> submitBest(ScoreEntry best) async {
+  // Never throws, so it can safely run in the background. Tells the
+  // leaderboard screen what happened (see SubmitResult).
+  static Future<SubmitResult> submitBest(ScoreEntry best) async {
     try {
       final playerName = _name;
-      if (playerName == null || !await ensureSignedIn()) return;
+      if (playerName == null || !await ensureSignedIn()) {
+        return SubmitResult.couldNotSend;
+      }
       final entry = _leaderboard.doc(id);
 
       // Look at the current entry first. Without internet, Firestore uses
@@ -142,7 +145,9 @@ class OnlinePlayer {
       } catch (_) {
         onlineScore = null;
       }
-      if (onlineScore != null && best.score <= onlineScore) return;
+      if (onlineScore != null && best.score <= onlineScore) {
+        return SubmitResult.notNeeded;
+      }
 
       // Not awaited on purpose: without internet, Firestore keeps the write
       // on the device and sends it as soon as there's a connection again,
@@ -162,8 +167,10 @@ class OnlinePlayer {
               debugPrint('Sending score failed: $error');
             }),
       );
+      return SubmitResult.sent;
     } catch (error) {
       debugPrint('Sending score failed: $error');
+      return SubmitResult.couldNotSend;
     }
   }
 
@@ -185,4 +192,16 @@ class OnlinePlayer {
       debugPrint('Changing leaderboard name failed: $error');
     }
   }
+}
+
+// What OnlinePlayer.submitBest did
+enum SubmitResult {
+  // A new best was handed to Firestore. Without internet it waits on the
+  // device and is sent automatically later.
+  sent,
+  // The board already has this score (or a better one)
+  notNeeded,
+  // Nothing could be sent (e.g. never signed in so far). The best score is
+  // still in the personal bests and gets sent at a later game over.
+  couldNotSend,
 }

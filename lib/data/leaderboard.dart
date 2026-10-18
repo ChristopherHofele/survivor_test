@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:survivor_test/actors/player.dart';
@@ -39,20 +41,46 @@ class LeaderboardResult {
   bool get meIsInTop => top.any((row) => row.isMe);
 }
 
+// Thrown by Leaderboard.load() when there's no (fast enough) connection
+class NoConnection implements Exception {
+  const NoConnection();
+  @override
+  String toString() => 'No connection';
+}
+
 class Leaderboard {
   // How many of the best players are shown
   static const int topCount = 10;
+  // How long loading may take before the screen says "No connection"
+  static const Duration timeLimit = Duration(seconds: 8);
 
   static CollectionReference<Map<String, dynamic>> get _entries =>
       FirebaseFirestore.instance.collection(
         OnlinePlayer.leaderboardCollection,
       );
 
-  // Loads the board. Throws if it can't be loaded (e.g. no connection);
-  // the screen shows a message then.
+  // Loads the board. Throws NoConnection without internet (or when it
+  // takes longer than timeLimit), or another error if something else went
+  // wrong; the screen shows a message then.
   static Future<LeaderboardResult> load() async {
+    try {
+      return await _load().timeout(timeLimit);
+    } on TimeoutException {
+      throw const NoConnection();
+    } on FirebaseException catch (error) {
+      // Firestore's names for "can't reach the server"
+      if (error.code == 'unavailable' || error.code == 'deadline-exceeded') {
+        throw const NoConnection();
+      }
+      rethrow;
+    }
+  }
+
+  static Future<LeaderboardResult> _load() async {
+    // Without a player ID the board can't be read. Signing in only fails
+    // without internet.
     if (!await OnlinePlayer.ensureSignedIn()) {
-      throw Exception('Not signed in');
+      throw const NoConnection();
     }
     final myId = OnlinePlayer.id;
 
@@ -61,6 +89,12 @@ class Leaderboard {
         .orderBy('score', descending: true)
         .limit(topCount)
         .get();
+    // Without internet, Firestore quietly answers with what it has saved on
+    // the device, which may be only a few entries (e.g. just the player's
+    // own). That would look like a real board, so treat it as offline.
+    if (topSnapshot.metadata.isFromCache) {
+      throw const NoConnection();
+    }
     final topDocs = topSnapshot.docs.toList()
       // Equal scores: whoever got there first comes first
       ..sort((a, b) {
@@ -85,6 +119,9 @@ class Leaderboard {
     }
     if (me == null && myId != null) {
       final myDoc = await _entries.doc(myId).get();
+      if (myDoc.metadata.isFromCache) {
+        throw const NoConnection();
+      }
       if (myDoc.exists) {
         // Counting doesn't load the entries, so this stays cheap
         final better = await _entries
