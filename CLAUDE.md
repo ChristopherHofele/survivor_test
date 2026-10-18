@@ -27,11 +27,14 @@ A top-down survivor game built with Flutter + Flame (`flame`, `flame_tiled`, `fl
 - `lib/components/`: items, trees, souls, statue, orb, zone, `Lob` (arc throw), `ScreenShake`, projectiles and attacks.
 - `lib/overlays/`: HUD pieces and the Flutter menu screens.
 - `lib/data/personal_bests.dart`: personal best list saved on the device.
+- `lib/data/online_player.dart`, `leaderboard.dart`, `blocked_names.dart`: the global leaderboard (player ID and name, sending scores, loading the board, the name filter). `firestore.rules` holds the server rules, which the user pastes into the Firebase console.
 - State that must survive changing rooms lives on the game or the player, because every door rebuilds the `Level`.
 
 ## Game design (built)
 
-**Characters.** Fire Guy, Melee Lad, Dash Man and Mine Fellow, picked on the start screen (Start stays disabled until one is chosen). Sprites and frame counts come from the `characterSprites` table in `player.dart`, with idle and walking animations; all three levels use the same art for now. `player.level` holds the upgrade level and `current` holds the animation.
+**Menus.** The start screen (`start_screen.dart`, overlay `StartScreen`) is the main menu: title, "Player: name ✎", Play, Leaderboard and Exit (Android/desktop only). Play opens `character_select_screen.dart` (overlay `CharacterSelect`), with Start and Back. It was split out because the menu overflowed the phone screen.
+
+**Characters.** Fire Guy, Melee Lad, Dash Man and Mine Fellow, picked on the character selection screen (Start stays disabled until one is chosen). Sprites and frame counts come from the `characterSprites` table in `player.dart`, with idle and walking animations; all three levels use the same art for now. `player.level` holds the upgrade level and `current` holds the animation.
 
 **Seeds and fruit (upgrades).**
 - Each upgrade room (Health, Stamina, Damage) has a special tree: a 32×32 `Tree` object in its `Collisions` layer.
@@ -63,7 +66,7 @@ A top-down survivor game built with Flutter + Flame (`flame`, `flame_tiled`, `fl
 - Score: +10 per kill, +1000 × boss level, +1 per second, −25 per hit, never below 0. The constants are on `SurvivorTest`.
 - Game Over reveals the stats one by one, then shows "Continue".
 - Personal Bests: the top 10 with score, character and date (day/month/year), with this run highlighted.
-- Global Leaderboard: still a placeholder, with the "Main Menu" button.
+- Global Leaderboard: the real board (see step 6 below), also reachable from the main menu.
 
 ## Testing switches (in `SurvivorTest`, keep `false`/`0` when committing)
 
@@ -98,7 +101,7 @@ A top-down survivor game built with Flutter + Flame (`flame`, `flame_tiled`, `fl
 4. Done and tested: `OnlinePlayer.submitBest()` runs after the personal best is saved at game over and is passed the **top personal best** (so a record that couldn't be sent gets sent later). It reads the player's entry in `leaderboard/{uid}` first (falling back to the device cache offline) and only `set`s when the score is higher or there's no entry. The write isn't awaited, so Firestore's offline queue delivers it later. Fields: `name`, `score`, `character`, `date` (the run's date), `updatedAt` (server timestamp). `saveName()` also `update`s the entry's name (only if the name changed; `not-found` is ignored). There's no local "last score sent" on purpose: deleting entries in the console must not stop resubmission. The user will delete test entries in the console by hand (no testing switch until step 8). The first version of the rules is in `firestore.rules` (the user pastes it into the console): read when signed in, write only your own entry.
 5. Done and tested: stricter rules in `firestore.rules`. Exactly the 5 fields; name regex matching `nameProblem`; integer score 0–1,000,000; one of the four character names; `date` no more than 1 day in the future; `updatedAt == request.time`. Updates only for a higher score or a name-only change (`diff().affectedKeys().hasOnly(['name','updatedAt'])`), and at most once every 10 s. No deletes. Tested with 44 cases in the local Firestore emulator (Java from Android Studio's `jbr`, `@firebase/rules-unit-testing`, run from a scratch folder, not the repo). Known trade-off: a name change within 10 s of a record is rejected (the name stays saved locally and goes online with the next record).
 5b. Done and tested: a blocked-names list (English + German) in `lib/data/blocked_names.dart` (`BlockedNames.anywhere` / `wholeWordOnly`, plain Dart with no imports), checked in `nameProblem`. **The rules' `isBlockedName` is generated from it** by `dart run tool/update_blocked_names_rules.dart`, which rewrites the block between the `BEGIN/END BLOCKED NAMES` markers in `firestore.rules`; never edit that block by hand. Cleaning before the check: lowercase, accents removed, digits 0/1/3/4/5/7 → o/i/e/a/s/t; each letter in the patterns is `x+`, so repeated letters still match (RE2 in the rules has no backreferences). "Anywhere" words are checked on the name without spaces/`-`/`_`; whole words are checked per word and against the whole compacted name. Tested with 76 names (blocked and harmless) in both Dart and the emulator. The start screen asks again for a name if the saved one is no longer allowed. The user doesn't want existing names hidden on the board, and is fine seeing the list.
-6. The screen: top 10 plus your own rank, with your entry highlighted.
+6. Done and tested: `lib/data/leaderboard.dart` (`Leaderboard.load()` → `LeaderboardResult` with `top`, `me`, `playerCount`). It reads the top 10 (`orderBy score desc, limit 10`, ties sorted by `date` on the device), the own entry, its place via `count()` of higher scores, and the total via `count()`. Equal scores share a place. `lib/overlays/global_leaderboard.dart` shows place, name, character and score (no date, as the user decided), highlights the own entry in amber, and adds it below "···" if it's outside the top 10. After a run the message line says "You're #N of M players!" (or "Not on the board yet"), with a "Main Menu" button. From the start screen's new "Leaderboard" button (overlay `GlobalLeaderboardFromMenu`) there's no message line and the button is "Back". The screen first awaits `game.leaderboardSubmission` (set in `_recordPersonalBest`) so a new record already shows. On errors it shows a simple "Couldn't load the leaderboard" (TODO for step 7).
 7. A clear message when offline.
 8. A testing switch that writes to a separate test collection.
 

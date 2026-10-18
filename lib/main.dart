@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:survivor_test/data/online_player.dart';
 import 'package:survivor_test/firebase_options.dart';
+import 'package:survivor_test/overlays/character_select_screen.dart';
 import 'package:survivor_test/overlays/game_over.dart';
 import 'package:survivor_test/overlays/global_leaderboard.dart';
 import 'package:survivor_test/overlays/personal_bests_screen.dart';
@@ -122,9 +123,14 @@ class _GameAppState extends State<GameApp> {
         gameFactory: () => SurvivorTest(onReturnToMenu: _restart),
         overlayBuilderMap: {
           'StartScreen': (_, game) => StartScreen(game: game),
+          CharacterSelectScreen.overlayName: (_, game) =>
+              CharacterSelectScreen(game: game),
           'GameOver': (_, game) => GameOver(game: game),
           'PersonalBests': (_, game) => PersonalBestsScreen(game: game),
-          'GlobalLeaderboard': (_, game) => GlobalLeaderboard(game: game),
+          GlobalLeaderboard.overlayAfterGame: (_, game) =>
+              GlobalLeaderboard(game: game),
+          GlobalLeaderboard.overlayFromStartScreen: (_, game) =>
+              GlobalLeaderboard(game: game, fromStartScreen: true),
         },
         initialActiveOverlays: const ['StartScreen'],
       ),

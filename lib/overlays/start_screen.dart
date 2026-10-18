@@ -3,15 +3,16 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/data/online_player.dart';
+import 'package:survivor_test/overlays/character_select_screen.dart';
+import 'package:survivor_test/overlays/global_leaderboard.dart';
 import 'package:survivor_test/overlays/menu_colors.dart';
 import 'package:survivor_test/overlays/name_dialog.dart';
 
 import 'package:survivor_test/survivor_test.dart';
 
-const selectedColor = Colors.amber;
-
+// The main menu: the player's name, Play (goes to the character selection),
+// Leaderboard and Exit
 class StartScreen extends StatefulWidget {
   final SurvivorTest game;
 
@@ -23,9 +24,6 @@ class StartScreen extends StatefulWidget {
 
 class _StartScreenState extends State<StartScreen> {
   SurvivorTest get game => widget.game;
-
-  bool get _characterChosen =>
-      game.selectedCharacter != CharacterChoice.Undecided;
 
   @override
   void initState() {
@@ -54,17 +52,14 @@ class _StartScreenState extends State<StartScreen> {
   Widget build(BuildContext context) {
 
     return Material(
-      color: Colors.transparent,
-      elevation: 100,
-      child: Center(
+      // Black over the whole screen, so none of the game shows at the edges
+      color: blackTextColor,
+      // Keeps the buttons away from a camera notch or rounded corners
+      child: SafeArea(
         child: Container(
           padding: const EdgeInsets.all(10.0),
-          height: 540,
-          width: 900,
-          decoration: const BoxDecoration(
-            color: blackTextColor,
-            borderRadius: const BorderRadius.all(Radius.circular(20)),
-          ),
+          width: double.infinity,
+          height: double.infinity,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -82,44 +77,39 @@ class _StartScreenState extends State<StartScreen> {
                   style: const TextStyle(color: whiteTextColor, fontSize: 18),
                 ),
               ),
-              const Text(
-                'Character Selection',
-                style: TextStyle(color: whiteTextColor, fontSize: 24),
-              ),
               const SizedBox(height: 20),
               SizedBox(
+                width: 200,
                 height: 75,
-                width: 900,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _characterButton('Fire Guy', CharacterChoice.FireGuy),
-                    _characterButton('Melee Lad', CharacterChoice.MeleeLad),
-                    _characterButton('Dash Man', CharacterChoice.DashMan),
-                    _characterButton('Mine Fellow', CharacterChoice.MineFellow),
-                  ],
+                child: ElevatedButton(
+                  onPressed: () {
+                    game.overlays.remove('StartScreen');
+                    game.overlays.add(CharacterSelectScreen.overlayName);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: whiteTextColor,
+                  ),
+                  child: const Text(
+                    'Play',
+                    style: TextStyle(fontSize: 40.0, color: blackTextColor),
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
               SizedBox(
                 width: 200,
-                height: 75,
+                height: 50,
                 child: ElevatedButton(
-                  // A null onPressed disables the button until a character
-                  // has been chosen
-                  onPressed: _characterChosen
-                      ? () {
-                          game.startGame = true;
-                          game.overlays.remove('StartScreen');
-                        }
-                      : null,
+                  onPressed: () {
+                    game.overlays.remove('StartScreen');
+                    game.overlays.add(GlobalLeaderboard.overlayFromStartScreen);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: whiteTextColor,
-                    disabledBackgroundColor: Colors.grey.shade700,
                   ),
                   child: const Text(
-                    'Start',
-                    style: TextStyle(fontSize: 40.0, color: blackTextColor),
+                    'Leaderboard',
+                    style: TextStyle(fontSize: 24.0, color: blackTextColor),
                   ),
                 ),
               ),
@@ -143,25 +133,6 @@ class _StartScreenState extends State<StartScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _characterButton(String label, CharacterChoice choice) {
-    final isSelected = game.selectedCharacter == choice;
-    return ElevatedButton(
-      onPressed: () {
-        // setState redraws the screen so the highlight and Start button update
-        setState(() {
-          game.selectedCharacter = choice;
-        });
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected ? selectedColor : whiteTextColor,
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 20.0, color: blackTextColor),
       ),
     );
   }

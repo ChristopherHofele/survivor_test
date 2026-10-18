@@ -187,10 +187,14 @@ class SurvivorTest extends FlameGame
     personalBestsResult = result;
     // Then send the best score on this device to the global leaderboard
     // (in the background; it only sends something if it's a new record)
-    unawaited(
-      result.then((saved) => OnlinePlayer.submitBest(saved.entries.first)),
+    leaderboardSubmission = result.then(
+      (saved) => OnlinePlayer.submitBest(saved.entries.first),
     );
   }
+
+  // Sending the score to the global leaderboard. The leaderboard screen
+  // waits for it, so a new record already shows up there.
+  Future<void>? leaderboardSubmission;
 
   // Shakes the screen briefly. A new shake replaces one that's still running.
   void shakeScreen() {
