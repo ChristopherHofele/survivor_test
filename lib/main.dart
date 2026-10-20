@@ -6,6 +6,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:survivor_test/data/online_player.dart';
+import 'package:survivor_test/data/unlocks.dart';
 import 'package:survivor_test/firebase_options.dart';
 import 'package:survivor_test/overlays/character_select_screen.dart';
 import 'package:survivor_test/overlays/game_over.dart';
@@ -28,6 +29,11 @@ void main() async {
     await OnlinePlayer.clearName();
   }
   await OnlinePlayer.loadName();
+  // Which characters are unlocked (needed by the character selection)
+  if (SurvivorTest.debugResetUnlocks) {
+    await Unlocks.reset();
+  }
+  await Unlocks.load();
   await Flame.device.fullScreen();
   await Flame.device.setLandscape();
   await SoLoud.instance.init(

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:survivor_test/actors/player.dart';
+import 'package:survivor_test/data/unlocks.dart';
 import 'package:survivor_test/overlays/menu_colors.dart';
 import 'package:survivor_test/survivor_test.dart';
 
 // Opened with "Play" on the start screen: pick a character, then Start.
+// Locked characters are greyed out with what unlocks them underneath.
 class CharacterSelectScreen extends StatefulWidget {
   final SurvivorTest game;
   const CharacterSelectScreen({super.key, required this.game});
@@ -24,6 +26,19 @@ class _CharacterSelectScreenState extends State<CharacterSelectScreen> {
 
   bool get _characterChosen =>
       game.selectedCharacter != CharacterChoice.Undecided;
+
+  bool _isUnlocked(CharacterChoice character) =>
+      SurvivorTest.debugUnlockAllCharacters || Unlocks.isUnlocked(character);
+
+  @override
+  void initState() {
+    super.initState();
+    // Start with the character played last time, or the starting character
+    if (game.selectedCharacter == CharacterChoice.Undecided) {
+      game.selectedCharacter =
+          Unlocks.lastCharacter ?? Unlocks.startingCharacter;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,10 +60,11 @@ class _CharacterSelectScreenState extends State<CharacterSelectScreen> {
               ),
               const SizedBox(height: 20),
               SizedBox(
-                height: 75,
+                height: 100,
                 width: 900,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _characterButton('Fire Guy', CharacterChoice.FireGuy),
                     _characterButton('Melee Lad', CharacterChoice.MeleeLad),
@@ -66,6 +82,7 @@ class _CharacterSelectScreenState extends State<CharacterSelectScreen> {
                   // has been chosen
                   onPressed: _characterChosen
                       ? () {
+                          Unlocks.saveLastCharacter(game.selectedCharacter);
                           game.startGame = true;
                           game.overlays.remove(CharacterSelectScreen.overlayName);
                         }
@@ -105,24 +122,49 @@ class _CharacterSelectScreenState extends State<CharacterSelectScreen> {
     );
   }
 
+  // A character's button, with what unlocks it underneath while locked
   Widget _characterButton(String label, CharacterChoice choice) {
     final isSelected = game.selectedCharacter == choice;
-    return ElevatedButton(
-      onPressed: () {
-        // setState redraws the screen so the highlight and Start button update
-        setState(() {
-          game.selectedCharacter = choice;
-        });
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected
-            ? CharacterSelectScreen.selectedColor
-            : whiteTextColor,
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 20.0, color: blackTextColor),
-      ),
+    final isUnlocked = _isUnlocked(choice);
+    final milestone = Unlocks.milestones[choice];
+    return Column(
+      children: [
+        ElevatedButton.icon(
+          // A null onPressed greys the button out: locked characters can't
+          // be chosen
+          onPressed: isUnlocked
+              ? () {
+                  // setState redraws the screen so the highlight updates
+                  setState(() {
+                    game.selectedCharacter = choice;
+                  });
+                }
+              : null,
+          icon: isUnlocked
+              ? null
+              : Icon(Icons.lock, size: 18, color: Colors.grey.shade400),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: isSelected
+                ? CharacterSelectScreen.selectedColor
+                : whiteTextColor,
+            disabledBackgroundColor: Colors.grey.shade700,
+          ),
+          label: Text(
+            label,
+            style: TextStyle(
+              fontSize: 20.0,
+              color: isUnlocked ? blackTextColor : Colors.grey.shade400,
+            ),
+          ),
+        ),
+        if (!isUnlocked && milestone != null) ...[
+          const SizedBox(height: 6),
+          Text(
+            milestone.hint(Unlocks.totalKills),
+            style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+          ),
+        ],
+      ],
     );
   }
 }

@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/overlays/menu_colors.dart';
 import 'package:survivor_test/survivor_test.dart';
 
 // Shows the run's stats one after another with the points each one gives,
-// then the final score, then a button that leads to the leaderboard.
+// then the final score, any characters unlocked in this run, then a button
+// that leads to the leaderboard.
 class GameOver extends StatefulWidget {
   final SurvivorTest game;
   const GameOver({super.key, required this.game});
@@ -18,18 +20,28 @@ class GameOver extends StatefulWidget {
 class _GameOverState extends State<GameOver> {
   // Time between one line appearing and the next
   static const Duration revealInterval = Duration(milliseconds: 600);
+  // The colour of the "New character unlocked" line
+  static const unlockColor = Colors.amber;
 
-  // How much is visible so far: 1-4 = stat lines, 5 = score, 6 = button
+  // How much is visible so far: 1-4 = stat lines, 5 = score,
+  // 6 = unlocked characters (only if there are any), then the button
   int _revealed = 0;
   static const int _scoreStep = 5;
-  static const int _buttonStep = 6;
+  static const int _unlockStep = 6;
+  int get _buttonStep => _unlocked.isEmpty ? _unlockStep : _unlockStep + 1;
   late final Timer _revealTimer;
+
+  // Characters unlocked in this run (checking takes a moment)
+  List<CharacterChoice> _unlocked = [];
 
   SurvivorTest get game => widget.game;
 
   @override
   void initState() {
     super.initState();
+    game.newlyUnlocked?.then((unlocked) {
+      if (mounted) setState(() => _unlocked = unlocked);
+    });
     _revealTimer = Timer.periodic(revealInterval, (timer) {
       setState(() => _revealed += 1);
       if (_revealed >= _buttonStep) {
@@ -111,6 +123,8 @@ class _GameOverState extends State<GameOver> {
                   ],
                 ),
               ),
+              if (_unlocked.isNotEmpty)
+                _appear(_unlockStep, _unlockLines()),
               const SizedBox(height: 12),
               _appear(
                 _buttonStep,
@@ -135,6 +149,30 @@ class _GameOverState extends State<GameOver> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // One line for all new characters, e.g. "New character unlocked: Melee
+  // Lad!" or "New characters unlocked: Melee Lad and Dash Man!"
+  Widget _unlockLines() {
+    final names = [
+      for (final character in _unlocked) characterNames[character]!,
+    ];
+    final list = names.length == 1
+        ? names.first
+        : '${names.sublist(0, names.length - 1).join(', ')} and ${names.last}';
+    final heading = names.length == 1
+        ? 'New character unlocked'
+        : 'New characters unlocked';
+    // Test runs don't save unlocks, so say so
+    final note = SurvivorTest.isTestRun ? ' (test run – not saved)' : '';
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Text(
+        '$heading: $list!$note',
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: unlockColor, fontSize: 18),
       ),
     );
   }

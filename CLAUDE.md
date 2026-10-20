@@ -36,11 +36,21 @@ A top-down survivor game built with Flutter + Flame (`flame`, `flame_tiled`, `fl
 
 **Characters.** Fire Guy, Melee Lad, Dash Man and Mine Fellow, picked on the character selection screen (Start stays disabled until one is chosen). Sprites and frame counts come from the `characterSprites` table in `player.dart`, with idle and walking animations; all three levels use the same art for now. `player.level` holds the upgrade level and `current` holds the animation.
 
+**Character unlocks** (done and tested). `lib/data/unlocks.dart` saves the unlocked characters, the enemy total across runs and the last character played on the device. The `milestones` table there (tuning constants at the top):
+- Fire Guy: from the start.
+- Melee Lad: defeat the boss.
+- Dash Man: 500 enemies in total across all runs; the hint shows progress, e.g. "(213/500)".
+- Mine Fellow: a **secret** milestone (hint "???"). Eat the same kind of fruit (apple, banana or cherry; not the strawberry) twice within one stretch of a run. A stretch runs from the start to the first boss, between two bosses, or after the last boss. Tracked in `game.fruitsSinceLastBoss` (filled by `game.fruitEaten`, cleared in `game.bossDefeated`) and `game.ateSameFruitTwice`.
+- "Defeat the level 3 boss" is kept for a possible fifth character.
+
+During the run, `game.checkUnlocks()` runs after every kill (`game.enemyKilled()`), boss defeat (`game.bossDefeated()`) and fruit (`game.fruitEaten()`). It uses the instant `Unlocks.newlyReached()`, saves right away with `Unlocks.unlock()`, remembers what was announced in `game.unlockedThisRun`, and shows an `UnlockBanner` (`lib/overlays/unlock_banner.dart`, top centre below the seeds, slides in, 3 s, one at a time from `_bannerQueue`). At game over, `Unlocks.finishRun()` checks once more and adds the run's kills to the total. The Game Over screen lists everything unlocked in the run ("New character unlocked: …!") before the Continue button. Test runs show unlocks with "(test run – not saved)" but don't save them or the kills. The character selection greys out locked characters (lock icon, hint underneath) and preselects the last character played (or Fire Guy).
+
 **Seeds and fruit (upgrades).**
 - Each upgrade room (Health, Stamina, Damage) has a special tree: a 32×32 `Tree` object in its `Collisions` layer.
 - Enemies killed within a quarter of the room's width send a soul to the tree instead of dropping a cookie. 10 souls drop the room's seed (Apple, Banana or Cherry) at the room's `*_Shop` object.
 - You can't leave a room without its seed, and a room's door stays closed while you carry its seed. You can carry one of each kind; they show on the HUD.
 - Touching the lake in Level 1 (any `DropOff` rectangle in the `Statue` layer) plants all carried seeds. The statue throws the matching fruit to the `Gift` point. Fruit gives the upgrade and +5 money, and upgrades stack.
+- The boss's strawberry resets only the attack cooldown (from cherries). Apples and bananas stay, which is intended.
 
 **Statue key event.**
 - Planting one seed of each kind activates the statue, and Level 1 is locked until the key is picked up.
@@ -70,7 +80,7 @@ A top-down survivor game built with Flutter + Flame (`flame`, `flame_tiled`, `fl
 
 ## Testing switches (in `SurvivorTest`, keep `false`/`0` when committing)
 
-`debugStartWithAllSeeds`, `debugAllEnemyTypesInLevel1`, `debugBossLevel` (1–4, 0 = off), `debugClearPersonalBests`, `debugClearPlayerName` (handled in `main()`). Runs with any of the first three on are test runs (`isTestRun`): not saved, not sent online. For faster statue tests, temporarily lower `soulsToCharge` in `lake_statue.dart`.
+`debugStartWithAllSeeds`, `debugAllEnemyTypesInLevel1`, `debugBossLevel` (1–4, 0 = off), `debugClearPersonalBests`, `debugClearPlayerName` (handled in `main()`), `debugUnlockAllCharacters` (nothing saved), `debugResetUnlocks` (handled in `main()`). Runs with any of the first three on are test runs (`isTestRun`): not saved, not sent online. For faster statue tests, temporarily lower `soulsToCharge` in `lake_statue.dart`.
 
 ## Placeholders waiting for the user's art
 

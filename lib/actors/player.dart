@@ -419,13 +419,16 @@ class Player extends SpriteAnimationGroupComponent<PlayerAnimation>
               break;
             case ItemType.Apple:
               maxHealth += 100;
+              game.fruitEaten(item.type);
               await SoLoud.instance.play(eatFruitSound);
             case ItemType.Bananas:
               staminaDrain -= 10;
+              game.fruitEaten(item.type);
               await SoLoud.instance.play(eatFruitSound);
             case ItemType.Cherries:
               maxAttackCooldown = maxAttackCooldown * 0.5;
               projectileMaximumHits += 1;
+              game.fruitEaten(item.type);
               await SoLoud.instance.play(eatFruitSound);
             case ItemType.Strawberry:
               _packAPunch();

@@ -687,7 +687,7 @@ class BasicEnemy extends SpriteAnimationComponent
       }
       game.enemyCount -= 1;
       game.world1.enemiesDefeated += 1;
-      game.enemiesKilled += 1;
+      game.enemyKilled();
       final collector = game.world1.soulCollector;
       if (isCharged && game.world1.statue != null) {
         // A charged enemy in Level 1 always drops the key to the boss room

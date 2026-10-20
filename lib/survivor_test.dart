@@ -11,6 +11,7 @@ import 'package:survivor_test/actors/player.dart';
 import 'package:survivor_test/components/items.dart';
 import 'package:survivor_test/data/online_player.dart';
 import 'package:survivor_test/data/personal_bests.dart';
+import 'package:survivor_test/data/unlocks.dart';
 import 'package:survivor_test/components/screen_shake.dart';
 import 'package:survivor_test/overlays/attack_button.dart';
 import 'package:survivor_test/overlays/dash_button.dart';
@@ -18,6 +19,7 @@ import 'package:survivor_test/overlays/health_display.dart';
 import 'package:survivor_test/level.dart';
 import 'package:survivor_test/overlays/money_display.dart';
 import 'package:survivor_test/overlays/seed_display.dart';
+import 'package:survivor_test/overlays/unlock_banner.dart';
 
 class SurvivorTest extends FlameGame
     with DragCallbacks, HasCollisionDetection, TapCallbacks {
@@ -42,6 +44,12 @@ class SurvivorTest extends FlameGame
   // Forgets the leaderboard name every time the app starts, so the
   // "choose your name" window shows again
   static const bool debugClearPlayerName = false;
+  // All characters can be chosen (nothing is saved, turning it off brings
+  // the locks back)
+  static const bool debugUnlockAllCharacters = false;
+  // Forgets all unlocked characters and the enemy total every time the app
+  // starts, so the milestones can be played through again
+  static const bool debugResetUnlocks = false;
 
   // True while a switch is on that makes runs easier or different from a
   // normal game. Such runs are neither saved as a personal best nor sent to
@@ -66,6 +74,87 @@ class SurvivorTest extends FlameGame
   // The level of every boss defeated in this run, e.g. [1, 2]
   final List<int> defeatedBossLevels = [];
   int get bossesDefeated => defeatedBossLevels.length;
+
+  // ---- Character unlocks ----
+  // How many of each fruit were eaten since the last boss (or the start)
+  final Map<ItemType, int> fruitsSinceLastBoss = {};
+  // True once the same fruit was eaten twice before a boss (Mine Fellow)
+  bool ateSameFruitTwice = false;
+  // Characters unlocked during this run and already announced with a
+  // banner
+  final Set<CharacterChoice> unlockedThisRun = {};
+  // All characters unlocked in this run (shown on the game over screen)
+  Future<List<CharacterChoice>>? newlyUnlocked;
+  // Banner texts waiting to be shown (one banner at a time)
+  final List<String> _bannerQueue = [];
+  bool _bannerShowing = false;
+
+  RunProgress get runProgress => RunProgress(
+    bossesDefeated: bossesDefeated,
+    enemiesKilled: enemiesKilled,
+    ateSameFruitTwice: ateSameFruitTwice,
+  );
+
+  // Called by the player when they eat an apple, banana or cherry
+  void fruitEaten(ItemType fruit) {
+    final count = (fruitsSinceLastBoss[fruit] ?? 0) + 1;
+    fruitsSinceLastBoss[fruit] = count;
+    if (count >= 2) {
+      ateSameFruitTwice = true;
+    }
+    checkUnlocks();
+  }
+
+  // Called by the boss when it dies
+  void bossDefeated(int bossLevel) {
+    defeatedBossLevels.add(bossLevel);
+    // A new stretch begins: fruits eaten before this boss don't count
+    fruitsSinceLastBoss.clear();
+    checkUnlocks();
+  }
+
+  // Called by enemies when they die
+  void enemyKilled() {
+    enemiesKilled += 1;
+    checkUnlocks();
+  }
+
+  // Checks the milestones right now and announces new characters with a
+  // banner. They're saved immediately, so they're kept even if the app is
+  // closed during the run (test runs only show them).
+  void checkUnlocks() {
+    final reached = Unlocks.newlyReached(
+      runProgress,
+      alreadyAnnounced: unlockedThisRun,
+    );
+    if (reached.isEmpty) return;
+    unlockedThisRun.addAll(reached);
+    if (!isTestRun) {
+      unawaited(Unlocks.unlock(reached));
+    }
+    for (final character in reached) {
+      final note = isTestRun ? ' (test run)' : '';
+      _bannerQueue.add(
+        'New character unlocked: ${characterNames[character]}!$note',
+      );
+    }
+    _showNextBanner();
+  }
+
+  void _showNextBanner() {
+    // After game over the game is paused, so no new banners
+    if (_bannerShowing || _bannerQueue.isEmpty || isGameOver) return;
+    _bannerShowing = true;
+    camera.viewport.add(
+      UnlockBanner(
+        text: _bannerQueue.removeAt(0),
+        onFinished: () {
+          _bannerShowing = false;
+          _showNextBanner();
+        },
+      ),
+    );
+  }
 
   // ---- Score: points per stat (shown on the game over screen) ----
   static const int pointsPerKill = 10;
@@ -178,6 +267,14 @@ class SurvivorTest extends FlameGame
     SoLoud.instance.disposeAllSources();
     pauseEngine();
     _recordPersonalBest();
+    // A last check (test runs show unlocks but don't save them). The game
+    // over screen lists everything unlocked in this run.
+    final announced = unlockedThisRun.toList();
+    newlyUnlocked = Unlocks.finishRun(
+      runProgress,
+      save: !isTestRun,
+      alreadyAnnounced: unlockedThisRun,
+    ).then((lastOnes) => [...announced, ...lastOnes]);
     overlays.add('GameOver');
   }
 
