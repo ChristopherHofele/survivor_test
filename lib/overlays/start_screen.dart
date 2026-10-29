@@ -64,7 +64,7 @@ class _StartScreenState extends State<StartScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                'Survivor Test',
+                'Vegetable Survivors',
                 style: TextStyle(color: whiteTextColor, fontSize: 30),
               ),
               // Tap to change the leaderboard name

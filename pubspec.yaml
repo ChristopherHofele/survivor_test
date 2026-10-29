@@ -1,8 +1,12 @@
 name: survivor_test
-description: "A new Flutter project."
+description: "Vegetable Survivors - a top-down survivor game."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The version players see (1.0.0) and the build number after the +.
+# The build number must go up with every upload to the Play Store.
+version: 1.0.0+1
 
 environment:
   sdk: ^3.10.4
@@ -33,3 +37,15 @@ flutter:
     - assets/images/Traps/Saw/
     - assets/audio/
     - assets/tiles/
+
+dev_dependencies:
+  # Only used on the computer: creates the app icon in all sizes
+  flutter_launcher_icons: ^0.14.4
+
+# Settings for the app icon. After replacing assets/icon/icon.png, run
+#     dart run flutter_launcher_icons
+# PLACEHOLDER: assets/icon/icon.png is a stand-in until the real icon exists
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/icon.png"

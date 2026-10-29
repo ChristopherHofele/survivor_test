@@ -51,18 +51,17 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAKxqeK1Qho356KRpXCvBd_lUOvB4lXfN4',
-    appId: '1:50774943706:android:ffb726b5d277d0f962c2e3',
+    appId: '1:50774943706:android:73f31751b91345de62c2e3',
     messagingSenderId: '50774943706',
     projectId: 'survivor-test-cd43b',
     storageBucket: 'survivor-test-cd43b.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyASQwZO50-ndwhKQ1MZPSCg54cNsBl1oqA',
-    appId: '1:50774943706:ios:e8fc98d4e1338fcb62c2e3',
+    appId: '1:50774943706:ios:21e717e6d95a685c62c2e3',
     messagingSenderId: '50774943706',
     projectId: 'survivor-test-cd43b',
     storageBucket: 'survivor-test-cd43b.firebasestorage.app',
-    iosBundleId: 'com.hofele.monstersurvivors',
+    iosBundleId: 'com.hofele.vegetablesurvivors',
   );
 }

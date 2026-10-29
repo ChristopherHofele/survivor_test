@@ -122,6 +122,8 @@ class _GameAppState extends State<GameApp> {
     // window) need: a place to open them on top of the game, and the
     // built-in texts and labels in the phone's language
     return MaterialApp(
+      // The name Android shows in the list of recent apps
+      title: 'Vegetable Survivors',
       // Hides the red "DEBUG" ribbon in the corner
       debugShowCheckedModeBanner: false,
       home: GameWidget<SurvivorTest>.controlled(
